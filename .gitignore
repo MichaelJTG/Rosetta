@@ -1,0 +1,93 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# uv
+.venv/
+venv/
+ENV/
+env/
+uv.lock
+
+# Testing
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+htmlcov/
+
+# Type checkers
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+
+# Environments
+.env
+.env.*
+!.env.example
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Obsidian — config local, no versionar
+vault/.obsidian/workspace.json
+vault/.obsidian/workspace-mobile.json
+vault/.obsidian/cache
+vault/.obsidian/plugins/*/data.json
+
+# Corpus normativo — los PDFs pesados se gestionan fuera del repo
+corpus/**/*.pdf
+corpus/**/*.docx
+corpus/**/raw/
+
+# ChromaDB persistencia local
+.chroma/
+chroma_db/
+
+# Neo4j datos locales
+neo4j_data/
+
+# Logs
+*.log
+logs/
+
+# Secretos
+*.pem
+*.key
+secrets/

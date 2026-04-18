@@ -1,0 +1,14 @@
+{
+  "origen": "github_secrets",
+  "activo_detectado": "AWS_ACCESS_KEY_ID=AKIA... en config.py",
+  "evidencia": "https://github.com/empresa-demo/webapp-backend/commit/e9a4b2c",
+  "vector_ataque": "Exposición de credencial cloud con permisos de producción en repositorio público de código fuente",
+  "dificultad_explotacion": "baja",
+  "cve_relacionado": null,
+  "metadatos": {
+    "repo": "empresa-demo/webapp-backend",
+    "commit": "e9a4b2c",
+    "linea": 42,
+    "visibility": "public"
+  }
+}
