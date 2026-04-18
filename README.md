@@ -115,7 +115,7 @@ Proprietary provisional · ver [LICENSE](./LICENSE). Sujeta a revisión a licenc
 
 Mj · michael.jt.pro@gmail.com
 
-Proyecto desarrollado bajo la mentoría informal de Carlos Gómez Pintado (CEO, Cyberxia).
+
 =======
 # Rosseta
 >>>>>>> 2eb388366f3d391d10ae549c6fd7b50ed0302d4f
