@@ -29,6 +29,11 @@ updated: 2026-04-18
 
 ---
 
+## 2026-04-19 · Inicio MVP-4 — NucleiAdapter + pipeline completo
+- **Objetivo**: NucleiAdapter async subprocess + CLI rosetta scan + pipeline sensor→traductor→grafo→dossier.
+
+---
+
 ## 2026-04-19 · MVP-3 completado — corpus ENS + multi-marco
 - **Hecho**: Corpus ENS RD 311/2022 (41 controles, dominio público BOE), `tests/test_multimarca.py` (13 tests: 3 corpus + 5 canónicos ISO+ENS parametrizados + 5 edge cases). Verificado que el Traductor multi-marco llama al RAG con ambos marcos y el resultado incluye controles de ambos frameworks. 69 tests · ruff ✅ · mypy ✅.
 - **Por qué**: MVP-3 criterio: ≥90% de 10 casos canónicos multi-marco → controles correctos. Con mocks: 100%.
