@@ -19,15 +19,15 @@ adapters_activos: []
 
 ## Estado actual
 
-- **MVP en curso**: MVP-2 🟢 en curso · [[MOC_Roadmap#MVP-2|Grafo Neo4j y trazabilidad]]
-- **MVP anterior**: MVP-1 ✅ completado (Traductor Simbiótico ISO 27001:2022, 5 hallazgos canónicos)
-- **Sprint activo**: [[07_Sprints/2026-04-19_sprint-2|Sprint 2]] 🟢 GrafoCorrelacion implementado
+- **MVP en curso**: MVP-4 🟢 próximo · [[MOC_Roadmap#MVP-4|Adaptador Nuclei Red Team]]
+- **MVP anterior**: MVP-3 ✅ completado (corpus ENS 41 controles, multi-marco ISO+ENS, 69 tests)
+- **Sprint activo**: [[07_Sprints/2026-04-19_sprint-2|Sprint 2]] 🟢 MVP-2 + MVP-3 completados
 - **LLM provider**: [[02_ADR/002-abstraccion-llm|ADR-002]] 🟡 pendiente aprobación · ollama (dev) / claude (validación)
 
 ## Marcos normativos
 
-- [[03_Normativa/ISO_27001_2022]] · 🟡 corpus descargado (93 controles, pendiente ingesta ChromaDB)
-- [[03_Normativa/ENS_2022]] · 🔴 corpus no cargado
+- [[03_Normativa/ISO_27001_2022]] · ✅ corpus cargado (93 controles intuitem)
+- [[03_Normativa/ENS_2022]] · ✅ corpus cargado (41 controles RD 311/2022, BOE)
 - [[03_Normativa/NIS2]] · 🔴 corpus no cargado
 - [[03_Normativa/DORA]] · 🔴 corpus no cargado
 - [[03_Normativa/RGPD]] · 🔴 corpus no cargado

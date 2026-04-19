@@ -1,0 +1,651 @@
+# Corpus ENS — Esquema Nacional de Seguridad (RD 311/2022)
+# Fuente: Real Decreto 311/2022, de 3 de mayo (BOE-A-2022-7191)
+# Dominio público — legislación española de libre difusión
+# Formato: compatible con intuitem/ciso-assistant-community para CorpusLoader
+# Cobertura: controles principales de las tres dimensiones (org / op / mp)
+
+objects:
+  reference_controls:
+
+    # -------------------------------------------------------------------------
+    # MARCO ORGANIZATIVO (org)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "org.1"
+      name: "Política de seguridad"
+      description: >
+        La organización dispondrá de una política de seguridad que articule la gestión
+        continuada de la seguridad, que sea conocida por todos los miembros de la organización
+        y aprobada por el órgano superior competente. Incluirá misión, roles, obligaciones
+        legales, planificación de contingencias y compromisos de revisión periódica.
+      translations:
+        es:
+          name: "Política de seguridad"
+          description: >
+            La organización dispondrá de una política de seguridad aprobada por el máximo
+            órgano directivo. Definirá roles, responsabilidades, gestión de riesgos y
+            revisión periódica. Sin política documentada, cualquier incidente carece de
+            marco de respuesta formal.
+
+    - ref_id: "org.2"
+      name: "Normativa de seguridad"
+      description: >
+        Existirá un conjunto coherente de normas de seguridad que desarrollen la política
+        de seguridad y regulen el uso correcto de los sistemas y los activos de la organización.
+      translations:
+        es:
+          name: "Normativa de seguridad"
+          description: >
+            Documentación normativa que regule el uso aceptable de sistemas, activos y datos.
+            Incluye normas de contraseñas, uso de dispositivos, acceso remoto y tratamiento
+            de datos. La ausencia de normativa es una no-conformidad frente a inspectores ENS.
+
+    - ref_id: "org.3"
+      name: "Procedimientos de seguridad"
+      description: >
+        Se dispondrá de procedimientos documentados para la realización de las actividades
+        establecidas en la normativa de seguridad, de forma que permitan la trazabilidad
+        de las operaciones y la detección de desviaciones.
+      translations:
+        es:
+          name: "Procedimientos de seguridad"
+          description: >
+            Procedimientos operativos documentados y actualizados para actividades de
+            seguridad: alta/baja de usuarios, respuesta a incidentes, copias de seguridad,
+            mantenimiento. La divergencia entre procedimiento escrito y práctica real
+            es un hallazgo crítico en auditorías ENS.
+
+    - ref_id: "org.4"
+      name: "Proceso de autorización"
+      description: >
+        Se establecerá un proceso formal de autorización para que el responsable de seguridad
+        apruebe el uso de instalaciones, equipos, aplicaciones y accesos privilegiados.
+      translations:
+        es:
+          name: "Proceso de autorización"
+          description: >
+            Todo acceso a sistemas y recursos debe pasar por un proceso formal de
+            autorización documentado. Los accesos concedidos sin proceso formal suponen
+            incumplimiento directo de este control.
+
+    # -------------------------------------------------------------------------
+    # MARCO OPERACIONAL — Planificación (op.pl)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "op.pl.1"
+      name: "Análisis de riesgos"
+      description: >
+        Se realizará un análisis de riesgos que identifique las amenazas y vulnerabilidades
+        sobre los activos de información, y se estimará la probabilidad de ocurrencia y
+        el impacto en caso de materialización.
+      translations:
+        es:
+          name: "Análisis de riesgos"
+          description: >
+            Análisis formal de riesgos documentado y actualizado. Los hallazgos técnicos
+            sin análisis de riesgo asociado impiden la priorización de medidas. Obligatorio
+            para categorías Media y Alta del ENS.
+
+    - ref_id: "op.pl.4"
+      name: "Plan de continuidad"
+      description: >
+        Se dispondrá de un plan de continuidad que establezca las medidas organizativas
+        y técnicas para garantizar la prestación continuada del servicio ante incidentes
+        o catástrofes.
+      translations:
+        es:
+          name: "Plan de continuidad"
+          description: >
+            Plan de continuidad de negocio y recuperación ante desastres documentado,
+            probado y actualizado. La falta de plan de continuidad expone a la organización
+            ante incidentes graves sin protocolo de respuesta.
+
+    # -------------------------------------------------------------------------
+    # MARCO OPERACIONAL — Control de acceso (op.acc)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "op.acc.1"
+      name: "Identificación"
+      description: >
+        Cada entidad (usuario, proceso o dispositivo) que accede al sistema dispondrá
+        de un identificador único. Se prohíben las cuentas compartidas. La identidad
+        de cada entidad se verificará antes de concederle acceso.
+      translations:
+        es:
+          name: "Identificación"
+          description: >
+            Cada usuario y proceso debe tener un identificador único. Las cuentas
+            compartidas o genéricas son una no-conformidad. La trazabilidad de acciones
+            requiere identidades individuales verificables.
+
+    - ref_id: "op.acc.2"
+      name: "Requisitos de acceso"
+      description: >
+        Los recursos del sistema se protegerán con mecanismos de control de acceso que
+        impidan el uso a entidades no autorizadas y se aplique el principio de mínimo
+        privilegio en la asignación de derechos.
+      translations:
+        es:
+          name: "Requisitos de acceso"
+          description: >
+            Principio de mínimo privilegio en la asignación de derechos de acceso.
+            Nadie debe tener más permisos de los estrictamente necesarios para su función.
+            Los accesos excesivos o sin revisar son incumplimientos directos.
+
+    - ref_id: "op.acc.4"
+      name: "Proceso de gestión de derechos de acceso"
+      description: >
+        Los derechos de acceso de los usuarios serán gestionados a lo largo de todo
+        su ciclo de vida (alta, modificación, baja), con un proceso formal documentado
+        y revisión periódica de accesos concedidos.
+      translations:
+        es:
+          name: "Proceso de gestión de derechos de acceso"
+          description: >
+            Proceso formal de alta, modificación y baja de accesos. Revisión periódica
+            de derechos concedidos. Los usuarios que conservan accesos tras abandono
+            de la organización o cambio de rol son una vulnerabilidad crítica y
+            un incumplimiento directo de este control.
+
+    - ref_id: "op.acc.5"
+      name: "Mecanismo de autenticación (usuarios)"
+      description: >
+        Los mecanismos de autenticación de usuarios se adaptarán al nivel de seguridad
+        del sistema. Para sistemas de categoría Media o Alta se exige autenticación
+        multifactor (MFA) para accesos remotos y accesos privilegiados.
+      translations:
+        es:
+          name: "Mecanismo de autenticación (usuarios)"
+          description: >
+            Autenticación robusta proporcional a la categoría del sistema. Categoría
+            Media/Alta: MFA obligatorio para accesos remotos y cuentas privilegiadas.
+            La ausencia de MFA en cuentas administradoras es una no-conformidad grave
+            en sistemas ENS categoría Media o Alta.
+
+    - ref_id: "op.acc.6"
+      name: "Mecanismo de autenticación (sistemas)"
+      description: >
+        Los sistemas se autenticarán mutuamente cuando se conecten entre sí.
+        Se utilizarán certificados o tokens seguros para la autenticación de sistemas.
+      translations:
+        es:
+          name: "Mecanismo de autenticación (sistemas)"
+          description: >
+            Autenticación mutua entre sistemas interconectados. Uso de certificados
+            o tokens seguros para comunicaciones sistema-a-sistema. La comunicación
+            entre sistemas sin autenticación mutua incumple este control.
+
+    # -------------------------------------------------------------------------
+    # MARCO OPERACIONAL — Explotación (op.exp)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "op.exp.1"
+      name: "Inventario de activos"
+      description: >
+        Se mantendrá un inventario actualizado de los activos del sistema, con información
+        suficiente para la gestión de su ciclo de vida y la respuesta a incidentes.
+      translations:
+        es:
+          name: "Inventario de activos"
+          description: >
+            Inventario actualizado de hardware, software, datos y servicios. Sin inventario,
+            es imposible gestionar vulnerabilidades o responder a incidentes de forma
+            ordenada. Base indispensable para la gestión de parches.
+
+    - ref_id: "op.exp.2"
+      name: "Configuración de seguridad"
+      description: >
+        Los activos del sistema serán configurados de acuerdo a guías de bastionado,
+        eliminando funcionalidades innecesarias, cerrando puertos no usados y aplicando
+        el principio de mínima funcionalidad.
+      translations:
+        es:
+          name: "Configuración de seguridad"
+          description: >
+            Bastionado de sistemas según guías de configuración segura (CCN-STIC).
+            Eliminación de servicios, puertos y funcionalidades no necesarios.
+            Los puertos abiertos sin justificación o los servicios no necesarios son
+            incumplimientos directos de este control.
+
+    - ref_id: "op.exp.3"
+      name: "Gestión de la configuración"
+      description: >
+        Se establecerán procedimientos para el control de cambios en la configuración
+        de los sistemas, con registro de todos los cambios realizados y posibilidad
+        de revertir a estados anteriores seguros.
+      translations:
+        es:
+          name: "Gestión de la configuración"
+          description: >
+            Control de cambios documentado con registro de modificaciones. Los cambios
+            no autorizados o no documentados en la configuración de sistemas son
+            incumplimientos que pueden ocultar compromisos de seguridad.
+
+    - ref_id: "op.exp.4"
+      name: "Mantenimiento y actualizaciones de seguridad"
+      description: >
+        Se mantendrán actualizados los sistemas con los parches de seguridad publicados
+        por los fabricantes. Se establecerá un procedimiento de gestión de vulnerabilidades
+        que incluya plazos máximos de aplicación según criticidad del parche.
+      translations:
+        es:
+          name: "Mantenimiento y actualizaciones de seguridad"
+          description: >
+            Gestión de parches con plazos máximos: vulnerabilidades críticas (CVSS ≥ 9)
+            en 24-72 horas; altas en 7 días; medias en 30 días. Los sistemas sin parchear
+            con vulnerabilidades conocidas son no-conformidades graves y fuente de
+            responsabilidad en caso de incidente.
+
+    - ref_id: "op.exp.7"
+      name: "Gestión de incidentes"
+      description: >
+        Se establecerá un proceso de detección, notificación, análisis y resolución
+        de incidentes de seguridad, con comunicación al CCN-CERT cuando proceda.
+      translations:
+        es:
+          name: "Gestión de incidentes"
+          description: >
+            Proceso documentado de gestión de incidentes: detección, clasificación,
+            respuesta y lecciones aprendidas. Notificación obligatoria al CCN-CERT
+            para incidentes en sistemas de la Administración Pública. La falta de
+            proceso implica imposibilidad de respuesta coordinada.
+
+    - ref_id: "op.exp.8"
+      name: "Registro de la actividad de los operadores"
+      description: >
+        Se registrará la actividad de los operadores y administradores del sistema,
+        de forma que sea posible determinar quién hizo qué y cuándo sobre los activos
+        de información. Los registros se protegerán frente a modificación o borrado.
+      translations:
+        es:
+          name: "Registro de la actividad de los operadores"
+          description: >
+            Logs de actividad de administradores: qué acciones, quién las realizó,
+            cuándo y sobre qué sistema. Protección de logs frente a manipulación.
+            La ausencia de registro de actividad de administradores impide la
+            detección de accesos no autorizados y el análisis forense.
+
+    - ref_id: "op.exp.9"
+      name: "Registro de la actividad de los usuarios"
+      description: >
+        Se registrará la actividad relevante de los usuarios del sistema, especialmente
+        los intentos de acceso fallidos, los accesos a datos sensibles y las operaciones
+        de alto riesgo.
+      translations:
+        es:
+          name: "Registro de la actividad de los usuarios"
+          description: >
+            Logs de actividad de usuarios: accesos, intentos fallidos, operaciones
+            sobre datos sensibles. Los sistemas sin logging de actividad de usuarios
+            son incapaces de detectar exfiltración de datos o accesos no autorizados.
+            No-conformidad directa para sistemas con datos personales o clasificados.
+
+    - ref_id: "op.exp.10"
+      name: "Protección de los registros de actividad"
+      description: >
+        Los registros de actividad (logs) se protegerán frente a acceso no autorizado,
+        modificación y borrado. Se almacenarán en sistemas separados de los monitorizados,
+        con retención mínima establecida en la política de seguridad.
+      translations:
+        es:
+          name: "Protección de los registros de actividad"
+          description: >
+            Los logs deben almacenarse en sistemas separados, con acceso restringido
+            y período de retención definido (mínimo 6 meses recomendado). Los logs
+            accesibles o modificables desde los propios sistemas auditados carecen
+            de valor probatorio en análisis forenses.
+
+    # -------------------------------------------------------------------------
+    # MARCO OPERACIONAL — Servicios externos (op.ext)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "op.ext.1"
+      name: "Contratación y acuerdos de nivel de servicio"
+      description: >
+        Cuando se contraten servicios de terceros que traten información del sistema,
+        los contratos incluirán cláusulas de seguridad y acuerdos de nivel de servicio
+        que garanticen el cumplimiento ENS.
+      translations:
+        es:
+          name: "Contratación y acuerdos de nivel de servicio"
+          description: >
+            Los contratos con terceros que procesen información deben incluir cláusulas
+            de seguridad ENS. Los servicios cloud o de terceros sin cláusulas de
+            cumplimiento ENS representan un riesgo de cadena de suministro.
+
+    # -------------------------------------------------------------------------
+    # MARCO OPERACIONAL — Monitorización (op.mon)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "op.mon.1"
+      name: "Detección de intrusión"
+      description: >
+        Se establecerán mecanismos de detección de intrusiones y comportamientos anómalos
+        en los sistemas, con generación de alertas automáticas ante eventos de seguridad
+        relevantes.
+      translations:
+        es:
+          name: "Detección de intrusión"
+          description: >
+            IDS/IPS o SIEM con reglas de detección de intrusiones activas. Alertas
+            automáticas ante comportamientos anómalos. La ausencia de mecanismos de
+            detección impide conocer si el sistema ha sido comprometido, incumpliendo
+            este control y op.exp.8/9.
+
+    - ref_id: "op.mon.2"
+      name: "Sistema de métricas"
+      description: >
+        Se recopilarán métricas de seguridad del sistema que permitan evaluar el nivel
+        de cumplimiento, detectar tendencias y tomar decisiones basadas en datos.
+      translations:
+        es:
+          name: "Sistema de métricas"
+          description: >
+            Métricas periódicas de seguridad: número de vulnerabilidades abiertas,
+            tiempo medio de parcheo, intentos de acceso fallidos, incidentes por
+            categoría. Sin métricas no hay gestión continua de la seguridad.
+
+    # -------------------------------------------------------------------------
+    # MEDIDAS DE PROTECCIÓN — Instalaciones (mp.if)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "mp.if.1"
+      name: "Áreas separadas y con control de acceso"
+      description: >
+        Los sistemas de información estarán ubicados en áreas con control de acceso
+        físico, separadas de zonas de acceso público, con registro de entradas y salidas.
+      translations:
+        es:
+          name: "Áreas separadas y con control de acceso"
+          description: >
+            Control de acceso físico a CPDs y salas de servidores. Registro de
+            accesos físicos. La ausencia de control de acceso físico a infraestructura
+            crítica es una vulnerabilidad grave para la integridad y disponibilidad.
+
+    # -------------------------------------------------------------------------
+    # MEDIDAS DE PROTECCIÓN — Personal (mp.per)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "mp.per.1"
+      name: "Caracterización del puesto de trabajo"
+      description: >
+        Cada puesto de trabajo con acceso a sistemas de información tendrá definidos
+        sus requisitos de seguridad y las responsabilidades del empleado en materia
+        de seguridad de la información.
+      translations:
+        es:
+          name: "Caracterización del puesto de trabajo"
+          description: >
+            Descripción de puestos con responsabilidades de seguridad definidas.
+            Los empleados deben conocer sus obligaciones. La falta de definición
+            de responsabilidades es origen de brechas por error humano.
+
+    - ref_id: "mp.per.3"
+      name: "Concienciación"
+      description: >
+        Todo el personal con acceso a sistemas recibirá formación periódica en
+        materia de seguridad de la información, adaptada a su rol y a las amenazas
+        actuales.
+      translations:
+        es:
+          name: "Concienciación"
+          description: >
+            Formación y concienciación periódica en seguridad para todo el personal.
+            Simulacros de phishing, formación en gestión de contraseñas y protocolos
+            de incidentes. La falta de concienciación es el vector principal de
+            ataques de ingeniería social.
+
+    # -------------------------------------------------------------------------
+    # MEDIDAS DE PROTECCIÓN — Comunicaciones (mp.com)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "mp.com.1"
+      name: "Perímetro seguro"
+      description: >
+        Se establecerá un perímetro de seguridad que separe la red interna de
+        redes externas no confiables, con dispositivos de filtrado (firewall, IPS)
+        que controlen el tráfico entrante y saliente.
+      translations:
+        es:
+          name: "Perímetro seguro"
+          description: >
+            Firewall perimetral con política de denegación por defecto. Control de
+            tráfico entrante y saliente. Los puertos o servicios expuestos a Internet
+            sin necesidad justificada (RDP, SSH, bases de datos) son incumplimientos
+            directos de este control y generan riesgo de explotación remota.
+
+    - ref_id: "mp.com.2"
+      name: "Protección de la confidencialidad"
+      description: >
+        Se cifrarán las comunicaciones que transporten información sensible o
+        clasificada, tanto en redes internas como externas, usando protocolos
+        seguros y algoritmos aprobados.
+      translations:
+        es:
+          name: "Protección de la confidencialidad"
+          description: >
+            Cifrado de comunicaciones con datos sensibles: TLS 1.2+ para web,
+            VPN para accesos remotos, cifrado de correo para información clasificada.
+            Las comunicaciones sin cifrar que transportan credenciales o datos
+            personales incumplen este control y el RGPD.
+
+    - ref_id: "mp.com.3"
+      name: "Protección de la autenticidad y de la integridad"
+      description: >
+        Se utilizarán mecanismos criptográficos para garantizar la autenticidad e
+        integridad de las comunicaciones, previniendo ataques de intermediario
+        (man-in-the-middle) y manipulación de datos en tránsito.
+      translations:
+        es:
+          name: "Protección de la autenticidad y de la integridad"
+          description: >
+            Firma digital, certificados y MACs para garantizar integridad y autenticidad.
+            La ausencia de validación de autenticidad permite ataques MITM y
+            suplantación de identidad en comunicaciones críticas.
+
+    # -------------------------------------------------------------------------
+    # MEDIDAS DE PROTECCIÓN — Soporte de información (mp.si)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "mp.si.1"
+      name: "Etiquetado de la información"
+      description: >
+        La información se clasificará y etiquetará según su nivel de sensibilidad,
+        aplicándose las medidas de protección correspondientes a cada nivel.
+      translations:
+        es:
+          name: "Etiquetado de la información"
+          description: >
+            Clasificación y etiquetado de documentos y datos según su sensibilidad
+            (público, interno, confidencial, secreto). Sin clasificación no se pueden
+            aplicar controles proporcionales al riesgo real de la información.
+
+    - ref_id: "mp.si.2"
+      name: "Criptografía"
+      description: >
+        Se utilizarán algoritmos y protocolos criptográficos aprobados por el CCN
+        para proteger la confidencialidad e integridad de la información almacenada
+        y en tránsito. Se prohíben algoritmos débiles (DES, MD5, RC4, RSA <2048 bits).
+      translations:
+        es:
+          name: "Criptografía"
+          description: >
+            Uso de criptografía aprobada por CCN-STIC: AES-256, RSA-2048+, SHA-256+,
+            TLS 1.2+. Prohibición de algoritmos débiles. Las claves o secretos expuestos
+            (como credenciales cloud en código) incumplen este control directamente,
+            además de comprometer todos los datos protegidos con esas claves.
+
+    - ref_id: "mp.si.5"
+      name: "Borrado y destrucción"
+      description: >
+        La información que ya no sea necesaria se borrará de forma segura, de modo
+        que no sea posible su recuperación posterior, usando métodos de borrado
+        certificado según el nivel de clasificación de la información.
+      translations:
+        es:
+          name: "Borrado y destrucción"
+          description: >
+            Borrado seguro de datos: sobreescritura múltiple, destrucción física de
+            soportes. Los datos no borrados correctamente pueden recuperarse y suponer
+            brechas de datos personales con consecuencias bajo el RGPD.
+
+    # -------------------------------------------------------------------------
+    # MEDIDAS DE PROTECCIÓN — Aplicaciones (mp.sw)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "mp.sw.1"
+      name: "Desarrollo de aplicaciones"
+      description: >
+        Las aplicaciones desarrolladas internamente o bajo encargo incorporarán
+        requisitos de seguridad desde el diseño (security by design), con revisiones
+        de código y pruebas de seguridad antes de su puesta en producción.
+      translations:
+        es:
+          name: "Desarrollo de aplicaciones"
+          description: >
+            Seguridad en el ciclo de desarrollo: requisitos de seguridad en el diseño,
+            revisión de código, análisis estático (SAST) y pruebas de penetración.
+            Las vulnerabilidades en aplicaciones propias (SQLi, XSS, RCE) son
+            incumplimientos de este control con potencial impacto crítico.
+
+    - ref_id: "mp.sw.2"
+      name: "Aceptación y puesta en servicio"
+      description: >
+        Antes de poner en servicio un sistema o aplicación, se realizarán las pruebas
+        necesarias para verificar el correcto funcionamiento y el cumplimiento de los
+        requisitos de seguridad definidos.
+      translations:
+        es:
+          name: "Aceptación y puesta en servicio"
+          description: >
+            Proceso formal de aceptación de sistemas antes de producción: pruebas
+            funcionales, de seguridad y de rendimiento. Los sistemas puestos en
+            producción sin pruebas de seguridad formales incumplen este control.
+
+    # -------------------------------------------------------------------------
+    # MEDIDAS DE PROTECCIÓN — Información (mp.info)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "mp.info.3"
+      name: "Firma electrónica"
+      description: >
+        Se utilizará firma electrónica reconocida o cualificada para garantizar la
+        autenticidad, integridad y no-repudio de los documentos y comunicaciones
+        electrónicas que lo requieran.
+      translations:
+        es:
+          name: "Firma electrónica"
+          description: >
+            Firma electrónica cualificada para documentos que requieren no-repudio.
+            La ausencia de firma en documentos con valor jurídico compromete su
+            validez legal y la trazabilidad de decisiones.
+
+    - ref_id: "mp.info.4"
+      name: "Cifrado de la información"
+      description: >
+        La información sensible o clasificada se almacenará cifrada en los soportes
+        de información, usando algoritmos y claves según las directrices del CCN.
+        Las claves de cifrado se protegerán con el mismo nivel de seguridad que la
+        información que protegen.
+      translations:
+        es:
+          name: "Cifrado de la información"
+          description: >
+            Cifrado en reposo de datos sensibles o clasificados: bases de datos,
+            ficheros, dispositivos portátiles. Las claves de cifrado almacenadas junto
+            a los datos cifrados o expuestas en repositorios de código invalidan
+            completamente la protección criptográfica.
+
+    - ref_id: "mp.info.6"
+      name: "Limpieza de metadatos"
+      description: >
+        Antes de publicar o compartir documentos externamente, se eliminarán los
+        metadatos que puedan revelar información sensible sobre la organización,
+        sus sistemas o sus usuarios.
+      translations:
+        es:
+          name: "Limpieza de metadatos"
+          description: >
+            Eliminación de metadatos de documentos antes de difusión externa.
+            Los metadatos pueden revelar rutas de red internas, nombres de usuarios,
+            versiones de software o estructura organizativa.
+
+    # -------------------------------------------------------------------------
+    # MEDIDAS DE PROTECCIÓN — Servicios (mp.s)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "mp.s.1"
+      name: "Protección del correo electrónico"
+      description: >
+        El servicio de correo electrónico dispondrá de mecanismos de filtrado de
+        spam y malware, cifrado de mensajes con información sensible y protección
+        frente a suplantación de dominio (SPF, DKIM, DMARC).
+      translations:
+        es:
+          name: "Protección del correo electrónico"
+          description: >
+            Filtrado antispam y antimalware en correo. Implementación de SPF, DKIM y
+            DMARC para prevenir spoofing. Cifrado de correos con información sensible.
+            La ausencia de SPF/DKIM/DMARC facilita ataques de phishing con dominio
+            legítimo suplantado.
+
+    - ref_id: "mp.s.2"
+      name: "Protección de servicios y aplicaciones web"
+      description: >
+        Las aplicaciones web dispondrán de mecanismos de protección frente a ataques
+        comunes (OWASP Top 10), incluyendo WAF, protección frente a inyección SQL,
+        XSS, CSRF y gestión segura de sesiones.
+      translations:
+        es:
+          name: "Protección de servicios y aplicaciones web"
+          description: >
+            WAF y protecciones frente a OWASP Top 10 en aplicaciones web. Las
+            aplicaciones web sin protecciones frente a SQLi, XSS o CSRF son vectores
+            de ataque de alta probabilidad con impacto potencial crítico sobre datos
+            y disponibilidad del servicio.
+
+    - ref_id: "mp.s.4"
+      name: "Protección frente a denegación de servicio"
+      description: >
+        Los servicios críticos dispondrán de medidas de protección frente a ataques
+        de denegación de servicio (DoS/DDoS), con capacidad de filtrado y mitigación.
+      translations:
+        es:
+          name: "Protección frente a denegación de servicio"
+          description: >
+            Protección anti-DDoS en servicios públicos críticos: CDN con mitigación,
+            rate limiting, blackholing. La falta de protección frente a DoS compromete
+            la disponibilidad del servicio, una de las tres dimensiones ENS.
+
+    # -------------------------------------------------------------------------
+    # MEDIDAS DE PROTECCIÓN — Equipos (mp.eq)
+    # -------------------------------------------------------------------------
+
+    - ref_id: "mp.eq.1"
+      name: "Puesto de trabajo despejado"
+      description: >
+        Los usuarios deberán mantener el puesto de trabajo despejado de documentación
+        con información sensible y bloquear la sesión cuando se ausenten, aplicando
+        la política de mesa limpia y pantalla limpia.
+      translations:
+        es:
+          name: "Puesto de trabajo despejado"
+          description: >
+            Política de mesa limpia: no dejar documentos sensibles visibles. Bloqueo
+            automático de sesión por inactividad. La información sensible visible en
+            puestos de trabajo es riesgo de acceso no autorizado por terceros.
+
+    - ref_id: "mp.eq.3"
+      name: "Protección de equipos portátiles"
+      description: >
+        Los equipos portátiles con acceso a información del sistema dispondrán de
+        cifrado de disco completo, gestión remota y capacidad de borrado remoto en
+        caso de pérdida o robo.
+      translations:
+        es:
+          name: "Protección de equipos portátiles"
+          description: >
+            Cifrado de disco completo (BitLocker, FileVault) en portátiles y
+            dispositivos móviles. MDM con borrado remoto. Los portátiles sin cifrado
+            de disco exponen toda la información almacenada ante pérdida o robo,
+            constituyendo una brecha de datos bajo el RGPD.
