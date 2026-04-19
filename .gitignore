@@ -57,6 +57,9 @@ dmypy.json
 .env.*
 !.env.example
 
+# Claude Code — config local personal, no versionar
+.claude/settings.local.json
+
 # IDEs
 .vscode/
 .idea/
@@ -67,6 +70,10 @@ Thumbs.db
 
 # Obsidian — config local, no versionar
 vault/.obsidian/workspace.json
+vault/**/.obsidian/workspace.json
+
+# Playbooks de sesión — notas locales de trabajo, no van al repo
+PLAYBOOK_*.md
 vault/.obsidian/workspace-mobile.json
 vault/.obsidian/cache
 vault/.obsidian/plugins/*/data.json

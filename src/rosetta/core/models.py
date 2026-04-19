@@ -8,13 +8,13 @@ modelo, lo que elimina la desincronización entre silos.
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class Severidad(str, Enum):
+class Severidad(StrEnum):
     """Severidad del hallazgo, independiente del marco normativo."""
 
     INFORMATIVA = "informativa"
@@ -24,7 +24,7 @@ class Severidad(str, Enum):
     CRITICA = "critica"
 
 
-class FuenteRedTeam(str, Enum):
+class FuenteRedTeam(StrEnum):
     """Sensor del Red Team que originó el hallazgo."""
 
     NUCLEI = "nuclei"
@@ -39,7 +39,7 @@ class FuenteRedTeam(str, Enum):
     OTRO = "otro"
 
 
-class MarcoNormativo(str, Enum):
+class MarcoNormativo(StrEnum):
     """Marcos normativos soportados por ROSETTA."""
 
     ISO_27001_2022 = "iso_27001_2022"
@@ -97,9 +97,7 @@ class DatosCompliance(BaseModel):
     controles_incumplidos: list[str] = Field(
         ..., description="IDs de controles incumplidos, ej: ['A.8.28', 'A.8.15']."
     )
-    cita_normativa: str = Field(
-        ..., description="Cita textual del artículo/control aplicable."
-    )
+    cita_normativa: str = Field(..., description="Cita textual del artículo/control aplicable.")
     justificacion: str = Field(
         ..., description="Razonamiento de la IA que conecta hallazgo con control."
     )

@@ -140,6 +140,95 @@ uv run pytest
 
 ---
 
+## 10. Desarrollo sin clave de Anthropic — Ollama local
+
+ROSETTA soporta tres proveedores LLM intercambiables (`claude`, `ollama`, `openai`). Con Ollama puedes iterar sobre el pipeline sin consumir créditos de API.
+
+### Instalar Ollama en Windows
+
+Descarga el instalador desde https://ollama.com/download y ejecútalo. Ollama se instala como servicio y arranca automáticamente.
+
+Alternativamente, desde PowerShell:
+
+```powershell
+# Descargar e instalar con winget (si está disponible)
+winget install Ollama.Ollama
+
+# O descargar el instalador directamente y ejecutarlo
+Start-Process "https://ollama.com/download/OllamaSetup.exe"
+```
+
+### Modelo recomendado
+
+| Modelo | Descarga | RAM mínima | Recomendado si... |
+|--------|----------|------------|-------------------|
+| `llama3.1:8b` | ~5 GB | 8 GB | Portátil con RAM suficiente |
+| `qwen2.5:7b` | ~4.7 GB | 6 GB | Portátil con poca RAM |
+
+Descargar el modelo (solo la primera vez):
+
+```powershell
+ollama pull llama3.1:8b
+# o
+ollama pull qwen2.5:7b
+```
+
+### Verificar que Ollama está corriendo
+
+```powershell
+# Listar modelos descargados
+ollama list
+
+# Verificar el endpoint HTTP local (debe responder 200)
+curl http://localhost:11434
+# Respuesta esperada: "Ollama is running"
+```
+
+Si Ollama no está corriendo como servicio, arráncalo manualmente:
+
+```powershell
+ollama serve
+```
+
+### Configurar `.env` para usar Ollama
+
+```env
+LLM_PROVIDER=ollama
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.1:8b
+```
+
+No es necesario tener `ANTHROPIC_API_KEY` definida cuando `LLM_PROVIDER=ollama`.
+
+### Limitación importante
+
+Los modelos pequeños de Ollama (7B–8B) pueden no respetar el schema de
+`tool-use` con la misma fidelidad que Claude Sonnet. Esto se traduce en:
+
+- Respuestas que no siguen el JSON schema de `DatosCompliance` exactamente.
+- Mayor tasa de error en la validación Pydantic del output del Traductor.
+- Inferencia de controles normativos menos precisa (especialmente en hallazgos ambiguos).
+
+**Regla práctica:**
+
+- **Ollama** → desarrollo iterativo del pipeline (RAG, prompts, flujo de datos).
+- **Claude** → validar la calidad del Traductor con los 5 hallazgos canónicos del MVP-1.
+
+### Cuándo cambiar a Claude
+
+Cuando tengas tu clave de Anthropic (puedes obtenerla con créditos iniciales gratuitos en https://console.anthropic.com):
+
+1. Edita `.env`:
+   ```env
+   LLM_PROVIDER=claude
+   ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxxx
+   ```
+2. Reinicia el proceso (`uv run rosetta ...` o `uvicorn`).
+
+No hay que tocar nada más: la `factory.get_llm_client()` selecciona la implementación automáticamente.
+
+---
+
 ## Checklist rápida antes del primer push a GitHub
 
 - [ ] `.env` **NO** está committeado (el `.gitignore` lo evita).

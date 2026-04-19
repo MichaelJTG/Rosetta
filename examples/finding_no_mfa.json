@@ -1,0 +1,14 @@
+{
+  "origen": "manual",
+  "activo_detectado": "Consola de administración AWS — 12 usuarios sin MFA habilitado",
+  "evidencia": "AWS IAM audit export 2026-04-18: 12/15 usuarios con acceso a consola sin MFA. Incluye 3 cuentas con permisos de administrador.",
+  "vector_ataque": "Cuentas de administrador accesibles solo con contraseña. Sin segundo factor de autenticación, cualquier contraseña comprometida (phishing, credential stuffing) da acceso completo a la infraestructura cloud.",
+  "dificultad_explotacion": "baja",
+  "cve_relacionado": null,
+  "metadatos": {
+    "usuarios_sin_mfa": 12,
+    "usuarios_admin_sin_mfa": 3,
+    "plataforma": "AWS IAM",
+    "ultimo_login_promedio_dias": 15
+  }
+}

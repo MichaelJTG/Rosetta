@@ -31,6 +31,6 @@ Incorporado al roadmap como **MVP-5**. Ver `docs/ROADMAP.md`.
 
 ## Relacionado con
 
-- [[00_Index]]
-- [[08_Reuniones/pendiente-reunion-carlos]]
-- Roadmap: MVP-5.
+- [[00_Index]] · [[00_Dashboard]] · [[MOC_Roadmap#MVP-5]]
+- [[08_Reuniones/pendiente-carlos-gomez]]
+- [[05_Hallazgos/sin-logs]] (ejemplo canónico relacionado)

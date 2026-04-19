@@ -46,6 +46,7 @@ dependencies = [
     # Parseo normativo
     "pypdf>=5.0.0",
     "markdown-it-py>=3.0.0",
+    "pyyaml>=6.0.0",
     # Orquestación open source sensors
     "python-nmap>=0.7.1",
 ]
@@ -58,6 +59,7 @@ dev = [
     "ruff>=0.7.0",
     "mypy>=1.13.0",
     "pre-commit>=4.0.0",
+    "types-PyYAML>=6.0.0",
 ]
 
 [project.scripts]
@@ -105,8 +107,10 @@ module = [
     "chromadb.*",
     "neo4j.*",
     "nmap.*",
+    "sentence_transformers.*",
 ]
 ignore_missing_imports = true
+follow_imports = "skip"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
