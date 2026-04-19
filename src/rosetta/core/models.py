@@ -110,6 +110,30 @@ class DatosCompliance(BaseModel):
     )
 
 
+class ResultadoDrift(BaseModel):
+    """Resultado del análisis de desviación procedimiento ↔ realidad operativa."""
+
+    procedimiento_id: str = Field(..., description="Identificador del procedimiento analizado.")
+    drift_detectado: bool = Field(..., description="True si se detecta desviación significativa.")
+    descripcion_drift: str = Field("", description="Descripción de la desviación detectada.")
+    fragmento_afectado: str = Field(
+        "", description="Fragmento del procedimiento que diverge de la realidad."
+    )
+    redaccion_propuesta: str = Field(
+        "", description="Nueva redacción propuesta para el fragmento afectado."
+    )
+    evidencias: list[str] = Field(
+        default_factory=list, description="Lista de evidencias observadas que evidencian el drift."
+    )
+    controles_afectados: list[str] = Field(
+        default_factory=list,
+        description="IDs de controles normativos (ISO/ENS) que podrían verse comprometidos.",
+    )
+    impacto: Severidad = Field(
+        Severidad.MEDIA, description="Severidad del drift desde perspectiva normativa."
+    )
+
+
 class HallazgoMaestro(BaseModel):
     """El Hallazgo Maestro: objeto unificado que atraviesa todo ROSETTA.
 

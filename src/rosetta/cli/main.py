@@ -313,5 +313,85 @@ def scan(
             console.print(markdown)
 
 
+@app.command(name="detect-drift")
+def detect_drift(
+    procedimiento: str = typer.Argument(
+        ..., help="Ruta al archivo del procedimiento (.md, .txt, .pdf)."
+    ),
+    observaciones: str = typer.Option(
+        ...,
+        "--observaciones",
+        "-o",
+        help="Observaciones separadas por '|' o ruta a archivo .txt/.json.",
+    ),
+    procedimiento_id: str = typer.Option(
+        None, "--id", help="ID del procedimiento. Por defecto: nombre del archivo."
+    ),
+) -> None:
+    """Detecta desviación (drift) entre un procedimiento interno y la realidad observada.
+
+    Ejemplo:
+        rosetta detect-drift examples/procedures/PRO-IAM-001.md \\
+          --observaciones "12 cuentas con >90 días inactivas sin desactivar|3 admins sin rotación de clave"
+    """
+    from rosetta.core.drift import DriftDetector
+    from rosetta.llm.factory import get_llm_client
+
+    proc_path = Path(procedimiento)
+    if not proc_path.exists():
+        console.print(f"[red]No se encontró el procedimiento:[/] {procedimiento}")
+        raise typer.Exit(1)
+
+    texto_proc = proc_path.read_text(encoding="utf-8")
+    pid = procedimiento_id or proc_path.stem
+
+    # Parsear observaciones: '|' separadas, o fichero
+    obs_path = Path(observaciones)
+    if obs_path.exists():
+        if obs_path.suffix.lower() == ".json":
+            import json as _json
+
+            obs_lista: list[str] = _json.loads(obs_path.read_text(encoding="utf-8"))
+        else:
+            obs_lista = [
+                line.strip()
+                for line in obs_path.read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+    else:
+        obs_lista = [o.strip() for o in observaciones.split("|") if o.strip()]
+
+    if not obs_lista:
+        console.print("[red]No se proporcionaron observaciones.[/]")
+        raise typer.Exit(1)
+
+    llm = get_llm_client()
+    detector = DriftDetector(llm=llm)
+
+    console.print(f"[cyan]Analizando drift[/] en {pid} con {len(obs_lista)} observaciones…")
+
+    try:
+        resultado = asyncio.run(detector.detectar_drift(pid, texto_proc, obs_lista))
+    except Exception as exc:
+        console.print(f"[red]Error en análisis de drift:[/] {exc}")
+        raise typer.Exit(1) from exc
+
+    if resultado.drift_detectado:
+        console.print(f"\n[bold red]⚠ DRIFT DETECTADO[/] — Impacto: {resultado.impacto.value}")
+        console.print(f"\n{resultado.descripcion_drift}")
+        if resultado.fragmento_afectado:
+            console.print(f"\n[dim]Fragmento afectado:[/]\n{resultado.fragmento_afectado}")
+        if resultado.redaccion_propuesta:
+            console.print(f"\n[green]Redacción propuesta:[/]\n{resultado.redaccion_propuesta}")
+        if resultado.controles_afectados:
+            console.print(
+                f"\n[yellow]Controles normativos afectados:[/] {', '.join(resultado.controles_afectados)}"
+            )
+    else:
+        console.print(
+            "[green]✓ Sin drift detectado.[/] El procedimiento refleja la realidad observada."
+        )
+
+
 if __name__ == "__main__":
     app()
