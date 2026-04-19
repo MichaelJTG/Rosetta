@@ -29,6 +29,22 @@ updated: 2026-04-18
 
 ---
 
+## 2026-04-19 · MVP-3 completado — corpus ENS + multi-marco
+- **Hecho**: Corpus ENS RD 311/2022 (41 controles, dominio público BOE), `tests/test_multimarca.py` (13 tests: 3 corpus + 5 canónicos ISO+ENS parametrizados + 5 edge cases). Verificado que el Traductor multi-marco llama al RAG con ambos marcos y el resultado incluye controles de ambos frameworks. 69 tests · ruff ✅ · mypy ✅.
+- **Por qué**: MVP-3 criterio: ≥90% de 10 casos canónicos multi-marco → controles correctos. Con mocks: 100%.
+- **Archivos**: `corpus/ens/ens-2022-rd311.yaml` · `corpus/ens/README.md` · `tests/test_multimarca.py`
+- **Enlaces**: [[07_Sprints/2026-04-19_sprint-2]] · [[03_Normativa/ENS_2022]] · [[MOC_Roadmap]]
+- **Estado**: ✅ hecho — MVP-3 criterio de aceptación cumplido (con mocks)
+
+---
+
+## 2026-04-19 · Inicio MVP-3 — ENS corpus + multi-marco
+- **Objetivo**: Corpus ENS RD 311/2022, Traductor multi-marco ISO+ENS, 10 casos canónicos.
+- **Estado previo**: MVP-2 commit limpio. 56 tests · ruff ✅ · mypy ✅. Sprint 2 abierto.
+- **Checkpoints esperados**: ninguno en esta fase (BOE = dominio público).
+
+---
+
 ## 2026-04-19 · MVP-2 implementado — GrafoCorrelacion + dossier + docker-compose
 - **Hecho**: `GrafoCorrelacion` completo (registrar_hallazgo MERGE idempotente, hallazgos_por_marco, controles_mas_incumplidos, hallazgos_por_activo, exportar_dossier Markdown). CLI `rosetta dossier`. `docker-compose.yml` con Neo4j 5.18 Community. 9 tests con driver mockeado (graph.py 84%). 56 tests totales · ruff ✅ · mypy ✅.
 - **Por qué**: MVP-2 requiere grafo operativo para trazabilidad de hallazgos y dossier exportable.
