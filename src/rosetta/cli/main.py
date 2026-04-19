@@ -178,5 +178,140 @@ def dossier(
         console.print(markdown)
 
 
+@app.command()
+def scan(
+    objetivo: str = typer.Argument(..., help="URL, IP o dominio del activo autorizado a escanear."),
+    sensor: str = typer.Option("nuclei", "--sensor", "-s", help="Sensor Red Team: nuclei."),
+    marco: str = typer.Option(
+        "iso_27001_2022", "--marco", "-m", help="Marco(s) normativo(s), separados por coma."
+    ),
+    salida: str = typer.Option(None, "--salida", "-o", help="Ruta del dossier Markdown de salida."),
+    chromadb_path: str = typer.Option(None, "--chroma", help="Ruta a ChromaDB."),
+    neo4j_uri: str = typer.Option(None, "--neo4j-uri", help="URI Neo4j."),
+    neo4j_user: str = typer.Option(None, "--neo4j-user", help="Usuario Neo4j."),
+    neo4j_password: str = typer.Option(None, "--neo4j-password", help="Contraseña Neo4j."),
+    nuclei_bin: str = typer.Option("nuclei", "--nuclei-bin", help="Ruta al binario nuclei."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Parsea hallazgos sin llamar al LLM."),
+) -> None:
+    """Pipeline completo: escanea con Nuclei, traduce a normativa y genera dossier.
+
+    Flujo: nuclei → DatosRedTeam → TraductorSimbiótico → Neo4j → Markdown.
+
+    Requiere nuclei en PATH y, para persistencia, Neo4j corriendo.
+    """
+    import uuid
+
+    from rosetta.adapters.red.nuclei import NucleiAdapter
+    from rosetta.core.graph import GrafoCorrelacion
+    from rosetta.core.models import DatosRedTeam, HallazgoMaestro, MarcoNormativo
+    from rosetta.core.rag import NormativaRAG
+    from rosetta.core.traductor import TraductorSimbiotico
+    from rosetta.llm.factory import get_llm_client
+
+    # Parsear marcos
+    marcos_raw = [m.strip() for m in marco.split(",")]
+    marcos: list[MarcoNormativo] = []
+    for m in marcos_raw:
+        try:
+            marcos.append(MarcoNormativo(m))
+        except ValueError:
+            valores = ", ".join(x.value for x in MarcoNormativo)
+            console.print(f"[red]Marco desconocido:[/] {m}. Opciones: {valores}")
+            raise typer.Exit(1) from None
+
+    console.print(f"[cyan]Escaneando[/] {objetivo} con {sensor}…")
+
+    # 1. Escaneo
+    if sensor == "nuclei":
+        adapter = NucleiAdapter(binario=nuclei_bin)
+    else:
+        console.print(f"[red]Sensor desconocido:[/] {sensor}. Disponibles: nuclei")
+        raise typer.Exit(1)
+
+    try:
+        hallazgos_red: list[DatosRedTeam] = asyncio.run(adapter.escanear(objetivo))
+    except FileNotFoundError as exc:
+        console.print(f"[red]{exc}[/]")
+        raise typer.Exit(1) from exc
+    except Exception as exc:
+        console.print(f"[red]Error en escaneo:[/] {exc}")
+        raise typer.Exit(1) from exc
+
+    if not hallazgos_red:
+        console.print("[yellow]No se encontraron hallazgos.[/]")
+        raise typer.Exit(0)
+
+    console.print(f"[green]✓[/] {len(hallazgos_red)} hallazgos encontrados.")
+
+    if dry_run:
+        for h in hallazgos_red:
+            console.print(f"  · {h.activo_detectado} — {h.vector_ataque[:80]}")
+        raise typer.Exit(0)
+
+    # 2. Traducir + persistir en grafo
+    chroma_path = chromadb_path or os.getenv("CHROMADB_PATH", ".chroma")
+    rag = NormativaRAG(chromadb_path=chroma_path)
+    llm = get_llm_client()
+    traductor = TraductorSimbiotico(llm=llm, rag=rag, marcos_activos=marcos)
+
+    neo_uri = neo4j_uri or os.getenv("NEO4J_URI", "bolt://localhost:7687")
+    neo_user = neo4j_user or os.getenv("NEO4J_USER", "neo4j")
+    neo_pass = neo4j_password or os.getenv("NEO4J_PASSWORD", "rosetta_dev")
+
+    grafo: GrafoCorrelacion | None = None
+    try:
+        grafo = GrafoCorrelacion.desde_uri(neo_uri, neo_user, neo_pass)
+    except Exception as exc:
+        console.print(f"[yellow]Neo4j no disponible ({exc}) — los hallazgos no se persistirán.[/]")
+
+    errores = 0
+    for rt_data in hallazgos_red:
+        try:
+            compliance = asyncio.run(traductor.traducir(rt_data))
+        except Exception as exc:
+            console.print(f"[yellow]Error traduciendo {rt_data.activo_detectado}:[/] {exc}")
+            errores += 1
+            continue
+
+        if grafo is not None:
+            hallazgo_id = f"SEC-{uuid.uuid4().hex[:8].upper()}"
+            for ctrl in compliance.controles_incumplidos:
+                for marco_obj in compliance.marcos_aplicables:
+                    grafo.registrar_hallazgo(
+                        hallazgo_id=hallazgo_id,
+                        activo=rt_data.activo_detectado,
+                        marco=marco_obj.value,
+                        control_id=ctrl,
+                        control_nombre=ctrl,
+                        severidad=compliance.impacto_legal.value,
+                        origen=rt_data.origen.value,
+                        evidencia=rt_data.evidencia,
+                        justificacion=compliance.justificacion,
+                        mitigacion=compliance.accion_mitigacion,
+                        timestamp=str(
+                            HallazgoMaestro(
+                                id_hallazgo=hallazgo_id,
+                                red_team_data=rt_data,
+                                compliance_data=compliance,
+                            ).timestamp
+                        ),
+                    )
+
+    console.print(
+        f"[green]✓[/] {len(hallazgos_red) - errores}/{len(hallazgos_red)} hallazgos traducidos."
+    )
+
+    # 3. Dossier
+    if grafo is not None:
+        markdown = grafo.exportar_dossier(marcos[0].value, titulo=f"Scan {objetivo}")
+        grafo.cerrar()
+
+        if salida:
+            Path(salida).write_text(markdown, encoding="utf-8")
+            console.print(f"[green]✓[/] Dossier exportado a [bold]{salida}[/]")
+        else:
+            console.print(markdown)
+
+
 if __name__ == "__main__":
     app()
