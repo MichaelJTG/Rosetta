@@ -1,4 +1,3 @@
-
 # ROSETTA
 
 **Real-time Orchestrator for Semantic Evidence, Translation & Traceability of Audit-findings**
@@ -28,7 +27,7 @@ Alrededor del Traductor, la plataforma orquesta herramientas open source como se
 
 ## Estado del proyecto
 
-> Fase: **pre-MVP · scaffolding inicial**. Ver `docs/ROADMAP.md` para el detalle de fases.
+> Fase: **MVP-7 completado · Gate CI/CD activo**. Ver `docs/ROADMAP.md` para el detalle de fases.
 
 ## Arquitectura rápida
 
@@ -59,7 +58,9 @@ Alrededor del Traductor, la plataforma orquesta herramientas open source como se
 
 ## Cómo empezar
 
-Requisitos: Python 3.11+, [uv](https://docs.astral.sh/uv/), una API key de Anthropic.
+ROSETTA soporta tres proveedores LLM intercambiables: **Claude** (Anthropic, por defecto), **OpenAI** y **Ollama** (modelos locales, sin coste). Puedes empezar sin clave de API usando Ollama — ver [NEXT_STEPS.md §10](./NEXT_STEPS.md#10-desarrollo-sin-clave-de-anthropic--ollama-local).
+
+Requisitos: Python 3.11+, [uv](https://docs.astral.sh/uv/). Para Claude: API key de Anthropic. Para Ollama: ninguna.
 
 ```bash
 # Clonar (cuando haya remoto) o entrar en el directorio del proyecto
@@ -115,7 +116,4 @@ Proprietary provisional · ver [LICENSE](./LICENSE). Sujeta a revisión a licenc
 
 Mj · michael.jt.pro@gmail.com
 
-
-=======
-# Rosseta
->>>>>>> 2eb388366f3d391d10ae549c6fd7b50ed0302d4f
+Proyecto desarrollado bajo la mentoría informal de Carlos Gómez Pintado (CEO, Cyberxia).

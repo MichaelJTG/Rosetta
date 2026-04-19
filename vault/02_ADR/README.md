@@ -14,3 +14,4 @@ Cada ADR nuevo creado en `docs/adr/NNN-titulo.md` debe tener su contraparte aqu�
 ## Índice
 
 - [[001-orquestacion-sobre-fork]] · Decidimos orquestar open source, no forkear.
+- [[002-abstraccion-del-proveedor-llm]] · Interfaz LLMClient: Claude / Ollama / OpenAI intercambiables.

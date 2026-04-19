@@ -1,0 +1,15 @@
+{
+  "origen": "nuclei",
+  "activo_detectado": "Servidor web Apache 2.4.49 — 10.0.2.100",
+  "evidencia": "nuclei CVE-2021-41773 template match: Apache 2.4.49 vulnerable a Path Traversal y RCE. Versión sin parchear desde hace 180 días.",
+  "vector_ataque": "Servidor Apache con vulnerabilidad crítica conocida (CVE-2021-41773, CVSS 9.8) sin parchear. Permite path traversal y ejecución remota de código sin autenticación. Explotable públicamente con exploit disponible en Metasploit.",
+  "dificultad_explotacion": "baja",
+  "cve_relacionado": "CVE-2021-41773",
+  "metadatos": {
+    "software": "Apache HTTP Server",
+    "version": "2.4.49",
+    "cvss": 9.8,
+    "dias_sin_parche": 180,
+    "exploit_publico": true
+  }
+}

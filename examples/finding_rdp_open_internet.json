@@ -1,0 +1,14 @@
+{
+  "origen": "nuclei",
+  "activo_detectado": "Servidor Windows 10.0.1.45 — puerto 3389 (RDP) abierto a Internet",
+  "evidencia": "nuclei scan 2026-04-18: tcp/3389 OPEN desde 0.0.0.0/0 sin restricción de IP",
+  "vector_ataque": "Protocolo RDP expuesto directamente a Internet sin VPN, sin MFA, sin lista blanca de IPs. Vulnerable a ataques de fuerza bruta y explotación de vulnerabilidades RDP (BlueKeep, DejaBlue).",
+  "dificultad_explotacion": "media",
+  "cve_relacionado": "CVE-2019-0708",
+  "metadatos": {
+    "protocolo": "RDP",
+    "puerto": 3389,
+    "os": "Windows Server 2019",
+    "acceso_desde": "0.0.0.0/0"
+  }
+}

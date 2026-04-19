@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "claude-sonnet-4-6",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "statusMessage": "Verificando archivos protegidos ROSETTA...",
+            "command": "python -c \"\nimport sys, json, re, os\ntry:\n    data = json.load(sys.stdin)\n    fp = (data.get('tool_input') or {}).get('file_path', '')\n    fp_norm = fp.replace('\\\\\\\\', '/')\n    fname = os.path.basename(fp_norm)\n    msg = None\n    if fname == '.env':\n        msg = 'ROSETTA: escritura en .env bloqueada. Los secretos de API nunca van al repositorio.'\n    elif fname == 'workspace.json' and '.obsidian' in fp_norm:\n        msg = 'ROSETTA: workspace.json de Obsidian es config local del usuario y no debe modificarse ni commitearse.'\n    elif re.search(r'\\\\bcorpus\\\\b.*\\\\.pdf$', fp_norm, re.IGNORECASE):\n        msg = 'ROSETTA: Los PDFs del corpus son solo lectura. Colocalos manualmente en corpus/<marco>/.'\n    if msg:\n        print(json.dumps({'continue': False, 'stopReason': msg}))\nexcept Exception:\n    pass\n\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "deny": [
+      "Write(.env)",
+      "Edit(.env)"
+    ]
+  }
+}

@@ -77,8 +77,8 @@ Todo nuevo módulo viene con tests. Cobertura mínima aceptable: 80% en la capa 
 2. **No commitees `.env`, claves API, dumps de base de datos, ni el directorio `.obsidian/workspace.json`**.
 3. **No tomes decisiones de arquitectura sin ADR**. Si el usuario pide algo que cambia una capa, propón primero un ADR.
 4. **Idioma del código**: inglés para nombres y comentarios técnicos; español para docstrings extensos, documentación de producto y notas del vault (el usuario trabaja en español y el proyecto se enfocará a mercado hispanohablante y europeo).
-5. **Al empezar una sesión nueva**: lee este archivo completo y `docs/ROADMAP.md` antes de tocar código.
-6. **Al terminar una sesión**: deja una nota en `vault/07_Sprints/` con lo hecho.
+5. **Al empezar una sesión nueva**: lee en este orden antes de tocar código — `CLAUDE.md` (este archivo) · `MISSION.md` · `HANDOFF.md` (primera sesión y refresh semanal) · `docs/ROADMAP.md` · `vault/00_Dashboard.md` · últimas entradas de `vault/00_Bitacora.md`.
+6. **Al terminar una sesión**: deja una nota en `vault/07_Sprints/`, actualiza `vault/00_Dashboard.md`, añade entrada de cierre a `vault/00_Bitacora.md`.
 
 ## 12. Contacto y contexto del autor
 
@@ -87,3 +87,33 @@ Autor: Mj (michael.jt.pro@gmail.com). Proyecto desarrollado como Trabajo de clas
 ## 13. Insight crítico del mentor (incorporar al roadmap)
 
 Carlos Gómez Pintado señaló que el gran dolor real de las empresas es **la revisión y mantenimiento de procedimientos**. Los procedimientos escritos divergen de la realidad operativa y nadie los actualiza. ROSETTA debe extender el Traductor para detectar **procedure drift**: comparar procedimiento escrito ↔ comportamiento observado por los sensores y proponer actualización. Ver fase MVP-5 en `docs/ROADMAP.md`.
+
+## 14. Protocolo de bitácora en Obsidian (CRÍTICO)
+
+El usuario abre Obsidian sobre `vault/` y espera ver el proyecto "vivo" — notas apareciendo, enlaces creándose, grafo creciendo — conforme trabajas. **No basta con crear código y callar**. Tras cada acción significativa, dejas rastro en el vault. Reglas:
+
+1. **Bitácora principal**: `vault/00_Bitacora.md`. Al iniciar sesión añades una entrada con fecha+hora y el objetivo de la sesión. Al terminar cada subtarea, añades una entrada con lo hecho y enlaces `[[]]` a las notas o archivos creados. **Append always**, nunca sobrescribes el histórico.
+
+2. **Dashboard**: `vault/00_Dashboard.md`. Cuando cambie el estado del proyecto (sprint activo, MVP completado, ADR aprobado, módulo terminado), actualizas los campos del frontmatter YAML y las secciones correspondientes.
+
+3. **Crear notas enlazadas, no texto plano**. Si encuentras una decisión, un aprendizaje, una interpretación normativa, una limitación de una herramienta — cada cosa es una nota en su carpeta con frontmatter YAML y tags. Usa siempre `[[enlaces bidireccionales]]` a entidades existentes.
+
+4. **Frecuencia mínima**: cada 20-30 minutos de trabajo real, o al completar cualquier unidad con sentido (un módulo, un test pasando, un refactor, un ADR, un fragmento de corpus). Si vas más de 30 min sin anexar nada a `00_Bitacora.md`, estás violando este protocolo.
+
+5. **Qué NO va al vault**: código fuente. Para código está el repo. En el vault va el **porqué**, el **aprendí**, el **decidí**, el **encontré**, el **descarté**. Si una nota tiene más de 20 líneas de código, se está usando mal.
+
+6. **Formato de entrada en la bitácora** (copia exacta):
+   ```markdown
+   ## 2026-04-18 14:32 · <acción corta>
+   - **Hecho**: <qué>
+   - **Por qué**: <razón corta>
+   - **Archivos**: `src/rosetta/llm/base.py` · [[02_ADR/002-llm-abstraction]]
+   - **Enlaces**: [[MOC_ADRs]] · [[03_Normativa/ISO_27001_2022]]
+   - **Estado**: ✅ hecho | 🟡 parcial | 🔴 bloqueado
+   ```
+
+7. **Si el usuario pregunta "¿en qué punto estamos?"**: no improvisas. Lees `vault/00_Dashboard.md` y las últimas entradas de `vault/00_Bitacora.md` y respondes desde esa fuente única de verdad.
+
+8. **MISSION.md es tu brújula**. Antes de empezar cualquier tarea de fondo, relees `MISSION.md` y compruebas dónde estás en el roadmap. Nunca avanzas a un MVP siguiente sin haber cumplido el criterio de aceptación del anterior. Si tienes que romper esta regla, paras y preguntas al usuario.
+
+Este protocolo existe porque el vault es el único canal por el que el usuario ve el trabajo sin tener que leer código. Romperlo = romper la confianza del proyecto.

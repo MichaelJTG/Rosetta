@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
 
 import structlog
 from fastapi import FastAPI, HTTPException
@@ -42,8 +42,8 @@ async def health() -> dict[str, str]:
 
 @app.post("/translate", response_model=DatosCompliance, tags=["traductor"])
 async def translate(
-    hallazgo: DatosRedTeam,
-    marcos: list[MarcoNormativo],
+    hallazgo: DatosRedTeam,  # noqa: ARG001
+    marcos: list[MarcoNormativo],  # noqa: ARG001
 ) -> DatosCompliance:
     """Traduce un hallazgo técnico a evidencia normativa multi-marco."""
     # TODO [MVP-1]: Inyectar TraductorSimbiotico y delegar.

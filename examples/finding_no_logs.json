@@ -1,0 +1,15 @@
+{
+  "origen": "otro",
+  "activo_detectado": "Servidor de base de datos PostgreSQL 192.168.1.100",
+  "evidencia": "Wazuh agent report 2026-04-18: PostgreSQL logging deshabilitado. pg_hba.conf sin auditoría. Sin registro de queries, conexiones ni errores de autenticación.",
+  "vector_ataque": "Base de datos de producción sin logging de accesos ni queries. Imposible detectar accesos no autorizados, exfiltración de datos o modificaciones no autorizadas. Incumple trazabilidad requerida por normativa.",
+  "dificultad_explotacion": "informativa",
+  "cve_relacionado": null,
+  "metadatos": {
+    "motor": "PostgreSQL 15",
+    "base_datos": "production_db",
+    "datos_personales": true,
+    "log_statement": "none",
+    "log_connections": "off"
+  }
+}
