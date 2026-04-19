@@ -4,9 +4,9 @@ tags: [dashboard, rosetta]
 created: 2026-04-18
 updated: 2026-04-19
 sprint_actual: 2
-mvp_actual: MVP-2
+mvp_actual: MVP-6
 mvp_estado: en-curso
-proximo_mvp: MVP-3
+proximo_mvp: MVP-7
 llm_proveedor: ollama (desarrollo) / claude (validación)
 marcos_cargados: []
 adapters_activos: []
@@ -19,8 +19,8 @@ adapters_activos: []
 
 ## Estado actual
 
-- **MVP en curso**: MVP-4 🟢 próximo · [[MOC_Roadmap#MVP-4|Adaptador Nuclei Red Team]]
-- **MVP anterior**: MVP-3 ✅ completado (corpus ENS 41 controles, multi-marco ISO+ENS, 69 tests)
+- **MVP en curso**: MVP-6 🟢 próximo · [[MOC_Roadmap#MVP-6|API REST y dashboard]]
+- **MVP anterior**: MVP-5 ✅ completado (DriftDetector, PRO-IAM-001 canónico, 93 tests)
 - **Sprint activo**: [[07_Sprints/2026-04-19_sprint-2|Sprint 2]] 🟢 MVP-2 + MVP-3 completados
 - **LLM provider**: [[02_ADR/002-abstraccion-llm|ADR-002]] 🟡 pendiente aprobación · ollama (dev) / claude (validación)
 
@@ -37,7 +37,7 @@ adapters_activos: []
 ## Adaptadores
 
 ### Red Team
-- Nuclei · 🟡 esqueleto sin implementar
+- Nuclei · ✅ implementado (async subprocess, parser JSON v3)
 - Amass · 🟡 esqueleto sin implementar
 - Subfinder · ⚪ no empezado
 - theHarvester · ⚪ no empezado

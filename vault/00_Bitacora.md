@@ -29,6 +29,24 @@ updated: 2026-04-18
 
 ---
 
+## 2026-04-19 · MVP-5 completado — Procedure Drift Detection (killer feature Carlos)
+- **Hecho**: `ResultadoDrift` modelo Pydantic. `DriftDetector.detectar_drift()` con LLM tool-use. CLI `rosetta detect-drift`. Procedimiento canónico `PRO-IAM-001.md` (caso de Carlos: cuentas IAM inactivas). 8 tests. 93 tests totales · ruff ✅ · mypy ✅.
+- **Por qué**: MVP-5 es la killer feature del mentor Carlos. El pain point real: procedimientos escritos divergen de la realidad operativa.
+- **Archivos**: `src/rosetta/core/drift.py` · `src/rosetta/core/models.py` · `examples/procedures/PRO-IAM-001.md` · `tests/test_drift.py`
+- **Enlaces**: [[07_Sprints/2026-04-19_sprint-2]] · [[06_Procedimientos/insight-carlos-procedure-drift]] · [[MOC_Roadmap]]
+- **Estado**: ✅ hecho — killer feature operativa con mocks; E2E requiere LLM vivo
+
+---
+
+## 2026-04-19 · MVP-4 completado — NucleiAdapter + pipeline completo
+- **Hecho**: NucleiAdapter (async subprocess, parser JSON Nuclei v3, mapeo severidad/CVE). CLI `rosetta scan --sensor nuclei --target <objetivo>`. Pipeline completo: nuclei → DatosRedTeam → TraductorSimbiótico → GrafoCorrelacion → dossier Markdown. Flag `--dry-run`. 16 tests adapter (subprocess mockeado). 85 tests · ruff ✅ · mypy ✅.
+- **Por qué**: MVP-4 criterio: `rosetta scan` produce dossier coherente desde Nuclei.
+- **Archivos**: `src/rosetta/adapters/red/nuclei.py` · `src/rosetta/cli/main.py` · `tests/test_nuclei_adapter.py`
+- **Enlaces**: [[07_Sprints/2026-04-19_sprint-2]] · [[MOC_Roadmap]]
+- **Estado**: ✅ hecho — falta smoke test con Nuclei real contra lab
+
+---
+
 ## 2026-04-19 · Inicio MVP-4 — NucleiAdapter + pipeline completo
 - **Objetivo**: NucleiAdapter async subprocess + CLI rosetta scan + pipeline sensor→traductor→grafo→dossier.
 
