@@ -22,6 +22,13 @@ updated: 2026-04-18
 
 ---
 
+## 2026-04-21 · FASE 1 completada — Corpus NIS2 + ReportGenerator + POST /reports/generate
+- **Hecho**: (1) Corpus NIS2 con 14 artículos clave (Art.21.1–Art.33) en YAML compatible con CorpusLoader. (2) `core/report_generator.py`: genera MD estructurado + PDF con reportlab (marca ROSETTA + campo cliente opcional). (3) Endpoint `POST /reports/generate` con filtrado por IDs. (4) 31 tests verdes (18 report_generator + 4 API). ruff ✅.
+- **Por qué**: PLAN_V4 FASE 1 — fundaciones: corpus multi-marco + generación de informes auditables en MD y PDF.
+- **Archivos**: `corpus/nis2/nis2-2022-articles.yaml` · `src/rosetta/core/report_generator.py` · `src/rosetta/api/schemas.py` · `src/rosetta/api/main.py` · `tests/test_report_generator.py` · `tests/test_api.py`
+- **Técnica clave**: reportlab como backend PDF (puro Python, portable) — WeasyPrint descartado por requerir GTK+ no disponible en Windows sin instalación nativa.
+- **Estado**: ✅ hecho
+
 ## 2026-04-21 · MVP-7 completado — Gate CI/CD
 - **Hecho**: Implementado `POST /analyze-diff` con `DiffParser` + `DiffAnalyzer` (LLM+RAG por hunk, tool-use con `tiene_violacion` explícito). GitHub Action composite en `action/action.yml` (obtiene diff, lee `.rosetta.yml`, llama API, publica comentario en PR, bloquea con exit 1). 141 tests (39 nuevos) · ruff ✅ · mypy strict ✅ · cobertura `diff_analyzer` 88%.
 - **Por qué**: Criterio de aceptación MVP-7: PR con secret hardcodeado → bloqueado con ISO 27001 A.8.24. ✅ verificado en tests E2E (`test_analyze_diff_secret_bloquea`).

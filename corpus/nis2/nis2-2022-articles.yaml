@@ -1,0 +1,234 @@
+# Corpus NIS2 — Directiva (UE) 2022/2555
+# Fuente: Diario Oficial de la UE, 27.12.2022, L 333/80 — EUR-Lex OJ:L:2022:333:TOC
+# Licencia: Dominio público — legislación europea de libre difusión
+# Formato: compatible con CorpusLoader._cargar_yaml_intuitem
+
+ref_id: "NIS2-2022/2555"
+name: "Directiva NIS2 — Seguridad de las Redes y Sistemas de Información"
+description: >
+  Directiva (UE) 2022/2555 del Parlamento Europeo y del Consejo,
+  de 14 de diciembre de 2022, relativa a las medidas destinadas a garantizar
+  un elevado nivel común de ciberseguridad en toda la Unión.
+objects:
+  reference_controls:
+    - ref_id: "Art.21.1"
+      name: "Medidas de gestión de riesgos de ciberseguridad"
+      description: >
+        Los Estados miembros velarán por que las entidades esenciales e importantes
+        adopten medidas técnicas, operativas y organizativas apropiadas y proporcionadas
+        para gestionar los riesgos que representen para la seguridad de los sistemas de
+        redes y de información que utilizan dichas entidades en sus operaciones o en la
+        prestación de sus servicios.
+      category: "risk_management"
+      translations:
+        es:
+          name: "Medidas de gestión de riesgos de ciberseguridad"
+          description: >
+            Las entidades esenciales e importantes deben adoptar medidas técnicas,
+            operativas y organizativas apropiadas y proporcionadas para gestionar
+            los riesgos para la seguridad de sus redes y sistemas de información,
+            con un enfoque basado en todos los peligros (all-hazards).
+
+    - ref_id: "Art.21.2.a"
+      name: "Políticas de análisis de riesgos y seguridad de los sistemas de información"
+      description: >
+        Las medidas de gestión de riesgos incluirán al menos: políticas relativas
+        al análisis de riesgos y a la seguridad de los sistemas de información.
+      category: "risk_management"
+      translations:
+        es:
+          name: "Políticas de análisis de riesgos y seguridad de sistemas"
+          description: >
+            Obligación de disponer de políticas documentadas para el análisis de riesgos
+            y la seguridad de los sistemas de información como parte de la gestión
+            de riesgos de ciberseguridad.
+
+    - ref_id: "Art.21.2.b"
+      name: "Gestión de incidentes"
+      description: >
+        Las medidas incluirán gestión de incidentes: planes de respuesta y recuperación,
+        notificación a CSIRT/autoridad competente, coordinación.
+      category: "incident_management"
+      translations:
+        es:
+          name: "Gestión de incidentes de ciberseguridad"
+          description: >
+            Obligación de disponer de procedimientos de gestión de incidentes, incluyendo
+            detección, análisis, contención, erradicación y recuperación. Los incidentes
+            significativos deben notificarse a la autoridad competente o CSIRT en 24 horas
+            (alerta temprana) y 72 horas (notificación completa).
+
+    - ref_id: "Art.21.2.c"
+      name: "Continuidad de las actividades empresariales y gestión de crisis"
+      description: >
+        Copias de seguridad, planes de recuperación ante desastres y gestión de crisis
+        como parte de las medidas de seguridad obligatorias.
+      category: "business_continuity"
+      translations:
+        es:
+          name: "Continuidad del negocio y gestión de crisis"
+          description: >
+            Las entidades deben disponer de políticas y capacidades de continuidad
+            de las actividades, incluyendo copias de seguridad, planes de recuperación
+            ante desastres (DRP) y procedimientos de gestión de crisis cibernéticas.
+
+    - ref_id: "Art.21.2.d"
+      name: "Seguridad de la cadena de suministro"
+      description: >
+        Seguridad de la cadena de suministro: relaciones con los proveedores directos
+        y proveedores de servicios, incluyendo aspectos de seguridad en los contratos.
+      category: "supply_chain"
+      translations:
+        es:
+          name: "Seguridad en la cadena de suministro"
+          description: >
+            Obligación de gestionar los riesgos de ciberseguridad derivados de la cadena
+            de suministro: evaluación de proveedores, cláusulas contractuales de seguridad,
+            supervisión de terceros con acceso a sistemas críticos.
+
+    - ref_id: "Art.21.2.e"
+      name: "Seguridad en la adquisición, desarrollo y mantenimiento de redes y sistemas"
+      description: >
+        Seguridad en el desarrollo de software, gestión de vulnerabilidades
+        y divulgación coordinada de vulnerabilidades.
+      category: "secure_development"
+      translations:
+        es:
+          name: "Seguridad en adquisición, desarrollo y mantenimiento de sistemas"
+          description: >
+            Las entidades deben aplicar prácticas de desarrollo seguro, gestión del ciclo
+            de vida de software, gestión de vulnerabilidades y aplicación de parches de
+            seguridad de forma oportuna.
+
+    - ref_id: "Art.21.2.f"
+      name: "Políticas y procedimientos para evaluar la eficacia de las medidas"
+      description: >
+        Políticas y procedimientos para evaluar la eficacia de las medidas de gestión
+        de riesgos de ciberseguridad, incluyendo auditorías de seguridad regulares.
+      category: "assessment"
+      translations:
+        es:
+          name: "Evaluación de la eficacia de las medidas de ciberseguridad"
+          description: >
+            Obligación de evaluar periódicamente la eficacia de las medidas de seguridad
+            mediante auditorías, pruebas de penetración, revisiones de configuración
+            y métricas de madurez de ciberseguridad.
+
+    - ref_id: "Art.21.2.g"
+      name: "Prácticas básicas de ciberhigiene y formación"
+      description: >
+        Prácticas básicas de ciberhigiene y formación en materia de ciberseguridad
+        para todo el personal de la entidad.
+      category: "awareness"
+      translations:
+        es:
+          name: "Ciberhigiene y formación en ciberseguridad"
+          description: >
+            Las entidades deben implantar prácticas básicas de ciberhigiene (contraseñas
+            seguras, actualizaciones, antivirus, cortafuegos) y proporcionar formación
+            periódica en ciberseguridad a empleados y directivos.
+
+    - ref_id: "Art.21.2.h"
+      name: "Políticas y procedimientos relativos a la criptografía"
+      description: >
+        Uso de criptografía y, cuando proceda, cifrado de extremo a extremo.
+      category: "cryptography"
+      translations:
+        es:
+          name: "Criptografía y cifrado"
+          description: >
+            Las entidades deben disponer de políticas sobre el uso de criptografía,
+            incluyendo cifrado de datos en tránsito y en reposo, y gestión segura
+            de claves criptográficas.
+
+    - ref_id: "Art.21.2.i"
+      name: "Seguridad de los recursos humanos, control de acceso y gestión de activos"
+      description: >
+        Seguridad de los recursos humanos, políticas de control de acceso
+        y gestión de activos (inventario de activos críticos).
+      category: "access_control"
+      translations:
+        es:
+          name: "RRHH, control de acceso y gestión de activos"
+          description: >
+            Obligación de implementar controles de acceso basados en el principio
+            de mínimo privilegio, gestión del ciclo de vida de identidades y accesos,
+            seguridad en los procesos de RRHH (incorporación, cambio de rol, baja)
+            e inventario actualizado de activos críticos.
+
+    - ref_id: "Art.21.2.j"
+      name: "Uso de soluciones de autenticación multifactor o de autenticación continua"
+      description: >
+        Uso de soluciones de autenticación multifactor (MFA) o de autenticación
+        continua, comunicaciones de voz, vídeo y texto seguras y sistemas
+        de comunicación de emergencia.
+      category: "authentication"
+      translations:
+        es:
+          name: "Autenticación multifactor y comunicaciones seguras"
+          description: >
+            Las entidades esenciales e importantes deben implementar autenticación
+            multifactor (MFA) o mecanismos de autenticación continua para el acceso
+            a sistemas y datos críticos. Obligación también de disponer de canales
+            de comunicación seguros para situaciones de emergencia.
+
+    - ref_id: "Art.23.1"
+      name: "Obligaciones de notificación — Alerta temprana (24h)"
+      description: >
+        Las entidades notificarán sin demora indebida y, en cualquier caso, en 24 horas
+        desde que tengan conocimiento del incidente significativo, una alerta temprana
+        al CSIRT o, cuando proceda, a la autoridad competente.
+      category: "incident_reporting"
+      translations:
+        es:
+          name: "Notificación de incidentes — alerta temprana 24 horas"
+          description: >
+            Los incidentes significativos (que afecten a la prestación del servicio
+            o a la continuidad del negocio) deben notificarse al CSIRT o autoridad
+            competente en un plazo máximo de 24 horas tras su detección.
+            La alerta temprana debe indicar si se sospecha un origen malicioso.
+
+    - ref_id: "Art.23.4"
+      name: "Notificación completa de incidente (72h)"
+      description: >
+        Notificación completa al CSIRT/autoridad competente en 72 horas,
+        con evaluación inicial del incidente, gravedad, indicadores de compromiso
+        y medidas de mitigación aplicadas.
+      category: "incident_reporting"
+      translations:
+        es:
+          name: "Notificación completa de incidente — 72 horas"
+          description: >
+            Obligación de presentar una notificación completa del incidente en 72 horas
+            con: evaluación del impacto, gravedad e indicadores de compromiso (IoC),
+            medidas de mitigación adoptadas y, si procede, afectación transfronteriza.
+
+    - ref_id: "Art.32"
+      name: "Supervisión y ejecución para entidades esenciales"
+      description: >
+        Régimen de supervisión ex ante y ex post para entidades esenciales:
+        auditorías de seguridad regulares, inspecciones in situ, sanciones
+        de hasta 10 millones de euros o el 2% del volumen de negocio mundial total.
+      category: "governance"
+      translations:
+        es:
+          name: "Supervisión de entidades esenciales"
+          description: >
+            Las autoridades competentes pueden ordenar auditorías de seguridad periódicas,
+            inspecciones in situ y fuera del lugar, y aplicar sanciones administrativas
+            de hasta 10.000.000 EUR o el 2% del volumen de negocio mundial anual total
+            (la cuantía mayor) a las entidades esenciales que incumplan la Directiva.
+
+    - ref_id: "Art.33"
+      name: "Supervisión y ejecución para entidades importantes"
+      description: >
+        Régimen de supervisión ex post para entidades importantes con sanciones
+        de hasta 7 millones de euros o el 1,4% del volumen de negocio mundial total.
+      category: "governance"
+      translations:
+        es:
+          name: "Supervisión de entidades importantes"
+          description: >
+            Para las entidades importantes, el régimen de supervisión es principalmente
+            ex post. Las sanciones pueden alcanzar 7.000.000 EUR o el 1,4% del volumen
+            de negocio mundial anual total.

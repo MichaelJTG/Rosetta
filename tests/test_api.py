@@ -254,3 +254,56 @@ async def test_compliance_state_invalid_marco_422(client: AsyncClient) -> None:
     """GET /compliance/state/marco_falso devuelve 422."""
     r = await client.get("/compliance/state/marco_falso")
     assert r.status_code == 422
+
+
+# ---------------------------------------------------------------------------
+# Tests reports
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_generate_report_sin_hallazgos(client: AsyncClient) -> None:
+    """POST /reports/generate con sesión vacía devuelve 200 y total_hallazgos=0."""
+    r = await client.post("/reports/generate", json={})
+    assert r.status_code == 200
+    data = r.json()
+    assert data["total_hallazgos"] == 0
+    assert data["md_path"].endswith(".md")
+    assert data["pdf_path"].endswith(".pdf")
+    assert "nombre_base" in data
+
+
+@pytest.mark.asyncio
+async def test_generate_report_con_hallazgos(client_with_findings: AsyncClient) -> None:
+    """POST /reports/generate incluye todos los hallazgos de la sesión."""
+    r = await client_with_findings.post(
+        "/reports/generate",
+        json={"nombre_cliente": "Test Corp", "confidencialidad": "CONFIDENCIAL"},
+    )
+    assert r.status_code == 200
+    assert r.json()["total_hallazgos"] == 5
+
+
+@pytest.mark.asyncio
+async def test_generate_report_filtrado_por_ids_inexistentes(
+    client_with_findings: AsyncClient,
+) -> None:
+    """POST /reports/generate con IDs que no existen devuelve 0 hallazgos."""
+    r = await client_with_findings.post(
+        "/reports/generate",
+        json={"hallazgo_ids": ["SEC-NOEXI-0001", "SEC-NOEXI-0002"]},
+    )
+    assert r.status_code == 200
+    assert r.json()["total_hallazgos"] == 0
+
+
+@pytest.mark.asyncio
+async def test_generate_report_nombre_base_personalizado(client: AsyncClient) -> None:
+    """POST /reports/generate con nombre_base personalizado lo refleja en la respuesta."""
+    r = await client.post(
+        "/reports/generate",
+        json={"nombre_base": "informe_acme_2026"},
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert data["nombre_base"] == "informe_acme_2026"
