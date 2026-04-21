@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # ROSETTA
 
 **Real-time Orchestrator for Semantic Evidence, Translation & Traceability of Audit-findings**
