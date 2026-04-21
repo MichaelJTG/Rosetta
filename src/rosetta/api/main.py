@@ -27,6 +27,8 @@ from rosetta.api.schemas import (
     DiffViolationItem,
     FindingItem,
     FindingsResponse,
+    ReportGenerateRequest,
+    ReportGenerateResponse,
     TranslateRequest,
 )
 from rosetta.core.diff_analyzer import DiffAnalysisResult, DiffViolation
@@ -366,6 +368,59 @@ def _persist_violation(
     findings.append(maestro)
     if grafo is not None:
         _persist_to_graph(grafo, maestro, compliance)
+
+
+# ---------------------------------------------------------------------------
+# Reports
+# ---------------------------------------------------------------------------
+
+
+@app.post("/reports/generate", response_model=ReportGenerateResponse, tags=["reports"])
+async def generate_report(
+    body: ReportGenerateRequest,
+    findings: FindingsDep,
+) -> ReportGenerateResponse:
+    """Genera un informe de auditoría en formato Markdown y PDF.
+
+    Incluye todos los hallazgos de la sesión actual o un subconjunto si se
+    especifican `hallazgo_ids`. El PDF lleva marca ROSETTA y, opcionalmente,
+    nombre e información del cliente.
+    """
+    from pathlib import Path
+
+    from rosetta.core.report_generator import ReportConfig, ReportGenerator
+
+    # Filtrar hallazgos si se especifican IDs
+    if body.hallazgo_ids is not None:
+        ids_set = set(body.hallazgo_ids)
+        hallazgos_seleccionados = [h for h in findings if h.id_hallazgo in ids_set]
+    else:
+        hallazgos_seleccionados = list(findings)
+
+    config = ReportConfig(
+        nombre_cliente=body.nombre_cliente,
+        autor=body.autor,
+        confidencialidad=body.confidencialidad,
+    )
+    gen = ReportGenerator(config)
+
+    ruta_reports = Path("reports")
+    try:
+        md_path, pdf_path = gen.generar(
+            hallazgos_seleccionados,
+            ruta_salida=ruta_reports,
+            nombre_base=body.nombre_base,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Error generando informe: {exc}") from exc
+
+    nombre_base = md_path.stem
+    return ReportGenerateResponse(
+        md_path=str(md_path),
+        pdf_path=str(pdf_path),
+        total_hallazgos=len(hallazgos_seleccionados),
+        nombre_base=nombre_base,
+    )
 
 
 def _generar_resumen_pr(result: DiffAnalysisResult) -> str:

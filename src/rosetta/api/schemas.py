@@ -120,3 +120,43 @@ class DiffAnalysisResponse(BaseModel):
         ...,
         description="Comentario Markdown listo para publicar como comentario en el PR.",
     )
+
+
+# ---------------------------------------------------------------------------
+# Report Generator — POST /reports/generate
+# ---------------------------------------------------------------------------
+
+
+class ReportGenerateRequest(BaseModel):
+    """Cuerpo de la petición POST /reports/generate."""
+
+    nombre_cliente: str | None = Field(
+        default=None,
+        description="Nombre de la organización auditada (aparece en portada y pie).",
+    )
+    autor: str = Field(
+        default="ROSETTA Audit Platform",
+        description="Nombre del auditor o equipo que firma el informe.",
+    )
+    confidencialidad: str = Field(
+        default="CONFIDENCIAL",
+        description="Nivel de confidencialidad impreso en cabecera y pie.",
+    )
+    nombre_base: str | None = Field(
+        default=None,
+        description="Nombre base para los archivos (sin extensión). "
+        "Por defecto: rosetta_report_YYYYMMDD_HHMMSS.",
+    )
+    hallazgo_ids: list[str] | None = Field(
+        default=None,
+        description="IDs de hallazgos a incluir. Si None, se incluyen todos los de la sesión.",
+    )
+
+
+class ReportGenerateResponse(BaseModel):
+    """Respuesta de POST /reports/generate."""
+
+    md_path: str = Field(..., description="Ruta al informe Markdown generado.")
+    pdf_path: str = Field(..., description="Ruta al informe PDF generado.")
+    total_hallazgos: int = Field(..., description="Número de hallazgos incluidos.")
+    nombre_base: str = Field(..., description="Nombre base usado para los archivos.")
