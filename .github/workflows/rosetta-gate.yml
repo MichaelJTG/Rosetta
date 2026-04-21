@@ -1,0 +1,31 @@
+name: ROSETTA Compliance Gate
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  compliance-check:
+    name: Verificación de Cumplimiento Normativo
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write   # necesario para publicar comentarios
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # necesario para git diff completo
+
+      - name: ROSETTA Gate
+        uses: ./action      # En producción: uses: tu-org/rosetta/action@v1
+        with:
+          rosetta_api_url: ${{ vars.ROSETTA_API_URL }}
+          rosetta_api_key: ${{ secrets.ROSETTA_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          post_comment: 'true'
+          config_file: '.rosetta.yml'

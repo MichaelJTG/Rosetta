@@ -10,6 +10,7 @@ from typing import Annotated, cast
 
 from fastapi import Depends, Request
 
+from rosetta.core.diff_analyzer import DiffAnalyzer
 from rosetta.core.models import HallazgoMaestro
 from rosetta.core.traductor import TraductorSimbiotico
 
@@ -29,6 +30,13 @@ def get_session_findings(request: Request) -> list[HallazgoMaestro]:
     return cast("list[HallazgoMaestro]", request.app.state.session_findings)
 
 
+def get_diff_analyzer(request: Request) -> DiffAnalyzer:
+    """Devuelve un DiffAnalyzer compartiendo LLM y RAG del Traductor."""
+    traductor = get_traductor(request)
+    return DiffAnalyzer(llm=traductor.llm, rag=traductor.rag)
+
+
 TraductorDep = Annotated[TraductorSimbiotico, Depends(get_traductor)]
 GrafoDep = Annotated[object | None, Depends(get_grafo)]
 FindingsDep = Annotated[list[HallazgoMaestro], Depends(get_session_findings)]
+DiffAnalyzerDep = Annotated[DiffAnalyzer, Depends(get_diff_analyzer)]

@@ -8,22 +8,32 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Any
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import structlog
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse
 
 from rosetta import __version__
 from rosetta.api.dashboard import HTML_DASHBOARD
-from rosetta.api.deps import FindingsDep, GrafoDep, TraductorDep
+from rosetta.api.deps import DiffAnalyzerDep, FindingsDep, GrafoDep, TraductorDep
 from rosetta.api.schemas import (
     ComplianceStateResponse,
     ControlSummary,
+    DiffAnalysisRequest,
+    DiffAnalysisResponse,
+    DiffViolationItem,
     FindingItem,
     FindingsResponse,
     TranslateRequest,
 )
+from rosetta.core.diff_analyzer import DiffAnalysisResult, DiffViolation
 from rosetta.core.models import (
     DatosCompliance,
+    DatosRedTeam,
+    FuenteRedTeam,
     HallazgoMaestro,
     MarcoNormativo,
     Severidad,
@@ -227,7 +237,10 @@ async def compliance_state(
     marco_str = marco.value
 
     if grafo is not None:
-        return _state_from_graph(grafo, marco_str)
+        try:
+            return _state_from_graph(grafo, marco_str)
+        except Exception as exc:
+            logger.warning("neo4j_query_failed_fallback_to_memory", error=str(exc))
 
     return _state_from_memory(findings, marco)
 
@@ -256,6 +269,143 @@ def _state_from_graph(grafo: Any, marco_str: str) -> ComplianceStateResponse:
         controles_incumplidos=controles,
         severidad_distribution=sev_dist,
     )
+
+
+# ---------------------------------------------------------------------------
+# CI/CD Gate
+# ---------------------------------------------------------------------------
+
+
+@app.post("/analyze-diff", response_model=DiffAnalysisResponse, tags=["ci-gate"])
+async def analyze_diff(
+    body: DiffAnalysisRequest,
+    analyzer: DiffAnalyzerDep,
+    grafo: GrafoDep,
+    findings: FindingsDep,
+) -> DiffAnalysisResponse:
+    """Gate de CI/CD: analiza el diff de un PR y detecta incumplimientos normativos.
+
+    Diseñado para ser llamado desde una GitHub Action. Devuelve `bloquear: true`
+    si se detectan violaciones cuya severidad supera el umbral configurado.
+
+    El campo `resumen_pr` contiene un comentario Markdown listo para publicar en el PR.
+    """
+    try:
+        bloquear_si = Severidad(body.bloquear_si)
+    except ValueError:
+        bloquear_si = Severidad.ALTA
+
+    try:
+        result = await analyzer.analizar(
+            diff_text=body.diff,
+            marcos=body.marcos,
+            bloquear_si=bloquear_si,
+            exclude_paths=body.exclude_paths,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    # Persistir cada violación como HallazgoMaestro (best-effort)
+    for violacion in result.violaciones:
+        _persist_violation(violacion, result, findings, grafo)
+
+    resumen = _generar_resumen_pr(result)
+
+    return DiffAnalysisResponse(
+        bloquear=result.bloquear,
+        total_hunks_analizados=result.total_hunks_analizados,
+        total_violaciones=len(result.violaciones),
+        marcos_usados=[m.value for m in result.marcos_usados],
+        violaciones=[
+            DiffViolationItem(
+                archivo=v.archivo,
+                linea_inicio=v.linea_inicio,
+                lineas_afectadas=list(v.lineas_afectadas),
+                controles_incumplidos=list(v.controles_incumplidos),
+                cita_normativa=v.cita_normativa,
+                justificacion=v.justificacion,
+                impacto_legal=v.impacto_legal.value,
+                accion_mitigacion=v.accion_mitigacion,
+                evidencia_auditoria=v.evidencia_auditoria,
+            )
+            for v in result.violaciones
+        ],
+        resumen_pr=resumen,
+    )
+
+
+def _persist_violation(
+    violacion: DiffViolation,
+    result: DiffAnalysisResult,
+    findings: list[HallazgoMaestro],
+    grafo: Any,
+) -> None:
+    """Persiste una violación de diff como HallazgoMaestro en sesión y Neo4j."""
+    datos_red = DatosRedTeam(
+        origen=FuenteRedTeam.MANUAL,
+        activo_detectado=f"{violacion.archivo}:{violacion.linea_inicio}",
+        evidencia="\n".join(list(violacion.lineas_afectadas)[:5]),
+        vector_ataque="Cambio de código en PR con incumplimiento normativo detectado por Gate CI/CD",
+        dificultad_explotacion=violacion.impacto_legal,
+    )
+    compliance = DatosCompliance(
+        marcos_aplicables=result.marcos_usados,
+        controles_incumplidos=list(violacion.controles_incumplidos),
+        cita_normativa=violacion.cita_normativa,
+        justificacion=violacion.justificacion,
+        impacto_legal=violacion.impacto_legal,
+        accion_mitigacion=violacion.accion_mitigacion,
+        evidencia_auditoria=violacion.evidencia_auditoria,
+    )
+    hallazgo_id = f"SEC-{uuid.uuid4().hex[:8].upper()}"
+    maestro = HallazgoMaestro(
+        id_hallazgo=hallazgo_id,
+        red_team_data=datos_red,
+        compliance_data=compliance,
+    )
+    findings.append(maestro)
+    if grafo is not None:
+        _persist_to_graph(grafo, maestro, compliance)
+
+
+def _generar_resumen_pr(result: DiffAnalysisResult) -> str:
+    """Genera el comentario Markdown del Gate para publicar en el PR."""
+    marcos_str = ", ".join(f"`{m.value}`" for m in result.marcos_usados)
+    footer = f"\n\n*Marcos: {marcos_str} · Hunks analizados: {result.total_hunks_analizados} · [ROSETTA](https://github.com/tu-org/rosetta)*"
+
+    if not result.violaciones:
+        return (
+            "## ROSETTA · Gate de Cumplimiento Normativo\n\n"
+            "✅ **Sin incumplimientos detectados** — El diff no introduce violaciones "
+            "normativas conocidas. El PR puede continuar." + footer
+        )
+
+    estado = "🔴 BLOQUEADO" if result.bloquear else "🟡 ADVERTENCIA"
+    n = len(result.violaciones)
+    lines = [
+        "## ROSETTA · Gate de Cumplimiento Normativo\n",
+        f"**Estado: {estado}** — {n} violación{'es' if n > 1 else ''} detectada{'s' if n > 1 else ''}\n",
+        "| Archivo | Línea | Controles | Severidad | Acción recomendada |",
+        "|---------|-------|-----------|-----------|-------------------|",
+    ]
+    for v in result.violaciones:
+        controles = ", ".join(f"`{c}`" for c in v.controles_incumplidos)
+        accion = v.accion_mitigacion
+        if len(accion) > 90:
+            accion = accion[:87] + "…"
+        lines.append(
+            f"| `{v.archivo}` | {v.linea_inicio} | {controles} "
+            f"| **{v.impacto_legal.value}** | {accion} |"
+        )
+
+    if result.violaciones:
+        lines.append("\n### Detalle de violaciones\n")
+        for i, v in enumerate(result.violaciones, 1):
+            lines.append(f"**{i}. `{v.archivo}:{v.linea_inicio}`** — {v.cita_normativa}")
+            lines.append(f"> {v.justificacion}")
+            lines.append("")
+
+    return "\n".join(lines) + footer
 
 
 def _state_from_memory(

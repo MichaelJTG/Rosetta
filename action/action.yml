@@ -1,0 +1,226 @@
+name: 'ROSETTA Compliance Gate'
+description: >
+  Analiza el diff de un PR y bloquea el merge si introduce incumplimientos
+  normativos (ISO 27001, ENS, NIS2, DORA). Requiere una instancia de la API
+  de ROSETTA accesible desde el runner de GitHub Actions.
+
+author: 'ROSETTA'
+
+branding:
+  icon: 'shield'
+  color: 'red'
+
+inputs:
+  rosetta_api_url:
+    description: 'URL base de la API de ROSETTA (sin barra final). Ej: https://rosetta.example.com'
+    required: true
+  rosetta_api_key:
+    description: 'API key de ROSETTA (si la instancia tiene autenticación habilitada).'
+    required: false
+    default: ''
+  config_file:
+    description: 'Ruta al fichero .rosetta.yml en el repositorio cliente.'
+    required: false
+    default: '.rosetta.yml'
+  base_ref:
+    description: 'Rama base contra la que calcular el diff (por defecto: la rama base del PR).'
+    required: false
+    default: ''
+  github_token:
+    description: 'Token de GitHub para publicar el comentario en el PR. Usa secrets.GITHUB_TOKEN.'
+    required: false
+    default: ''
+  post_comment:
+    description: 'Si "true", publica el resumen de ROSETTA como comentario en el PR.'
+    required: false
+    default: 'true'
+
+outputs:
+  bloquear:
+    description: '"true" si el PR introduce incumplimientos que superan el umbral configurado.'
+    value: ${{ steps.analizar.outputs.bloquear }}
+  total_violaciones:
+    description: 'Número total de violaciones normativas detectadas.'
+    value: ${{ steps.analizar.outputs.total_violaciones }}
+  resumen_pr:
+    description: 'Comentario Markdown generado por ROSETTA.'
+    value: ${{ steps.analizar.outputs.resumen_pr }}
+
+runs:
+  using: composite
+  steps:
+    - name: Verificar dependencias (curl, jq, python3)
+      shell: bash
+      run: |
+        for cmd in curl jq python3; do
+          if ! command -v "$cmd" &>/dev/null; then
+            echo "::error::Falta dependencia requerida: $cmd"
+            exit 1
+          fi
+        done
+
+    - name: Obtener diff del PR
+      shell: bash
+      id: diff
+      run: |
+        BASE="${{ inputs.base_ref }}"
+        if [ -z "$BASE" ]; then
+          BASE="${GITHUB_BASE_REF:-main}"
+        fi
+
+        echo "Calculando diff contra origin/$BASE..."
+        git fetch origin "$BASE" --depth=50 2>/dev/null || true
+
+        git diff "origin/$BASE"...HEAD > /tmp/rosetta_pr.diff 2>/dev/null || \
+          git diff HEAD~1...HEAD > /tmp/rosetta_pr.diff
+
+        LINES=$(wc -l < /tmp/rosetta_pr.diff)
+        echo "Diff capturado: $LINES lineas"
+        echo "diff_lines=$LINES" >> "$GITHUB_OUTPUT"
+
+    - name: Leer configuración .rosetta.yml
+      shell: bash
+      id: config
+      run: |
+        CONFIG_FILE="${{ inputs.config_file }}"
+        MARCO="iso_27001_2022"
+        BLOQUEAR_SI="alta"
+        EXCLUDE_PATHS=""
+
+        if [ -f "$CONFIG_FILE" ]; then
+          echo "Leyendo configuracion desde $CONFIG_FILE"
+          # Parseo simple con grep/sed — evita dependencia de PyYAML
+          _val=$(grep -m1 '^marco:' "$CONFIG_FILE" | sed 's/^marco:[[:space:]]*//' | tr -d '"'"'" )
+          [ -n "$_val" ] && MARCO="$_val"
+
+          _val=$(grep -m1 '^bloquear_si:' "$CONFIG_FILE" | sed 's/^bloquear_si:[[:space:]]*//' | tr -d '"'"'" )
+          [ -n "$_val" ] && BLOQUEAR_SI="$_val"
+
+          # exclude_paths: extraer items de lista YAML (lineas con "  - valor")
+          EXCLUDE_PATHS=$(awk '/^exclude_paths:/,/^[^ ]/' "$CONFIG_FILE" \
+            | grep '^[[:space:]]*-' \
+            | sed 's/^[[:space:]]*-[[:space:]]*//' \
+            | tr -d '"'"'" \
+            | tr '\n' ',' \
+            | sed 's/,$//')
+        else
+          echo "No se encontro $CONFIG_FILE — usando valores por defecto"
+        fi
+
+        echo "marco=$MARCO" >> "$GITHUB_OUTPUT"
+        echo "bloquear_si=$BLOQUEAR_SI" >> "$GITHUB_OUTPUT"
+        echo "exclude_paths=$EXCLUDE_PATHS" >> "$GITHUB_OUTPUT"
+        echo "Marco: $MARCO | Bloquear si: $BLOQUEAR_SI | Excluir: $EXCLUDE_PATHS"
+
+    - name: Enviar diff a ROSETTA API
+      shell: bash
+      id: analizar
+      run: |
+        API_URL="${{ inputs.rosetta_api_url }}"
+        API_KEY="${{ inputs.rosetta_api_key }}"
+        MARCO="${{ steps.config.outputs.marco }}"
+        BLOQUEAR_SI="${{ steps.config.outputs.bloquear_si }}"
+        EXCLUDE="${{ steps.config.outputs.exclude_paths }}"
+
+        # Construir lista de exclude_paths como array JSON con python3 -c
+        EXCLUDE_JSON="[]"
+        if [ -n "$EXCLUDE" ]; then
+          EXCLUDE_JSON=$(python3 -c "import json,sys; paths=[p.strip() for p in sys.argv[1].split(',') if p.strip()]; print(json.dumps(paths))" "$EXCLUDE")
+        fi
+
+        # Construir el body JSON — jq maneja el escaping del diff
+        BODY=$(jq -n \
+          --rawfile diff /tmp/rosetta_pr.diff \
+          --arg marco "$MARCO" \
+          --arg bloquear_si "$BLOQUEAR_SI" \
+          --argjson exclude_paths "$EXCLUDE_JSON" \
+          '{diff: $diff, marcos: [$marco], bloquear_si: $bloquear_si, exclude_paths: $exclude_paths}')
+
+        # Headers
+        HEADERS=(-H "Content-Type: application/json")
+        if [ -n "$API_KEY" ]; then
+          HEADERS+=(-H "X-API-Key: $API_KEY")
+        fi
+
+        echo "Enviando diff a $API_URL/analyze-diff..."
+        HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" \
+          -X POST "$API_URL/analyze-diff" \
+          "${HEADERS[@]}" \
+          -d "$BODY" \
+          --max-time 120)
+
+        HTTP_CODE=$(echo "$HTTP_RESPONSE" | tail -1)
+        BODY_RESP=$(echo "$HTTP_RESPONSE" | head -n -1)
+
+        if [ "$HTTP_CODE" != "200" ]; then
+          echo "::error::ROSETTA API devolvio HTTP $HTTP_CODE"
+          echo "Respuesta: $BODY_RESP"
+          exit 1
+        fi
+
+        echo "$BODY_RESP" > /tmp/rosetta_result.json
+
+        BLOQUEAR=$(echo "$BODY_RESP" | jq -r '.bloquear')
+        TOTAL_VIOLACIONES=$(echo "$BODY_RESP" | jq -r '.total_violaciones')
+        RESUMEN_PR=$(echo "$BODY_RESP" | jq -r '.resumen_pr')
+
+        echo "bloquear=$BLOQUEAR" >> "$GITHUB_OUTPUT"
+        echo "total_violaciones=$TOTAL_VIOLACIONES" >> "$GITHUB_OUTPUT"
+
+        # resumen_pr puede ser multilinea — usar delimiter
+        {
+          echo "resumen_pr<<ROSETTA_DELIMITER"
+          echo "$RESUMEN_PR"
+          echo "ROSETTA_DELIMITER"
+        } >> "$GITHUB_OUTPUT"
+
+        echo "Resultado: bloquear=$BLOQUEAR, violaciones=$TOTAL_VIOLACIONES"
+
+    - name: Publicar comentario en el PR
+      if: inputs.post_comment == 'true' && inputs.github_token != '' && github.event_name == 'pull_request'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+      run: |
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        REPO="${{ github.repository }}"
+        RESUMEN="${{ steps.analizar.outputs.resumen_pr }}"
+
+        # Buscar comentario anterior de ROSETTA para actualizar en lugar de duplicar
+        EXISTING_ID=$(curl -s \
+          -H "Authorization: Bearer $GH_TOKEN" \
+          -H "Accept: application/vnd.github+json" \
+          "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments" \
+          | jq -r '[.[] | select(.body | startswith("## ROSETTA"))] | first | .id // empty')
+
+        BODY_JSON=$(jq -n --arg body "$RESUMEN" '{body: $body}')
+
+        if [ -n "$EXISTING_ID" ]; then
+          curl -s -X PATCH \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/issues/comments/$EXISTING_ID" \
+            -d "$BODY_JSON" > /dev/null
+          echo "Comentario ROSETTA actualizado (ID: $EXISTING_ID)"
+        else
+          curl -s -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments" \
+            -d "$BODY_JSON" > /dev/null
+          echo "Comentario ROSETTA publicado"
+        fi
+
+    - name: Evaluar resultado del Gate
+      shell: bash
+      run: |
+        BLOQUEAR="${{ steps.analizar.outputs.bloquear }}"
+        TOTAL="${{ steps.analizar.outputs.total_violaciones }}"
+
+        if [ "$BLOQUEAR" = "true" ]; then
+          echo "::error::ROSETTA Gate: PR BLOQUEADO — $TOTAL violacion(es) normativa(s) detectada(s)."
+          echo "Revisa el comentario en el PR para ver los detalles y la accion de mitigacion."
+          exit 1
+        else
+          echo "ROSETTA Gate: PR aprobado — sin incumplimientos normativos detectados."
+        fi
