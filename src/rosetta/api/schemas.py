@@ -160,3 +160,24 @@ class ReportGenerateResponse(BaseModel):
     pdf_path: str = Field(..., description="Ruta al informe PDF generado.")
     total_hallazgos: int = Field(..., description="Número de hallazgos incluidos.")
     nombre_base: str = Field(..., description="Nombre base usado para los archivos.")
+
+
+# ---------------------------------------------------------------------------
+# PDF Ingestion — POST /ingest/pdf
+# ---------------------------------------------------------------------------
+
+
+class IngestPdfResponse(BaseModel):
+    """Respuesta de POST /ingest/pdf."""
+
+    total_hallazgos: int = Field(..., description="Número de hallazgos extraídos del PDF.")
+    paginas_procesadas: int = Field(..., description="Número de páginas procesadas.")
+    paginas_con_hallazgos: int = Field(
+        ..., description="Páginas de las que se extrajeron hallazgos."
+    )
+    modo_extraccion: str = Field(
+        ..., description="'texto' si pdfplumber extrajo texto; 'imagen' si se usó visión LLM."
+    )
+    hallazgo_ids: list[str] = Field(
+        ..., description="IDs de los HallazgoMaestro registrados en la sesión."
+    )

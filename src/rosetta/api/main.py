@@ -12,8 +12,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import tempfile
+
 import structlog
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, UploadFile
 from fastapi.responses import HTMLResponse
 
 from rosetta import __version__
@@ -27,6 +29,7 @@ from rosetta.api.schemas import (
     DiffViolationItem,
     FindingItem,
     FindingsResponse,
+    IngestPdfResponse,
     ReportGenerateRequest,
     ReportGenerateResponse,
     TranslateRequest,
@@ -420,6 +423,65 @@ async def generate_report(
         pdf_path=str(pdf_path),
         total_hallazgos=len(hallazgos_seleccionados),
         nombre_base=nombre_base,
+    )
+
+
+@app.post("/ingest/pdf", response_model=IngestPdfResponse, tags=["ingestion"])
+async def ingest_pdf(
+    file: UploadFile,
+    traductor: TraductorDep,
+    findings: FindingsDep,
+) -> IngestPdfResponse:
+    """Ingesta un PDF de informe de auditoría humano y extrae hallazgos.
+
+    Acepta un PDF con informe de auditoría de seguridad. Extrae el texto de
+    cada página con pdfplumber; en páginas escaneadas recurre a visión LLM
+    (pypdfium2 + Claude). Cada hallazgo extraído se registra como HallazgoMaestro
+    en la sesión con ``origen=MANUAL`` y se traduce al marco ISO 27001:2022
+    por defecto.
+    """
+    from pathlib import Path
+
+    from rosetta.core.pdf_ingestion import PdfAuditorIngester
+
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="El archivo debe ser un PDF (.pdf).")
+
+    contents = await file.read()
+    if not contents:
+        raise HTTPException(status_code=400, detail="El archivo PDF está vacío.")
+
+    # Guardar en fichero temporal para que pdfplumber/pypdfium2 puedan abrirlo
+    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+        tmp.write(contents)
+        tmp_path = Path(tmp.name)
+
+    try:
+        ingester = PdfAuditorIngester(llm_client=traductor.llm)
+        result = await ingester.ingestar(tmp_path)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+    # Registrar cada hallazgo extraído como HallazgoMaestro en sesión
+    hallazgo_ids: list[str] = []
+    for dato in result.hallazgos:
+        hallazgo_id = f"PDF-{uuid.uuid4().hex[:8].upper()}"
+        maestro = HallazgoMaestro(
+            id_hallazgo=hallazgo_id,
+            red_team_data=dato,
+            compliance_data=None,
+        )
+        findings.append(maestro)
+        hallazgo_ids.append(hallazgo_id)
+
+    return IngestPdfResponse(
+        total_hallazgos=len(result.hallazgos),
+        paginas_procesadas=result.paginas_procesadas,
+        paginas_con_hallazgos=result.paginas_con_hallazgos,
+        modo_extraccion=result.modo_extraccion,
+        hallazgo_ids=hallazgo_ids,
     )
 
 
