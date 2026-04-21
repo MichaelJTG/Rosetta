@@ -2,7 +2,7 @@
 title: Índice del vault — ROSETTA
 tags: [indice, rosetta]
 created: 2026-04-18
-updated: 2026-04-18
+updated: 2026-04-19
 ---
 
 # ROSETTA Vault — Segundo Cerebro del Proyecto
@@ -14,10 +14,10 @@ updated: 2026-04-18
 - **[[00_Dashboard]]** · estado actual del proyecto (MVP, LLM, marcos, adapters)
 - **[[00_Bitacora]]** · histórico cronológico de acciones con enlaces
 - **MOCs (Maps of Content)**:
-  - [[MOC_Roadmap]] · los 8 MVPs y los 9 problemas base
-  - [[MOC_ADRs]] · decisiones de arquitectura
-  - [[MOC_Normativas]] · los 7 marcos normativos objetivo
-  - [[MOC_Sprints]] · histórico de sprints
+  - [[MOC_Roadmap]] · los 8 MVPs y los 9 problemas base — **MVP-1→6 completados, MVP-7 en diseño**
+  - [[MOC_ADRs]] · decisiones de arquitectura — ADR-001 ✅ ADR-002 ✅
+  - [[MOC_Normativas]] · marcos normativos — ISO ✅ ENS ✅ (corpus) · NIS2/DORA/RGPD pendientes
+  - [[MOC_Sprints]] · Sprint 0 ✅ Sprint 1 ✅ Sprint 2 ✅ Sprint 3 🟢
   - [[MOC_Hallazgos]] · hallazgos canónicos para validar el Traductor
 
 ## Carpetas del vault
@@ -45,11 +45,11 @@ updated: 2026-04-18
 
 `#adr` `#normativa/iso27001` `#normativa/ens` `#normativa/nis2` `#normativa/dora` `#normativa/rgpd` `#normativa/nist` `#normativa/pci` `#sprint/N` `#hallazgo` `#control` `#procedimiento` `#decision/pendiente` `#decision/aprobada` `#riesgo` `#mentor/carlos` `#idea` `#bloqueo`
 
-## Estado actual
+## Estado actual · 2026-04-19
 
-Para datos siempre frescos consulta [[00_Dashboard]]. Referencia rápida:
-
-- MVP actual: MVP-0 ✅ completado
-- Próximo: [[MOC_Roadmap#MVP-1|MVP-1 · Traductor sobre ISO 27001:2022]]
-- ADR pendiente: [[02_ADR/002-abstraccion-llm|ADR-002 · Abstracción LLM]]
-- Insight vivo: [[06_Procedimientos/insight-carlos-procedure-drift|Procedure drift · MVP-5]]
+- **MVP actual**: MVP-7 🟡 en diseño (Gate CI/CD)
+- **Último completado**: [[MOC_Roadmap#MVP-6|MVP-6 · API REST + dashboard]] ✅ 102 tests
+- **LLM activo**: Ollama qwen2.5:14b (local, sin coste, 16GB RAM)
+- **Corpus activos**: ISO 27001 ✅ (93 controles) · ENS 🟡 (pendiente cargar)
+- **Sprint activo**: [[MOC_Sprints|Sprint 3]] 🟢
+- **ADR pendiente de proponer**: ADR-003 · Ingestión de PDF
