@@ -53,6 +53,7 @@ dependencies = [
     "pdfplumber>=0.11.9",
     "pdf2image>=1.17.0",
     "reportlab>=4.4.10",
+    "python-multipart>=0.0.26",
 ]
 
 [project.optional-dependencies]
@@ -118,6 +119,7 @@ module = [
     "sentence_transformers.*",
     "reportlab.*",
     "pdfplumber.*",
+    "pypdfium2.*",
     "pdf2image.*",
     "weasyprint.*",
 ]

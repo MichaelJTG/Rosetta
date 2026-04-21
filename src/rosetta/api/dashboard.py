@@ -144,9 +144,19 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       <div id="state-result" style="margin-top:.75rem"></div>
     </div>
 
-    <!-- Panel 3: Hallazgos de sesión (ancho completo) -->
+    <!-- Panel 3: Ingesta de PDF de auditoría -->
+    <div class="card">
+      <h2>&#128196; Ingestar informe PDF</h2>
+      <label for="pdf-file">Informe de auditoría (PDF)</label>
+      <input type="file" id="pdf-file" accept=".pdf" style="font-family:system-ui; padding:.4rem 0;">
+      <button id="btn-ingest" onclick="doIngestPdf()">Extraer hallazgos</button>
+      <div id="ingest-msg"></div>
+      <div id="ingest-result" style="margin-top:.75rem"></div>
+    </div>
+
+    <!-- Panel 4: Hallazgos de sesión (ancho completo) -->
     <div class="card span-full">
-      <h2>&#128196; Hallazgos de sesión</h2>
+      <h2>&#9776; Hallazgos de sesión</h2>
       <div id="findings-count"></div>
       <div id="findings-table"><div class="empty">Sin hallazgos aún — traduce un hallazgo para empezar.</div></div>
       <button onclick="loadFindings()" style="margin-top:.5rem; background:#2d3748;">&#8635; Refrescar</button>
@@ -283,6 +293,42 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       } catch (e) {
         resEl.innerHTML = '<span class="error">Error de red: ' + e.message + '</span>';
       }
+    }
+
+    async function doIngestPdf() {
+      const btn = document.getElementById('btn-ingest');
+      const msgEl = document.getElementById('ingest-msg');
+      const resEl = document.getElementById('ingest-result');
+      const fileInput = document.getElementById('pdf-file');
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) {
+        msgEl.innerHTML = '<span class="error">Selecciona un archivo PDF primero.</span>';
+        return;
+      }
+      btn.disabled = true;
+      msgEl.innerHTML = '<span style="color:#90cdf4">Procesando PDF... (puede tardar unos segundos)</span>';
+      resEl.innerHTML = '';
+      const form = new FormData();
+      form.append('file', file);
+      try {
+        const r = await fetch(API + '/ingest/pdf', { method: 'POST', body: form });
+        const d = await r.json();
+        if (!r.ok) {
+          msgEl.innerHTML = '<span class="error">Error ' + r.status + ': ' + (d.detail || JSON.stringify(d)) + '</span>';
+        } else {
+          msgEl.innerHTML = '<span class="success">&#10003; ' + d.total_hallazgos + ' hallazgo(s) extraídos de ' + d.paginas_procesadas + ' página(s)</span>';
+          resEl.innerHTML = '<table><tr><th>Campo</th><th>Valor</th></tr>' +
+            '<tr><td>Páginas procesadas</td><td>' + d.paginas_procesadas + '</td></tr>' +
+            '<tr><td>Páginas con hallazgos</td><td>' + d.paginas_con_hallazgos + '</td></tr>' +
+            '<tr><td>Modo extracción</td><td>' + d.modo_extraccion + '</td></tr>' +
+            '<tr><td>IDs registrados</td><td style="font-size:.75rem">' + (d.hallazgo_ids||[]).slice(0,5).join(', ') + (d.hallazgo_ids.length > 5 ? ' …' : '') + '</td></tr>' +
+            '</table>';
+          loadFindings();
+        }
+      } catch (e) {
+        msgEl.innerHTML = '<span class="error">Error de red: ' + e.message + '</span>';
+      }
+      btn.disabled = false;
     }
 
     checkHealth();
