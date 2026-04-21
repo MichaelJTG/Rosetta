@@ -13,6 +13,29 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "statusMessage": "Ruff lint check...",
+            "command": "python -c \"\nimport sys, json, subprocess, os\ntry:\n    data = json.load(sys.stdin)\n    fp = (data.get('tool_input') or {}).get('file_path', '')\n    if fp.endswith('.py'):\n        result = subprocess.run(\n            ['uv', 'run', 'ruff', 'check', '--quiet', fp],\n            capture_output=True, text=True,\n            cwd=r'C:\\\\Users\\\\WorkStation\\\\Desktop\\\\Rosetta'\n        )\n        if result.stdout.strip():\n            print(result.stdout.strip())\nexcept Exception:\n    pass\n\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "statusMessage": "Verificando cobertura de tests pendientes...",
+            "command": "python -c \"\nimport subprocess, os\nresult = subprocess.run(\n    ['python', '-m', 'pytest', '--tb=no', '-q', '--co', '-q'],\n    capture_output=True, text=True,\n    cwd=r'C:\\\\Users\\\\WorkStation\\\\Desktop\\\\Rosetta'\n)\nif result.returncode == 0:\n    lines = [l for l in result.stdout.splitlines() if 'test' in l.lower()]\n    if lines:\n        total = lines[-1]\n        print(f'Tests recopilados: {total}')\n\" 2>/dev/null || true"
+          }
+        ]
+      }
     ]
   },
   "permissions": {

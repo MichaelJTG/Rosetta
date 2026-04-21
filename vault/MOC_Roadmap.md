@@ -60,7 +60,7 @@ FastAPI con 5 endpoints: `GET /health` · `POST /translate` · `GET /findings` �
 
 **Arrancar**:
 ```bash
-PYTHONIOENCODING=utf-8 uv run uvicorn src.rosetta.api.main:app --reload
+ $env:PYTHONIOENCODING="utf-8"; uv run uvicorn src.rosetta.api.main:app --reload
 # → http://localhost:8000/dashboard
 ```
 

@@ -117,3 +117,63 @@ El usuario abre Obsidian sobre `vault/` y espera ver el proyecto "vivo" — nota
 8. **MISSION.md es tu brújula**. Antes de empezar cualquier tarea de fondo, relees `MISSION.md` y compruebas dónde estás en el roadmap. Nunca avanzas a un MVP siguiente sin haber cumplido el criterio de aceptación del anterior. Si tienes que romper esta regla, paras y preguntas al usuario.
 
 Este protocolo existe porque el vault es el único canal por el que el usuario ve el trabajo sin tener que leer código. Romperlo = romper la confianza del proyecto.
+
+---
+
+## 15. Agentes disponibles (everything-claude-code)
+
+El proyecto tiene configurados agentes especializados de [everything-claude-code](https://github.com/affaan-m/everything-claude-code) en `~/.claude/agents/`. Úsalos proactivamente:
+
+### Agentes de calidad de código
+| Agente | Cuándo usarlo |
+|--------|--------------|
+| `python-reviewer` | Después de cualquier cambio en `.py`. Verifica PEP8, type hints, seguridad, FastAPI patterns. |
+| `code-reviewer` | Revisión general de calidad tras escribir código. |
+| `tdd-guide` | Antes de implementar cualquier feature o bugfix. Enforce Red-Green-Refactor. |
+| `type-design-analyzer` | Al diseñar modelos Pydantic, dataclasses, o Protocols. |
+| `refactor-cleaner` | Para limpiar código muerto, duplicados o módulos que crecieron demasiado. |
+
+### Agentes de seguridad y rendimiento
+| Agente | Cuándo usarlo |
+|--------|--------------|
+| `security-reviewer` | Antes de cualquier commit que toque endpoints FastAPI, autenticación, o manejo de secretos. |
+| `performance-optimizer` | Al optimizar el pipeline LLM/RAG o queries Neo4j/ChromaDB. |
+| `silent-failure-hunter` | En código async de FastAPI donde los errores se pueden tragar silenciosamente. |
+| `database-reviewer` | Al escribir queries Cypher (Neo4j) o accesos a ChromaDB. |
+
+### Agentes de resolución de problemas
+| Agente | Cuándo usarlo |
+|--------|--------------|
+| `build-error-resolver` | Cuando fallen imports, dependencias o el entorno uv. |
+
+### Agentes ROSETTA propios (`.claude/agents/`)
+| Agente | Cuándo usarlo |
+|--------|--------------|
+| `rosetta-architect` | Ante cualquier cambio de arquitectura que afecte capas. Propone ADR primero. |
+| `rosetta-compliance-researcher` | Para buscar controles normativos exactos (ISO 27001, ENS, NIS2). |
+| `rosetta-test-writer` | Para escribir tests de nuevos módulos siguiendo las convenciones del proyecto. |
+
+## 16. Skills disponibles (everything-claude-code)
+
+Skills instaladas y accesibles vía herramienta `Skill`:
+
+| Skill | Propósito en ROSETTA |
+|-------|---------------------|
+| `python-patterns` | Patrones Python idiomáticos: Protocol, dataclasses, generadores, concurrencia |
+| `python-testing` | Pytest fixtures, mocks, parametrize para tests de adaptadores |
+| `tdd-workflow` | Flujo completo Red-Green-Refactor con coverage 80%+ |
+| `security-review` | Proceso de revisión de seguridad para endpoints de la API REST |
+| `security-scan` | Escaneo estático con bandit + revisión de dependencias |
+| `verification-loop` | Loop de verificación antes de declarar una tarea completa |
+| `claude-api` | Optimización del uso de Anthropic SDK con prompt caching (crítico para el Traductor) |
+| `backend-patterns` | Patrones de API REST, Repository pattern, manejo de errores |
+| `agentic-engineering` | Diseño de pipelines LLM/RAG para el Traductor Simbiótico |
+| `api-design` | Diseño de endpoints FastAPI con Pydantic response models |
+
+## 17. Hooks automáticos configurados
+
+Los siguientes hooks están activos en `.claude/settings.json`:
+
+- **PreToolUse (Write/Edit)**: Bloquea escritura en `.env`, `workspace.json` de Obsidian, y PDFs del corpus.
+- **PostToolUse (Write/Edit)**: Ejecuta `ruff check` automáticamente al editar archivos `.py`. Los warnings aparecen en el terminal.
+- **Stop**: Al terminar sesión, muestra el número de tests recopilados como recordatorio de cobertura.
