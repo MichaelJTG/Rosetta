@@ -22,10 +22,88 @@ updated: 2026-04-18
 
 ---
 
+## 2026-04-21 · MVP-7 completado — Gate CI/CD
+- **Hecho**: Implementado `POST /analyze-diff` con `DiffParser` + `DiffAnalyzer` (LLM+RAG por hunk, tool-use con `tiene_violacion` explícito). GitHub Action composite en `action/action.yml` (obtiene diff, lee `.rosetta.yml`, llama API, publica comentario en PR, bloquea con exit 1). 141 tests (39 nuevos) · ruff ✅ · mypy strict ✅ · cobertura `diff_analyzer` 88%.
+- **Por qué**: Criterio de aceptación MVP-7: PR con secret hardcodeado → bloqueado con ISO 27001 A.8.24. ✅ verificado en tests E2E (`test_analyze_diff_secret_bloquea`).
+- **Archivos**: `src/rosetta/core/diff_analyzer.py` · `src/rosetta/api/main.py` · `src/rosetta/api/schemas.py` · `src/rosetta/api/deps.py` · `tests/test_diff_analyzer.py` · `tests/test_api_diff.py` · `action/action.yml` · `.rosetta.yml` · `.github/workflows/rosetta-gate.yml`
+- **Técnica clave**: `tiene_violacion: bool` en el tool schema del LLM permite respuesta explícita "sin violación" para cambios neutros, evitando falsos positivos. `DiffParser` filtra automáticamente lock files, binarios y patrones glob del usuario antes de llamar al LLM.
+- **Enlaces**: [[MOC_Roadmap]] · [[07_Sprints/2026-04-21_sprint-3]] · [[00_Dashboard]]
+- **Estado**: ✅ hecho
+
+---
+
+## 2026-04-21 · Inicio de sesión — Sprint 3 abierto
+- **Hecho**: Abierto [[07_Sprints/2026-04-21_sprint-3]] para MVP-7 Gate CI/CD. Estado previo: MVP-6 ✅, 102 tests, ruff+mypy strict ✅. Diseño MVP-7 aprobado (Action llama API externa, hunks por línea, config `.rosetta.yml`).
+- **Por qué**: Continuar el roadmap desde el punto exacto donde quedó la sesión anterior.
+- **Archivos**: `vault/07_Sprints/2026-04-21_sprint-3.md`
+- **Enlaces**: [[MOC_Sprints]] · [[00_Dashboard]] · [[MOC_Roadmap]]
+- **Estado**: 🟢 en curso
+
+---
+
+## 2026-04-21 · Instalación y configuración de everything-claude-code
+
+- **Hecho**: Instalado plugin `affaan-m/everything-claude-code` (48 agentes, 183 skills). Copiadas rules a `~/.claude/rules/` (common + python). Instalados 10 agentes ECC en `~/.claude/agents/`. Configurados hooks PostToolUse (ruff check auto en .py) y Stop (conteo de tests). Activadas 14 rules user-level. Documentados agentes y skills en `CLAUDE.md` secciones 15-17.
+- **Por qué**: Fortalecer el harness de desarrollo para calidad, seguridad y TDD en sesiones futuras. Crítico para la capa núcleo type-safe y el uso de Anthropic SDK.
+- **Archivos**: `.claude/settings.json` · `~/.claude/settings.json` · `CLAUDE.md`
+- **Enlaces**: [[MOC_ADRs]] · [[00_Dashboard]]
+- **Estado**: ✅ hecho
+
+## 2026-04-20 · Nota de anti-patrón "LLM-as-scanner" tras revisar deep-eye
+- **Hecho**: Creada [[05_Hallazgos/anti-patron-llm-as-scanner]] contrastando el enfoque de deep-eye (zakirkun, MIT, ~1k stars) con el de ROSETTA. deep-eye mete el LLM dentro del escáner (genera payloads); ROSETTA lo usa después del hallazgo (traduce a controles). Incluye tabla de contraste y talking points para Carlos/profesores/clientes.
+- **Por qué**: El usuario preguntó si hay algo aprovechable del repo. La respuesta es no como dependencia ni como patrón arquitectónico, pero sí como contraste narrativo que refuerza la tesis del Traductor Simbiótico.
+- **Archivos**: `vault/05_Hallazgos/anti-patron-llm-as-scanner.md`
+- **Enlaces**: [[MOC_Hallazgos]] · [[05_Hallazgos/referencia-decepticon]] · [[CLAUDE]] §2
+- **Estado**: ✅ hecho
+
+## 2026-04-20 · Arquitectura multi-agente diseñada a partir de referencia Decepticon
+- **Hecho**: Creado catálogo de 16 agentes especialistas ([[10_Agentes/MOC_Agentes]]) con specs detalladas para los 3 más críticos ([[10_Agentes/Rosetta]], [[10_Agentes/TraductorISO]], [[10_Agentes/Validador]]). Propuesto [[02_ADR/004-arquitectura-multi-agente]] y documentados 3 patrones arquitectónicos como notas de hallazgo: [[05_Hallazgos/patron-litellm-gateway]], [[05_Hallazgos/patron-agentes-especializados]], [[05_Hallazgos/patron-aislamiento-dual-red]]. Creada nota [[05_Hallazgos/referencia-decepticon]] separando producto (no alineado, Decepticon es ofensivo) de patrones (sí adoptables, Apache-2.0).
+- **Por qué**: El usuario preguntó por https://github.com/PurpleAILAB/Decepticon y pidió generar agentes equivalentes adaptados a ROSETTA. Decepticon valida que un patrón multi-agente con 16 especialistas y gateway LiteLLM es viable; lo adaptamos al dominio de compliance manteniendo el principio *"orquestar, no forkear"* (CLAUDE.md §4).
+- **Archivos**: `vault/10_Agentes/MOC_Agentes.md` · `vault/10_Agentes/Rosetta.md` · `vault/10_Agentes/TraductorISO.md` · `vault/10_Agentes/Validador.md` · `vault/02_ADR/004-arquitectura-multi-agente.md` · `vault/05_Hallazgos/referencia-decepticon.md` · `vault/05_Hallazgos/patron-litellm-gateway.md` · `vault/05_Hallazgos/patron-agentes-especializados.md` · `vault/05_Hallazgos/patron-aislamiento-dual-red.md`
+- **Enlaces**: [[MOC_ADRs]] · [[MOC_Hallazgos]] · [[02_ADR/002-abstraccion-llm]]
+- **Estado**: 🟡 parcial — ADR-004 propuesto pendiente de aprobación del usuario; Traductores ENS/NIS2/DORA/RGPD/NIST/PCI, Crucero, Dossiero, Gatemaster, Deriva, Reconocedor, Vigilante y Soundwave documentados en MOC pero sin ficha individual (se crean cuando toquen a implementar en MVP-8).
+
+## 2026-04-19 · Vault sincronizado — MOCs actualizados al estado real del proyecto
+- **Hecho**: Actualizados [[MOC_Roadmap]], [[MOC_Sprints]], [[MOC_ADRs]], [[MOC_Normativas]], [[00_Index]], [[03_Normativa/ISO_27001_2022]], [[03_Normativa/ENS_2022]]. El vault reflejaba MVP-0 completado y el resto como pendiente, cuando en realidad MVP-1→6 están todos completados.
+- **Por qué**: El usuario abrió el vault en Obsidian y vio datos desactualizados (ej: MVP-2 como "no empezado"). El vault es el canal de visibilidad del proyecto — no tenerlo al día rompe la confianza.
+- **Archivos**: `vault/MOC_Roadmap.md` · `vault/MOC_Sprints.md` · `vault/MOC_ADRs.md` · `vault/MOC_Normativas.md` · `vault/00_Index.md` · `vault/03_Normativa/ISO_27001_2022.md` · `vault/03_Normativa/ENS_2022.md`
+- **Estado**: ✅ hecho
+
+## 2026-04-19 · Primera traducción real con Ollama qwen2.5:14b
+- **Hecho**: Instalado Ollama vía winget + descargado qwen2.5:14b (~9GB). Configurado `LLM_PROVIDER=ollama` en `.env`. Añadido `load_dotenv()` a API y CLI (faltaba). Corpus ISO 27001 cargado (93 fragmentos). Traducción `finding_aws_leaked_key.json` → controles ISO A.5.23 + A.8.4 ✅. Dashboard web operativo en `http://localhost:8000/dashboard`.
+- **Por qué**: Validar que el Traductor funciona con LLM local sin coste de API, para desarrollo continuo.
+- **Archivos**: `src/rosetta/api/main.py` · `src/rosetta/cli/main.py` · `.env`
+- **Decisión técnica**: qwen2.5:14b es el mínimo recomendado para tool-use estructurado con 16GB RAM. Modelos 8B son menos fiables para JSON schema.
+- **Bloqueos resueltos**: `.env` no se cargaba (faltaba `load_dotenv()`); Neo4j intentaba conectar aunque no estuviera corriendo (fix: try/except + `NEO4J_URI` comentada); encoding cp1252 en Windows (fix: `PYTHONIOENCODING=utf-8`); múltiples procesos uvicorn en el mismo puerto.
+- **Estado**: ✅ hecho
+
+## 2026-04-19 · MVP-7 Gate CI/CD — diseño aprobado
+- **Hecho**: Brainstorming del Gate de CI/CD con el usuario. Decisiones: (A) la GitHub Action llama a la API externa de ROSETTA, (B) el diff se divide en hunks para granularidad de línea, (C) config en `.rosetta.yml` del repo cliente (sin `exclude_paths` — YAGNI), `api_key` como GitHub Secret.
+- **Por qué**: MVP-7 es el siguiente paso del roadmap. El diseño previo evita sorpresas durante la implementación.
+- **Estado**: 🟡 parcial — diseño aprobado, implementación pendiente
+
+---
+
+## 2026-04-19 · MVP-6 completado — API REST + dashboard visual
+- **Hecho**: Implementados 3 endpoints funcionales (`POST /translate`, `GET /findings`, `GET /compliance/state/{marco}`) + panel visual en `GET /dashboard`. 102 tests, ruff+mypy strict ✅.
+- **Por qué**: El usuario quería poder probar la herramienta desde un navegador sin usar la CLI.
+- **Archivos**: `src/rosetta/api/main.py` · `src/rosetta/api/schemas.py` · `src/rosetta/api/deps.py` · `src/rosetta/api/dashboard.py` · `tests/test_api.py`
+- **Decisión técnica**: dashboard como HTML embebido en FastAPI (sin Streamlit, sin npm) — cero dependencias nuevas, todo en el mismo proceso uvicorn.
+- **Estado**: ✅ hecho
+
+---
+
 ## 2026-04-19 · Inicio de sesión
 - **Objetivo**: Cerrar MVP-1 — subir cobertura ≥80% en core/, resolver test E2E con mocks, validar criterio de aceptación (5 hallazgos canónicos → control ISO correcto).
 - **Estado previo**: leído [[00_Dashboard]]. MVP en curso: MVP-1 (Traductor Simbiótico sobre ISO 27001). Sprint 1 abierto. 37 tests, cobertura 70%, ruff ✅, mypy ✅. Pendiente: cobertura y test E2E.
 - **Checkpoints esperados**: MVP-1 criterio de aceptación cumplido → 🛑 CHECKPOINT luz verde para MVP-2.
+
+---
+
+## 2026-04-19 · Cierre de sesión — MVP-0 a MVP-5 completados
+- **Hecho**: 6 MVPs implementados en una sesión. 93 tests · ruff ✅ · mypy ✅. Pausa para pruebas del usuario.
+- **Estado**: 🛑 Esperando resultados de pruebas antes de avanzar a MVP-6 (API REST).
+- **Próximo paso cuando retome**: MVP-6 — FastAPI endpoints + Streamlit/dashboard básico.
 
 ---
 

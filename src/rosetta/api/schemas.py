@@ -59,3 +59,64 @@ class ComplianceStateResponse(BaseModel):
     total_hallazgos: int
     controles_incumplidos: list[ControlSummary]
     severidad_distribution: dict[str, int]
+
+
+# ---------------------------------------------------------------------------
+# CI/CD Gate — POST /analyze-diff
+# ---------------------------------------------------------------------------
+
+
+class DiffAnalysisRequest(BaseModel):
+    """Cuerpo de la petición POST /analyze-diff."""
+
+    diff: str = Field(
+        ...,
+        description="Diff unificado completo del PR (salida de `git diff origin/main...HEAD`).",
+    )
+    marcos: list[MarcoNormativo] = Field(
+        default=[MarcoNormativo.ISO_27001_2022],
+        description="Marcos normativos contra los que analizar el diff.",
+    )
+    bloquear_si: str = Field(
+        default="alta",
+        description="Severidad mínima para bloquear el PR (baja | media | alta | critica).",
+    )
+    exclude_paths: list[str] = Field(
+        default_factory=list,
+        description="Patrones glob de rutas a ignorar (ej. ['tests/**', '*.lock']).",
+    )
+
+
+class DiffViolationItem(BaseModel):
+    """Una violación normativa detectada en el diff — ítem de la respuesta."""
+
+    archivo: str = Field(..., description="Ruta del archivo con la violación.")
+    linea_inicio: int = Field(..., description="Línea de inicio del hunk afectado.")
+    lineas_afectadas: list[str] = Field(
+        ..., description="Líneas añadidas que contienen la violación."
+    )
+    controles_incumplidos: list[str] = Field(
+        ..., description="IDs de controles normativo incumplidos."
+    )
+    cita_normativa: str
+    justificacion: str
+    impacto_legal: str
+    accion_mitigacion: str
+    evidencia_auditoria: str
+
+
+class DiffAnalysisResponse(BaseModel):
+    """Respuesta de POST /analyze-diff."""
+
+    bloquear: bool = Field(
+        ...,
+        description="True si el PR debe ser bloqueado por incumplimientos normativos.",
+    )
+    total_hunks_analizados: int = Field(..., description="Número de hunks analizados.")
+    total_violaciones: int = Field(..., description="Número de violaciones detectadas.")
+    marcos_usados: list[str] = Field(..., description="Marcos normativos usados en el análisis.")
+    violaciones: list[DiffViolationItem]
+    resumen_pr: str = Field(
+        ...,
+        description="Comentario Markdown listo para publicar como comentario en el PR.",
+    )

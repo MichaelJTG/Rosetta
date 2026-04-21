@@ -3,10 +3,10 @@ title: Dashboard ROSETTA
 tags: [dashboard, rosetta]
 created: 2026-04-18
 updated: 2026-04-19
-sprint_actual: 2
-mvp_actual: MVP-6
-mvp_estado: en-curso
-proximo_mvp: MVP-7
+sprint_actual: 3
+mvp_actual: MVP-7
+mvp_estado: completado
+proximo_mvp: MVP-8
 llm_proveedor: ollama (desarrollo) / claude (validación)
 marcos_cargados: []
 adapters_activos: []
@@ -19,10 +19,10 @@ adapters_activos: []
 
 ## Estado actual
 
-- **MVP en curso**: MVP-6 🟢 próximo · [[MOC_Roadmap#MVP-6|API REST y dashboard]]
-- **MVP anterior**: MVP-5 ✅ completado (DriftDetector, PRO-IAM-001 canónico, 93 tests)
-- **Sprint activo**: [[07_Sprints/2026-04-19_sprint-2|Sprint 2]] 🟢 MVP-2 + MVP-3 completados
-- **LLM provider**: [[02_ADR/002-abstraccion-llm|ADR-002]] 🟡 pendiente aprobación · ollama (dev) / claude (validación)
+- **MVP en curso**: MVP-8 ⚪ próximo (NIS2, DORA, NIST CSF 2)
+- **MVP anterior**: MVP-7 ✅ completado (`POST /analyze-diff` · GitHub Action · 141 tests)
+- **Sprint activo**: [[07_Sprints/2026-04-21_sprint-3|Sprint 3]] ✅ Gate CI/CD completo
+- **LLM provider**: [[02_ADR/002-abstraccion-llm|ADR-002]] ✅ aprobada · ollama (dev) / claude (validación)
 
 ## Marcos normativos
 

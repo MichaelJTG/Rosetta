@@ -1,0 +1,21 @@
+# Configuración de ROSETTA para el Gate de CI/CD
+# Coloca este fichero en la raíz de tu repositorio cliente.
+# Referencia: https://github.com/tu-org/rosetta
+
+version: "1"
+
+# Marco normativo activo para el análisis
+# Opciones: iso_27001_2022 | ens_2022 | nis2 | dora | rgpd | nist_csf_2 | pci_dss_4
+marco: iso_27001_2022
+
+# Severidad mínima para bloquear el PR
+# Opciones: baja | media | alta | critica
+bloquear_si: alta
+
+# Rutas a ignorar en el análisis (patrones glob)
+exclude_paths:
+  - "*.lock"           # Lock files de dependencias
+  - "tests/**"         # Tests (no son código de producción)
+  - "docs/**"          # Documentación
+  - "*.md"             # Markdown
+  - ".github/**"       # Configuración de GitHub Actions
