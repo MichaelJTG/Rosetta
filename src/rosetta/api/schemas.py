@@ -244,3 +244,49 @@ class AuditStatusResponse(BaseModel):
     hallazgo_ids: list[str] = Field(
         ..., description="IDs de HallazgoMaestro registrados en la sesión."
     )
+
+
+# ---------------------------------------------------------------------------
+# Blue Team — POST /blue/ingest
+# ---------------------------------------------------------------------------
+
+
+class AlertaBlueItem(BaseModel):
+    """Alerta Blue Team normalizada para la respuesta."""
+
+    id: str
+    timestamp: str
+    nivel: int
+    regla_id: str
+    regla_descripcion: str
+    agente_id: str
+    agente_nombre: str
+    activo: str
+
+
+class BlueIngestRequest(BaseModel):
+    """Cuerpo de POST /blue/ingest — ingesta offline de alertas Wazuh."""
+
+    formato: str = Field(
+        default="json",
+        description="Formato del payload: 'json' o 'csv'.",
+    )
+    datos_json: list[dict[str, object]] | None = Field(
+        default=None,
+        description="Alertas Wazuh en formato JSON (lista o wrapper API).",
+    )
+    datos_csv: str | None = Field(
+        default=None,
+        description="Alertas Wazuh en formato CSV (texto completo del fichero).",
+    )
+
+
+class BlueIngestResponse(BaseModel):
+    """Respuesta de POST /blue/ingest."""
+
+    total_alertas: int = Field(..., description="Número de alertas ingestadas.")
+    alertas: list[AlertaBlueItem] = Field(..., description="Alertas normalizadas.")
+    resumen_cobertura: dict[str, object] = Field(
+        ...,
+        description="Cobertura Red↔Blue: total, con_cobertura, sin_cobertura, porcentaje.",
+    )

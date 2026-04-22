@@ -171,6 +171,21 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       <div id="ingest-result" style="margin-top:.75rem"></div>
     </div>
 
+    <!-- Panel 6: Blue Team — Ingesta alertas Wazuh -->
+    <div class="card" style="grid-column: 1 / -1">
+      <h2>&#128737; Blue Team &#8212; Alertas Wazuh</h2>
+      <div style="display:flex; gap:1rem; margin-bottom:.5rem; font-size:.85rem; align-items:center">
+        <label>Formato:</label>
+        <label><input type="radio" name="blue-fmt" value="json" checked> JSON</label>
+        <label><input type="radio" name="blue-fmt" value="csv"> CSV</label>
+      </div>
+      <label for="blue-data">Datos de alertas (pega JSON o CSV de export Wazuh)</label>
+      <textarea id="blue-data" style="min-height:100px; font-family:Consolas,monospace; font-size:.8rem" placeholder='[{"id":"1","timestamp":"2026-04-22T10:00:00","rule":{"id":"5710","level":7,"description":"SSH brute force"},"agent":{"id":"001","name":"srv-web","ip":"1.2.3.4"}}]'></textarea>
+      <button id="btn-blue" onclick="doBlueIngest()">Ingestar alertas</button>
+      <div id="blue-msg"></div>
+      <div id="blue-result" style="margin-top:.75rem"></div>
+    </div>
+
     <!-- Panel 4: Hallazgos de sesión (ancho completo) -->
     <div class="card span-full">
       <h2>&#9776; Hallazgos de sesión</h2>
@@ -389,6 +404,47 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
             '<tr><td>IDs registrados</td><td style="font-size:.75rem">' + (d.hallazgo_ids||[]).slice(0,5).join(', ') + (d.hallazgo_ids.length > 5 ? ' …' : '') + '</td></tr>' +
             '</table>';
           loadFindings();
+        }
+      } catch (e) {
+        msgEl.innerHTML = '<span class="error">Error de red: ' + e.message + '</span>';
+      }
+      btn.disabled = false;
+    }
+
+    async function doBlueIngest() {
+      const btn = document.getElementById('btn-blue');
+      const msgEl = document.getElementById('blue-msg');
+      const resEl = document.getElementById('blue-result');
+      const fmt = document.querySelector('input[name="blue-fmt"]:checked').value;
+      const rawData = document.getElementById('blue-data').value.trim();
+      if (!rawData) {
+        msgEl.innerHTML = '<span class="error">Introduce datos JSON o CSV primero.</span>';
+        return;
+      }
+      btn.disabled = true;
+      msgEl.innerHTML = '<span style="color:#90cdf4">Procesando alertas Blue Team...</span>';
+      resEl.innerHTML = '';
+      let body;
+      if (fmt === 'json') {
+        try { body = { formato: 'json', datos_json: JSON.parse(rawData) }; }
+        catch (e) { msgEl.innerHTML = '<span class="error">JSON inválido: ' + e.message + '</span>'; btn.disabled=false; return; }
+      } else {
+        body = { formato: 'csv', datos_csv: rawData };
+      }
+      try {
+        const r = await fetch(API + '/blue/ingest', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        const d = await r.json();
+        if (!r.ok) {
+          msgEl.innerHTML = '<span class="error">Error ' + r.status + ': ' + (d.detail || JSON.stringify(d)) + '</span>';
+        } else {
+          const cob = d.resumen_cobertura || {};
+          msgEl.innerHTML = '<span class="success">&#10003; ' + d.total_alertas + ' alerta(s) ingestada(s)</span>';
+          resEl.innerHTML = '<table><tr><th>Campo</th><th>Valor</th></tr>' +
+            '<tr><td>Total alertas</td><td>' + d.total_alertas + '</td></tr>' +
+            '<tr><td>Hallazgos Red con cobertura Blue</td><td>' + (cob.con_cobertura||0) + ' / ' + (cob.total_hallazgos||0) + ' (' + (cob.porcentaje_cobertura||0) + '%)</td></tr>' +
+            '<tr><td>Sin cobertura Blue</td><td>' + (cob.sin_cobertura||0) + '</td></tr>' +
+            '<tr><td>Alertas correlacionadas</td><td>' + (cob.total_alertas_correlacionadas||0) + '</td></tr>' +
+            '</table>';
         }
       } catch (e) {
         msgEl.innerHTML = '<span class="error">Error de red: ' + e.message + '</span>';
