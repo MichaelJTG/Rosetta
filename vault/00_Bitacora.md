@@ -22,6 +22,15 @@ updated: 2026-04-18
 
 ---
 
+## 2026-04-22 11:30 · FASE 4 completada — Blue Team Wazuh + enriquecimiento Red↔Blue
+- **Hecho**: `adapters/blue/wazuh.py` completo (auth JWT, consultar_alertas, estado_activo, ingestar_json/csv offline). `core/blue_enrichment.py` (enriquecer() por IP match, resumen_cobertura()). `POST /blue/ingest` con correlación Red↔Blue. Panel Blue Team en dashboard. 39 tests nuevos → 253 total. ruff ✅ · mypy ✅. Commit `407be23`.
+- **Por qué**: PLAN_V4 FASE 4 — cobertura defensiva: cruzar hallazgos Red Team con alertas Wazuh para auditoría completa.
+- **Archivos**: `src/rosetta/adapters/blue/wazuh.py` · `src/rosetta/core/blue_enrichment.py` · `src/rosetta/api/main.py` · `tests/test_blue.py`
+- **Enlaces**: [[MOC_Roadmap]] · [[00_Dashboard]]
+- **Estado**: ✅ hecho
+
+---
+
 ## 2026-04-22 10:45 · FASE 3 completada — Modo A Orquestador + Nmap + WebSocket
 - **Hecho**: `core/orchestrator.py` (Orchestrator asyncio.Semaphore, rate limiting, lista negra IPs privadas/loopback, declaración alcance obligatoria, callback progreso). `adapters/red/nmap.py` (wrapper XML binario nmap, severidad por puerto: 445/6379/23=CRITICA). Endpoints `POST /audit/start`, `WS /audit/ws/{id}`, `GET /audit/{id}`. Dashboard: panel Modo A con log WebSocket live. 34 tests nuevos → 214 total. ruff ✅ · mypy ✅. Commit `90e3c55`.
 - **Por qué**: PLAN_V4 FASE 3 — auditor automático Red Team con controles de seguridad obligatorios (declaración de alcance, lista negra, IPs privadas bloqueadas).
