@@ -240,3 +240,14 @@ updated: 2026-04-18
 - **Archivos**: `pyproject.toml` · `src/rosetta/**` · `docs/adr/001-orquestacion-sobre-fork.md` · [[02_ADR/001-orquestacion-sobre-fork]] · [[07_Sprints/2026-04-18_sprint-0]]
 - **Enlaces**: [[MOC_Roadmap#MVP-0]] · [[02_ADR/001-orquestacion-sobre-fork]]
 - **Estado**: ✅ hecho
+
+## 2026-04-22 · FASE 2 completada — Ingesta de PDF de auditor humano
+- **Hecho**: Implementado pipeline completo de ingesta de informes PDF.
+  `PdfAuditorIngester` extrae texto con pdfplumber; en páginas escaneadas
+  renderiza a imagen con pypdfium2 y usa visión LLM (Claude). Extracción
+  estructurada via tool-use (`extraer_hallazgos`) → `DatosRedTeam`.
+  Endpoint `POST /ingest/pdf` (multipart) + panel de upload en dashboard.
+  17 tests nuevos; 180 passed en suite completa; mypy clean.
+- **Por qué**: PLAN_V4 FASE 2 — Modo B de entrada de datos (auditor humano con PDF).
+- **Archivos**: `src/rosetta/core/pdf_ingestion.py` · `src/rosetta/api/main.py` · `src/rosetta/api/schemas.py` · `src/rosetta/api/dashboard.py` · `tests/test_pdf_ingestion.py`
+- **Estado**: ✅ hecho — commit feat(mvp-8): FASE 2
