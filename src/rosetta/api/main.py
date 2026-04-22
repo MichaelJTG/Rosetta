@@ -20,9 +20,12 @@ from rosetta import __version__
 from rosetta.api.dashboard import HTML_DASHBOARD
 from rosetta.api.deps import DiffAnalyzerDep, FindingsDep, GrafoDep, TraductorDep
 from rosetta.api.schemas import (
+    AlertaBlueItem,
     AuditStartRequest,
     AuditStartResponse,
     AuditStatusResponse,
+    BlueIngestRequest,
+    BlueIngestResponse,
     ComplianceStateResponse,
     ControlSummary,
     DiffAnalysisRequest,
@@ -688,6 +691,72 @@ def _generar_resumen_pr(result: DiffAnalysisResult) -> str:
             lines.append("")
 
     return "\n".join(lines) + footer
+
+
+# ---------------------------------------------------------------------------
+# Blue Team — POST /blue/ingest
+# ---------------------------------------------------------------------------
+
+
+@app.post("/blue/ingest", response_model=BlueIngestResponse, tags=["blue-team"])
+async def blue_ingest(
+    body: BlueIngestRequest,
+    findings: FindingsDep,
+) -> BlueIngestResponse:
+    """Ingesta offline de alertas Wazuh en formato JSON o CSV.
+
+    Parsea el payload, normaliza las alertas al formato interno y calcula
+    la cobertura defensiva Red↔Blue cruzando con los hallazgos de la sesión.
+
+    Formatos soportados:
+      - ``json``: lista de objetos alerta Wazuh o wrapper ``{"data": {"affected_items": [...]}}``
+      - ``csv``: texto CSV con columnas estándar de export Wazuh
+    """
+    from rosetta.adapters.blue.wazuh import WazuhAdapter
+    from rosetta.core.blue_enrichment import enriquecer, resumen_cobertura
+
+    if body.formato == "csv":
+        if not body.datos_csv:
+            raise HTTPException(status_code=400, detail="Se requiere 'datos_csv' para formato csv.")
+        alertas = WazuhAdapter.ingestar_csv(body.datos_csv)
+    else:
+        if body.datos_json is None:
+            raise HTTPException(
+                status_code=400, detail="Se requiere 'datos_json' para formato json."
+            )
+        alertas = WazuhAdapter.ingestar_json(body.datos_json)
+
+    # Enriquecer con hallazgos Red Team de la sesión
+    hallazgos_dict = [
+        {
+            "activo_detectado": m.red_team_data.activo_detectado,
+            "vector_ataque": m.red_team_data.vector_ataque,
+            "dificultad_explotacion": m.red_team_data.dificultad_explotacion,
+        }
+        for m in findings
+    ]
+    enriquecidos = enriquecer(hallazgos_dict, alertas)
+    cobertura = resumen_cobertura(enriquecidos)
+
+    alertas_response = [
+        AlertaBlueItem(
+            id=a["id"],
+            timestamp=a["timestamp"],
+            nivel=a["nivel"],
+            regla_id=a["regla_id"],
+            regla_descripcion=a["regla_descripcion"],
+            agente_id=a["agente_id"],
+            agente_nombre=a["agente_nombre"],
+            activo=a["activo"],
+        )
+        for a in alertas
+    ]
+
+    return BlueIngestResponse(
+        total_alertas=len(alertas),
+        alertas=alertas_response,
+        resumen_cobertura=cobertura,
+    )
 
 
 def _state_from_memory(
