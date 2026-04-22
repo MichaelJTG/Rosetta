@@ -22,6 +22,15 @@ updated: 2026-04-18
 
 ---
 
+## 2026-04-22 10:45 · FASE 3 completada — Modo A Orquestador + Nmap + WebSocket
+- **Hecho**: `core/orchestrator.py` (Orchestrator asyncio.Semaphore, rate limiting, lista negra IPs privadas/loopback, declaración alcance obligatoria, callback progreso). `adapters/red/nmap.py` (wrapper XML binario nmap, severidad por puerto: 445/6379/23=CRITICA). Endpoints `POST /audit/start`, `WS /audit/ws/{id}`, `GET /audit/{id}`. Dashboard: panel Modo A con log WebSocket live. 34 tests nuevos → 214 total. ruff ✅ · mypy ✅. Commit `90e3c55`.
+- **Por qué**: PLAN_V4 FASE 3 — auditor automático Red Team con controles de seguridad obligatorios (declaración de alcance, lista negra, IPs privadas bloqueadas).
+- **Archivos**: `src/rosetta/core/orchestrator.py` · `src/rosetta/adapters/red/nmap.py` · `src/rosetta/api/main.py` · `src/rosetta/api/dashboard.py` · `tests/test_orchestrator.py`
+- **Enlaces**: [[MOC_Roadmap]] · [[00_Dashboard]]
+- **Estado**: ✅ hecho
+
+---
+
 ## 2026-04-21 · FASE 1 completada — Corpus NIS2 + ReportGenerator + POST /reports/generate
 - **Hecho**: (1) Corpus NIS2 con 14 artículos clave (Art.21.1–Art.33) en YAML compatible con CorpusLoader. (2) `core/report_generator.py`: genera MD estructurado + PDF con reportlab (marca ROSETTA + campo cliente opcional). (3) Endpoint `POST /reports/generate` con filtrado por IDs. (4) 31 tests verdes (18 report_generator + 4 API). ruff ✅.
 - **Por qué**: PLAN_V4 FASE 1 — fundaciones: corpus multi-marco + generación de informes auditables en MD y PDF.
