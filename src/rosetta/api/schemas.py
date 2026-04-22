@@ -181,3 +181,66 @@ class IngestPdfResponse(BaseModel):
     hallazgo_ids: list[str] = Field(
         ..., description="IDs de los HallazgoMaestro registrados en la sesión."
     )
+
+
+# ---------------------------------------------------------------------------
+# Audit — POST /audit/start  ·  GET /audit/{audit_id}
+# ---------------------------------------------------------------------------
+
+
+class AuditStartRequest(BaseModel):
+    """Cuerpo de la petición POST /audit/start."""
+
+    objetivos: list[str] = Field(
+        ...,
+        min_length=1,
+        description="URLs, IPs o dominios del alcance autorizado.",
+    )
+    adaptadores: list[str] = Field(
+        default=["nuclei"],
+        description="Adaptadores a usar: 'nuclei', 'nmap'.",
+    )
+    max_concurrencia: int = Field(
+        default=3,
+        ge=1,
+        le=10,
+        description="Máximo de tareas paralelas (rate limiting).",
+    )
+    lista_negra: list[str] = Field(
+        default_factory=list,
+        description="Objetivos adicionales excluidos del escaneo.",
+    )
+    declaracion_alcance: str = Field(
+        ...,
+        min_length=10,
+        description=(
+            "Declaración explícita de autorización para escanear los objetivos. "
+            "Campo obligatorio — mínimo 10 caracteres."
+        ),
+    )
+
+
+class AuditStartResponse(BaseModel):
+    """Respuesta de POST /audit/start."""
+
+    audit_id: str = Field(..., description="Identificador único de la auditoría.")
+    objetivos: int = Field(..., description="Número de objetivos en el alcance.")
+    adaptadores: list[str] = Field(..., description="Adaptadores activos.")
+    ws_url: str = Field(
+        ..., description="URL relativa del WebSocket de progreso: /audit/ws/{audit_id}"
+    )
+
+
+class AuditStatusResponse(BaseModel):
+    """Respuesta de GET /audit/{audit_id}."""
+
+    audit_id: str
+    estado: str = Field(..., description="'en_curso' | 'completado' | 'error'")
+    objetivos_procesados: int
+    total_hallazgos: int
+    errores: list[str]
+    inicio: str = Field(..., description="ISO-8601 UTC")
+    fin: str | None = Field(None, description="ISO-8601 UTC, None si en curso")
+    hallazgo_ids: list[str] = Field(
+        ..., description="IDs de HallazgoMaestro registrados en la sesión."
+    )

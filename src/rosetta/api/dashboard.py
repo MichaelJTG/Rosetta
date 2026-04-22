@@ -144,7 +144,24 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       <div id="state-result" style="margin-top:.75rem"></div>
     </div>
 
-    <!-- Panel 3: Ingesta de PDF de auditoría -->
+    <!-- Panel 3: Auditoría automática (Modo A) -->
+    <div class="card">
+      <h2>&#9881; Auditoría automática (Modo A)</h2>
+      <label for="audit-objetivos">Objetivos (uno por línea)</label>
+      <textarea id="audit-objetivos" style="min-height:80px">https://ejemplo.com</textarea>
+      <label style="margin-top:.5rem">Adaptadores</label>
+      <div style="display:flex; gap:1rem; margin-bottom:.5rem; font-size:.85rem">
+        <label><input type="checkbox" id="chk-nuclei" checked> nuclei</label>
+        <label><input type="checkbox" id="chk-nmap"> nmap</label>
+      </div>
+      <label for="audit-alcance">Declaración de alcance autorizado</label>
+      <textarea id="audit-alcance" style="min-height:60px" placeholder="Ej: Autorizado por el CISO para escanear el entorno de staging el 2026-04-22."></textarea>
+      <button id="btn-audit" onclick="startAudit()">Iniciar auditoría</button>
+      <div id="audit-msg"></div>
+      <div id="audit-log" style="margin-top:.75rem; font-size:.75rem; font-family:Consolas,monospace; max-height:180px; overflow-y:auto; background:#0f1117; padding:.5rem; border-radius:4px; display:none;"></div>
+    </div>
+
+    <!-- Panel 5: Ingesta de PDF de auditoría -->
     <div class="card">
       <h2>&#128196; Ingestar informe PDF</h2>
       <label for="pdf-file">Informe de auditoría (PDF)</label>
@@ -293,6 +310,54 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       } catch (e) {
         resEl.innerHTML = '<span class="error">Error de red: ' + e.message + '</span>';
       }
+    }
+
+    async function startAudit() {
+      const btn = document.getElementById('btn-audit');
+      const msgEl = document.getElementById('audit-msg');
+      const logEl = document.getElementById('audit-log');
+      const objetivos = document.getElementById('audit-objetivos').value
+        .split('\\n').map(s => s.trim()).filter(Boolean);
+      const alcance = document.getElementById('audit-alcance').value.trim();
+      const adaptadores = [];
+      if (document.getElementById('chk-nuclei').checked) adaptadores.push('nuclei');
+      if (document.getElementById('chk-nmap').checked) adaptadores.push('nmap');
+
+      if (!objetivos.length) { msgEl.innerHTML = '<span class="error">Introduce al menos un objetivo.</span>'; return; }
+      if (alcance.length < 10) { msgEl.innerHTML = '<span class="error">La declaración de alcance debe tener al menos 10 caracteres.</span>'; return; }
+
+      btn.disabled = true;
+      logEl.style.display = 'block';
+      logEl.innerHTML = '';
+      msgEl.innerHTML = '<span style="color:#90cdf4">Iniciando auditoría...</span>';
+
+      const body = { objetivos, adaptadores, declaracion_alcance: alcance };
+      let auditId;
+      try {
+        const r = await fetch(API + '/audit/start', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+        });
+        const d = await r.json();
+        if (!r.ok) { msgEl.innerHTML = '<span class="error">Error ' + r.status + ': ' + (d.detail||JSON.stringify(d)) + '</span>'; btn.disabled=false; return; }
+        auditId = d.audit_id;
+        msgEl.innerHTML = '<span class="success">&#9679; Auditoría ' + auditId + ' en curso...</span>';
+      } catch(e) { msgEl.innerHTML = '<span class="error">Error de red: ' + e.message + '</span>'; btn.disabled=false; return; }
+
+      const wsProto = location.protocol === 'https:' ? 'wss' : 'ws';
+      const ws = new WebSocket(wsProto + '://' + location.host + '/audit/ws/' + auditId);
+      ws.onmessage = function(ev) {
+        const d = JSON.parse(ev.data);
+        const color = d.tipo === 'error' ? '#fc8181' : d.tipo === 'fin' ? '#68d391' : '#e2e8f0';
+        logEl.innerHTML += '<div style="color:' + color + '">[' + (d.timestamp||'').slice(11,19) + '] ' + (d.mensaje||'') + '</div>';
+        logEl.scrollTop = logEl.scrollHeight;
+        if (d.tipo === 'fin') {
+          msgEl.innerHTML = '<span class="success">&#10003; Auditoría completada — ' + (d.hallazgos_acumulados||0) + ' hallazgo(s)</span>';
+          loadFindings();
+          btn.disabled = false;
+        }
+      };
+      ws.onerror = function() { msgEl.innerHTML = '<span class="error">Error en WebSocket</span>'; btn.disabled=false; };
+      ws.onclose = function() { if (btn.disabled) btn.disabled = false; };
     }
 
     async function doIngestPdf() {

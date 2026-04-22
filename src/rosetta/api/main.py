@@ -2,26 +2,27 @@
 
 from __future__ import annotations
 
+import asyncio
+import json
 import os
+import tempfile
 import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Any
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
-import tempfile
-
 import structlog
-from fastapi import FastAPI, HTTPException, Query, UploadFile
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Query, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
 from rosetta import __version__
 from rosetta.api.dashboard import HTML_DASHBOARD
 from rosetta.api.deps import DiffAnalyzerDep, FindingsDep, GrafoDep, TraductorDep
 from rosetta.api.schemas import (
+    AuditStartRequest,
+    AuditStartResponse,
+    AuditStatusResponse,
     ComplianceStateResponse,
     ControlSummary,
     DiffAnalysisRequest,
@@ -43,9 +44,17 @@ from rosetta.core.models import (
     MarcoNormativo,
     Severidad,
 )
+from rosetta.core.orchestrator import (
+    AlcanceAuditoria,
+    Orchestrator,
+    ProgresoAuditoria,
+    ResultadoAuditoria,
+)
 from rosetta.core.rag import NormativaRAG
 from rosetta.core.traductor import TraductorSimbiotico
 from rosetta.llm.factory import get_llm_client
+
+load_dotenv()
 
 logger = structlog.get_logger(__name__)
 
@@ -65,6 +74,9 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     rag = NormativaRAG(chromadb_path=chroma_path)
     _app.state.traductor = TraductorSimbiotico(llm=llm, rag=rag, marcos_activos=marcos)
     _app.state.session_findings = []  # list[HallazgoMaestro]
+    _app.state.audits = {}  # dict[str, ResultadoAuditoria]
+    _app.state.audit_queues = {}  # dict[str, asyncio.Queue[ProgresoAuditoria | None]]
+    _app.state.audit_events = {}  # dict[str, list[dict[str, Any]]]
 
     # Neo4j es opcional — si no está configurado la API sigue funcionando
     neo_uri = os.getenv("NEO4J_URI")
@@ -481,6 +493,159 @@ async def ingest_pdf(
         paginas_procesadas=result.paginas_procesadas,
         paginas_con_hallazgos=result.paginas_con_hallazgos,
         modo_extraccion=result.modo_extraccion,
+        hallazgo_ids=hallazgo_ids,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Audit — Modo A
+# ---------------------------------------------------------------------------
+
+
+@app.post("/audit/start", response_model=AuditStartResponse, tags=["audit"])
+async def audit_start(
+    body: AuditStartRequest,
+    findings: FindingsDep,
+    request: Any,
+) -> AuditStartResponse:
+    """Inicia una auditoría automática Red Team en segundo plano.
+
+    Valida el alcance (declaración de autorización, lista negra, IPs privadas)
+    y lanza la ejecución en un asyncio.Task. Devuelve el `audit_id` para
+    conectar el WebSocket de progreso en `WS /audit/ws/{audit_id}`.
+    """
+    audit_id = uuid.uuid4().hex[:12]
+    alcance = AlcanceAuditoria(
+        objetivos=body.objetivos,
+        adaptadores=body.adaptadores,
+        max_concurrencia=body.max_concurrencia,
+        lista_negra=body.lista_negra,
+        declaracion_alcance=body.declaracion_alcance,
+    )
+
+    orchestrator = Orchestrator()
+    try:
+        orchestrator._validar_alcance(alcance)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    queue: asyncio.Queue[ProgresoAuditoria | None] = asyncio.Queue()
+    request.app.state.audit_queues[audit_id] = queue
+    request.app.state.audit_events[audit_id] = []
+
+    resultado_placeholder = ResultadoAuditoria(
+        audit_id=audit_id,
+        estado="en_curso",
+        objetivos_procesados=[],
+        hallazgos=[],
+        errores=[],
+        inicio=__import__("datetime").datetime.utcnow(),
+    )
+    request.app.state.audits[audit_id] = resultado_placeholder
+
+    async def run_audit() -> None:
+        async def on_progreso(evento: ProgresoAuditoria) -> None:
+            evento_dict = evento.to_dict()
+            request.app.state.audit_events[audit_id].append(evento_dict)
+            await queue.put(evento)
+
+        try:
+            resultado = await orchestrator.ejecutar(
+                alcance, on_progreso=on_progreso, audit_id=audit_id
+            )
+        except Exception as exc:  # noqa: BLE001
+            resultado = ResultadoAuditoria(
+                audit_id=audit_id,
+                estado="error",
+                objetivos_procesados=[],
+                hallazgos=[],
+                errores=[str(exc)],
+                inicio=resultado_placeholder.inicio,
+                fin=__import__("datetime").datetime.utcnow(),
+            )
+
+        request.app.state.audits[audit_id] = resultado
+
+        # Registrar hallazgos como HallazgoMaestro en sesión
+        for dato in resultado.hallazgos:
+            hid = f"AUD-{uuid.uuid4().hex[:8].upper()}"
+            maestro = HallazgoMaestro(
+                id_hallazgo=hid,
+                red_team_data=dato,
+                compliance_data=None,
+            )
+            findings.append(maestro)
+
+        await queue.put(None)  # sentinel: fin del stream
+
+    asyncio.create_task(run_audit())
+
+    return AuditStartResponse(
+        audit_id=audit_id,
+        objetivos=len(body.objetivos),
+        adaptadores=body.adaptadores,
+        ws_url=f"/audit/ws/{audit_id}",
+    )
+
+
+@app.websocket("/audit/ws/{audit_id}")
+async def audit_ws(websocket: WebSocket, audit_id: str) -> None:
+    """WebSocket de progreso de auditoría.
+
+    Emite eventos JSON conforme el orquestador avanza. Cierra automáticamente
+    cuando la auditoría termina (evento tipo 'fin') o si el cliente desconecta.
+    Los eventos pasados se replayan al conectar (útil ante reconexiones).
+    """
+    await websocket.accept()
+
+    # Replay de eventos ya ocurridos (reconexión tardía)
+    past_events: list[dict[str, Any]] = websocket.app.state.audit_events.get(audit_id, [])
+    for evt in past_events:
+        try:
+            await websocket.send_text(json.dumps(evt))
+        except WebSocketDisconnect:
+            return
+
+    queue: asyncio.Queue[ProgresoAuditoria | None] | None = websocket.app.state.audit_queues.get(
+        audit_id
+    )
+    if queue is None:
+        await websocket.send_text(json.dumps({"error": f"audit_id {audit_id!r} no encontrado"}))
+        await websocket.close()
+        return
+
+    try:
+        while True:
+            evento = await queue.get()
+            if evento is None:  # sentinel — fin del stream
+                await websocket.close()
+                return
+            await websocket.send_text(json.dumps(evento.to_dict()))
+    except WebSocketDisconnect:
+        pass
+
+
+@app.get("/audit/{audit_id}", response_model=AuditStatusResponse, tags=["audit"])
+async def audit_status(audit_id: str, request: Any) -> AuditStatusResponse:
+    """Consulta el estado y resultados de una auditoría por su ID."""
+    resultado: ResultadoAuditoria | None = request.app.state.audits.get(audit_id)
+    if resultado is None:
+        raise HTTPException(status_code=404, detail=f"Auditoría '{audit_id}' no encontrada.")
+
+    hallazgo_ids = [
+        m.id_hallazgo
+        for m in request.app.state.session_findings
+        if m.id_hallazgo.startswith("AUD-")
+    ]
+
+    return AuditStatusResponse(
+        audit_id=resultado.audit_id,
+        estado=resultado.estado,
+        objetivos_procesados=len(resultado.objetivos_procesados),
+        total_hallazgos=resultado.total_hallazgos,
+        errores=resultado.errores,
+        inicio=resultado.inicio.isoformat(),
+        fin=resultado.fin.isoformat() if resultado.fin else None,
         hallazgo_ids=hallazgo_ids,
     )
 
