@@ -1,9 +1,10 @@
 ---
 title: ADR-004 · Arquitectura multi-agente por marco normativo
-tags: [adr, arquitectura, decision/pendiente, rosetta]
+tags: [adr, arquitectura, decision/aprobada, rosetta]
 adr_id: 004
-estado: propuesto
+estado: aprobada
 fecha_propuesta: 2026-04-20
+fecha_aprobacion: 2026-04-23
 supersede: N/A
 relacionados: [ADR-002]
 ---
@@ -12,7 +13,7 @@ relacionados: [ADR-002]
 
 ## Estado
 
-**Propuesto** · 2026-04-20 · pendiente de aprobación del usuario.
+**Aprobada** · 2026-04-24 · implementada en FASE 5.
 
 ## Contexto
 

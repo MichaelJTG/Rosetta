@@ -28,6 +28,8 @@ from rosetta.api.schemas import (
     BlueIngestResponse,
     ComplianceStateResponse,
     ControlSummary,
+    CopilotApiResponse,
+    CopilotRequest,
     DiffAnalysisRequest,
     DiffAnalysisResponse,
     DiffViolationItem,
@@ -787,4 +789,40 @@ def _state_from_memory(
         total_hallazgos=len(relevant),
         controles_incumplidos=controles,
         severidad_distribution=sev_dist,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Copilot — POST /copilot/ask
+# ---------------------------------------------------------------------------
+
+
+@app.post("/copilot/ask", response_model=CopilotApiResponse, tags=["copilot"])
+async def copilot_ask(request: CopilotRequest) -> CopilotApiResponse:
+    """Consulta al Copilot normativo en lenguaje natural.
+
+    Recibe una pregunta libre, recupera contexto RAG del corpus normativo
+    y genera una respuesta fundamentada. No requiere hallazgo previo.
+
+    Returns:
+        Respuesta con fuentes y nivel de confianza.
+    """
+    from rosetta.core.copilot import CopilotQuery, consultar_copilot
+
+    llm = get_llm_client()
+    chroma_path = os.getenv("CHROMADB_PATH", ".chroma")
+    rag = NormativaRAG(chromadb_path=chroma_path)
+
+    query = CopilotQuery(pregunta=request.pregunta, contexto=request.contexto)
+
+    try:
+        response = await consultar_copilot(query=query, llm=llm, rag=rag)
+    except Exception as exc:
+        logger.error("copilot_error", error=str(exc))
+        raise HTTPException(status_code=500, detail=f"Error en Copilot: {exc}") from exc
+
+    return CopilotApiResponse(
+        respuesta=response.respuesta,
+        fuentes=response.fuentes,
+        confianza=response.confianza,
     )

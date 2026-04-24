@@ -290,3 +290,34 @@ class BlueIngestResponse(BaseModel):
         ...,
         description="Cobertura Red↔Blue: total, con_cobertura, sin_cobertura, porcentaje.",
     )
+
+
+# ---------------------------------------------------------------------------
+# Copilot — POST /copilot/ask
+# ---------------------------------------------------------------------------
+
+
+class CopilotRequest(BaseModel):
+    """Cuerpo de la petición POST /copilot/ask."""
+
+    pregunta: str = Field(..., description="Pregunta en lenguaje natural sobre normativa.")
+    contexto: str = Field(
+        "",
+        description="Contexto operativo adicional (tipo de sistema, sector, etc.).",
+    )
+
+
+class CopilotApiResponse(BaseModel):
+    """Respuesta de POST /copilot/ask."""
+
+    respuesta: str = Field(..., description="Respuesta fundamentada en el corpus normativo.")
+    fuentes: list[str] = Field(
+        default_factory=list,
+        description="IDs de controles usados como fuente RAG.",
+    )
+    confianza: float = Field(
+        ...,
+        ge=0.0,
+        le=1.0,
+        description="Nivel de confianza (0-1) proporcional a fragmentos RAG disponibles.",
+    )

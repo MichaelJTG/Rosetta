@@ -134,6 +134,83 @@ class ResultadoDrift(BaseModel):
     )
 
 
+class ModelProfile(StrEnum):
+    """Perfil de modelo LLM para agentes especializados."""
+
+    ECO = "eco"  # Desarrollo: modelo barato (Ollama/Haiku)
+    MAX = "max"  # Producción: mejor modelo (Claude Sonnet)
+    TEST = "test"  # CI: stub sin llamadas reales
+
+
+class Traduccion(BaseModel):
+    """Output contractual de un agente Traductor especialista.
+
+    Contiene la traducción normativa de un hallazgo para un marco concreto,
+    junto con los metadatos del agente que la produjo y los fragmentos RAG
+    usados para fundamentarla.
+    """
+
+    marco: MarcoNormativo
+    datos: DatosCompliance
+    agente_id: str = Field(..., description="ID del agente que generó la traducción.")
+    fragmentos_usados: list[str] = Field(
+        default_factory=list,
+        description="IDs de controles RAG recuperados para esta traducción.",
+    )
+    confianza: float = Field(
+        default=1.0,
+        ge=0.0,
+        le=1.0,
+        description="Score de confianza asignado por el Validador (0-1).",
+    )
+
+
+class ValidacionResult(BaseModel):
+    """Resultado del agente Validador sobre una traducción."""
+
+    traduccion_id: str = Field(..., description="agente_id:marco de la traducción validada.")
+    valida: bool
+    problemas: list[str] = Field(
+        default_factory=list,
+        description="Problemas detectados (controles alucinados, justificación débil, etc.).",
+    )
+    confianza: float = Field(default=1.0, ge=0.0, le=1.0)
+    razonamiento: str = Field("", description="Explicación del Validador.")
+
+
+class DossierMultimarco(BaseModel):
+    """Dossier de auditoría multi-marco compilado por el orquestador Rosetta.
+
+    Resultado final que agrega traducciones validadas de todos los marcos activos
+    para un hallazgo concreto.
+    """
+
+    hallazgo_id: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    traducciones: list[Traduccion] = Field(default_factory=list)
+    validaciones: list[ValidacionResult] = Field(default_factory=list)
+    marcos_procesados: list[MarcoNormativo] = Field(default_factory=list)
+    marcos_fallidos: list[MarcoNormativo] = Field(default_factory=list)
+
+    @property
+    def traducciones_validas(self) -> list[Traduccion]:
+        """Traducciones que superaron la validación."""
+        ids_validos = {v.traduccion_id for v in self.validaciones if v.valida}
+        return [t for t in self.traducciones if f"{t.agente_id}:{t.marco.value}" in ids_validos]
+
+    @property
+    def controles_unicos(self) -> list[str]:
+        """Todos los controles incumplidos sin duplicar."""
+        seen: set[str] = set()
+        result: list[str] = []
+        for t in self.traducciones:
+            for c in t.datos.controles_incumplidos:
+                if c not in seen:
+                    seen.add(c)
+                    result.append(c)
+        return result
+
+
 class HallazgoMaestro(BaseModel):
     """El Hallazgo Maestro: objeto unificado que atraviesa todo ROSETTA.
 
