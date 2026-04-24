@@ -27,7 +27,35 @@ Alrededor del Traductor, la plataforma orquesta herramientas open source como se
 
 ## Estado del proyecto
 
-> Fase: **MVP-7 completado · Gate CI/CD activo**. Ver `docs/ROADMAP.md` para el detalle de fases.
+> **PLAN V4 completo — 7 fases cerradas · 332 tests · cobertura 80%**
+>
+> | Fase | Descripción | Estado |
+> |------|-------------|--------|
+> | 1 | Corpus ISO/ENS/NIS2 · ReportGenerator MD + PDF | ✅ |
+> | 2 | Modo B: ingestión de PDFs de auditoría humana | ✅ |
+> | 3 | Modo A: auditoría automática Red Team + WebSocket | ✅ |
+> | 4 | Blue Team: Wazuh + correlación Red↔Blue | ✅ |
+> | 5 | Multi-agente (7 traductores) + Attack Chain, Drift, Timeline, Copilot | ✅ |
+> | 6 | Corpus DORA, RGPD, NIST CSF 2.0, PCI-DSS 4.0 | ✅ |
+> | 7 | Polish: auth HTTP Basic, historial SQLite, grafo vis.js, panel Drift | ✅ |
+>
+> Ver `docs/ROADMAP.md` para el detalle de fases y criterios de aceptación.
+
+## Capacidades actuales
+
+- **7 marcos normativos**: ISO 27001:2022 · ENS 2022 · NIS2 · DORA · RGPD · NIST CSF 2.0 · PCI-DSS 4.0
+- **Modo A** — auditoría automática Red Team (Nuclei, Nmap) con WebSocket de progreso en tiempo real
+- **Modo B** — ingestión de informes PDF de auditoría humana con extracción LLM
+- **Blue Team** — correlación de alertas Wazuh con hallazgos Red Team
+- **Multi-agente** — 7 traductores especializados por marco + orquestador + validador
+- **Attack Chain** — encadenamiento MITRE ATT&CK sobre hallazgos correlacionados
+- **Compliance Timeline** — snapshots históricos de cumplimiento
+- **Procedure Drift** — detecta divergencias entre procedimientos escritos y realidad observada
+- **Copilot normativo** — preguntas en lenguaje natural sobre controles
+- **Gate CI/CD** — endpoint `POST /analyze-diff` para bloquear PRs con incumplimientos normativos
+- **Grafo vis.js** — visualización interactiva activo → control en el dashboard
+- **Historial persistente** — hallazgos de sesión almacenados en SQLite (sobrevive a reinicios)
+- **Autenticación básica** — HTTP Basic Auth opcional vía variables de entorno
 
 ## Arquitectura rápida
 
@@ -85,6 +113,13 @@ uv run mypy src/
 
 # Arrancar la API (modo dev)
 uv run uvicorn rosetta.api.main:app --reload
+
+# Habilitar autenticación básica (opcional — sin estas vars no se requiere auth)
+export ROSETTA_USER=admin
+export ROSETTA_PASSWORD=changeme
+
+# Dashboard visual
+open http://localhost:8000/dashboard
 ```
 
 ## Estructura del repositorio
