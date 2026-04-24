@@ -7,9 +7,9 @@ import json
 import os
 import tempfile
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterable, MutableSequence
 from contextlib import asynccontextmanager
-from typing import Any
+from typing import Annotated, Any
 
 import structlog
 from dotenv import load_dotenv
@@ -17,6 +17,7 @@ from fastapi import FastAPI, HTTPException, Query, UploadFile, WebSocket, WebSoc
 from fastapi.responses import HTMLResponse
 
 from rosetta import __version__
+from rosetta.api.auth import BasicAuthMiddleware
 from rosetta.api.dashboard import HTML_DASHBOARD
 from rosetta.api.deps import DiffAnalyzerDep, FindingsDep, GrafoDep, TraductorDep
 from rosetta.api.schemas import (
@@ -33,6 +34,8 @@ from rosetta.api.schemas import (
     DiffAnalysisRequest,
     DiffAnalysisResponse,
     DiffViolationItem,
+    DriftRequest,
+    DriftResponse,
     FindingItem,
     FindingsResponse,
     IngestPdfResponse,
@@ -78,7 +81,10 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     llm = get_llm_client()
     rag = NormativaRAG(chromadb_path=chroma_path)
     _app.state.traductor = TraductorSimbiotico(llm=llm, rag=rag, marcos_activos=marcos)
-    _app.state.session_findings = []  # list[HallazgoMaestro]
+    from rosetta.core.session_store import SessionStore
+
+    db_path = os.getenv("ROSETTA_SESSION_DB", ".rosetta_sessions.db")
+    _app.state.session_findings = SessionStore(db_path=db_path)
     _app.state.audits = {}  # dict[str, ResultadoAuditoria]
     _app.state.audit_queues = {}  # dict[str, asyncio.Queue[ProgresoAuditoria | None]]
     _app.state.audit_events = {}  # dict[str, list[dict[str, Any]]]
@@ -105,6 +111,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
     if _app.state.grafo is not None:
         _app.state.grafo.cerrar()
+    _app.state.session_findings.close()
     logger.info("rosetta_api_stopping")
 
 
@@ -117,6 +124,7 @@ app = FastAPI(
     version=__version__,
     lifespan=lifespan,
 )
+app.add_middleware(BasicAuthMiddleware)
 
 
 # ---------------------------------------------------------------------------
@@ -359,7 +367,7 @@ async def analyze_diff(
 def _persist_violation(
     violacion: DiffViolation,
     result: DiffAnalysisResult,
-    findings: list[HallazgoMaestro],
+    findings: MutableSequence[HallazgoMaestro],
     grafo: Any,
 ) -> None:
     """Persiste una violación de diff como HallazgoMaestro en sesión y Neo4j."""
@@ -762,7 +770,7 @@ async def blue_ingest(
 
 
 def _state_from_memory(
-    findings: list[HallazgoMaestro], marco: MarcoNormativo
+    findings: Iterable[HallazgoMaestro], marco: MarcoNormativo
 ) -> ComplianceStateResponse:
     """Calcula el estado de cumplimiento desde los hallazgos en sesión."""
     relevant = [
@@ -826,3 +834,123 @@ async def copilot_ask(request: CopilotRequest) -> CopilotApiResponse:
         fuentes=response.fuentes,
         confianza=response.confianza,
     )
+
+
+# ---------------------------------------------------------------------------
+# Procedure Drift — POST /drift/analyze
+# ---------------------------------------------------------------------------
+
+
+@app.post("/drift/analyze", response_model=DriftResponse, tags=["drift"])
+async def drift_analyze(body: DriftRequest) -> DriftResponse:
+    """Detecta procedure drift comparando un procedimiento con observaciones reales.
+
+    Usa el módulo ``core/drift.py`` con LLM + tool-use para identificar si la
+    práctica operativa real diverge del procedimiento escrito y propone una
+    actualización del texto.
+    """
+    from rosetta.core.drift import DriftDetector
+    from rosetta.core.models import ResultadoDrift
+
+    llm = get_llm_client()
+    detector = DriftDetector(llm=llm)
+
+    try:
+        resultado: ResultadoDrift = await detector.detectar_drift(
+            procedimiento_id="API-DRIFT",
+            texto_procedimiento=body.procedimiento,
+            observaciones=body.observaciones,
+        )
+    except Exception as exc:
+        logger.error("drift_analyze_error", error=str(exc))
+        raise HTTPException(status_code=500, detail=f"Error analizando drift: {exc}") from exc
+
+    return DriftResponse(
+        drift_detectado=resultado.drift_detectado,
+        descripcion_drift=resultado.descripcion_drift,
+        fragmento_afectado=resultado.fragmento_afectado,
+        redaccion_propuesta=resultado.redaccion_propuesta,
+        controles_afectados=resultado.controles_afectados,
+        severidad=resultado.impacto.value,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Graph data — GET /graph/data
+# ---------------------------------------------------------------------------
+
+
+@app.get("/graph/data", tags=["graph"])
+async def graph_data(
+    findings: FindingsDep,
+    marco: Annotated[
+        MarcoNormativo | None, Query(description="Filtrar por marco normativo.")
+    ] = None,
+) -> dict[str, Any]:
+    """Devuelve nodos y aristas del grafo de correlación para vis.js.
+
+    Construye el grafo desde los hallazgos de sesión. Nodos: activos y controles.
+    Aristas: activo → control (relación «viola»). Filtra por marco si se especifica.
+    """
+    nodes: list[dict[str, Any]] = []
+    edges: list[dict[str, Any]] = []
+    seen_nodes: set[str] = set()
+    edge_id = 0
+
+    for maestro in findings:
+        if maestro.compliance_data is None:
+            continue
+        compliance = maestro.compliance_data
+
+        if marco and marco not in compliance.marcos_aplicables:
+            continue
+
+        activo = maestro.red_team_data.activo_detectado
+        activo_id = f"asset:{maestro.id_hallazgo}"
+        sev = compliance.impacto_legal.value
+
+        color_map = {
+            "critica": "#742a2a",
+            "alta": "#744210",
+            "media": "#4a5568",
+            "baja": "#276749",
+            "informativa": "#2c5282",
+        }
+
+        if activo_id not in seen_nodes:
+            nodes.append(
+                {
+                    "id": activo_id,
+                    "label": activo[:40] + ("…" if len(activo) > 40 else ""),
+                    "group": "asset",
+                    "title": f"{maestro.id_hallazgo} · {activo}",
+                    "color": color_map.get(sev, "#4a5568"),
+                }
+            )
+            seen_nodes.add(activo_id)
+
+        for ctrl_id in compliance.controles_incumplidos:
+            ctrl_node_id = f"ctrl:{ctrl_id}"
+            if ctrl_node_id not in seen_nodes:
+                nodes.append(
+                    {
+                        "id": ctrl_node_id,
+                        "label": ctrl_id,
+                        "group": "control",
+                        "title": ctrl_id,
+                        "color": "#2b6cb0",
+                    }
+                )
+                seen_nodes.add(ctrl_node_id)
+
+            edges.append(
+                {
+                    "id": edge_id,
+                    "from": activo_id,
+                    "to": ctrl_node_id,
+                    "label": sev,
+                }
+            )
+            edge_id += 1
+
+    return {"nodes": nodes, "edges": edges}

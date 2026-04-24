@@ -11,7 +11,7 @@ from typing import Annotated, cast
 from fastapi import Depends, Request
 
 from rosetta.core.diff_analyzer import DiffAnalyzer
-from rosetta.core.models import HallazgoMaestro
+from rosetta.core.session_store import SessionStore
 from rosetta.core.traductor import TraductorSimbiotico
 
 
@@ -25,9 +25,9 @@ def get_grafo(request: Request) -> object | None:
     return cast("object | None", request.app.state.grafo)
 
 
-def get_session_findings(request: Request) -> list[HallazgoMaestro]:
-    """Devuelve la lista de hallazgos de la sesión actual."""
-    return cast("list[HallazgoMaestro]", request.app.state.session_findings)
+def get_session_findings(request: Request) -> SessionStore:
+    """Devuelve el SessionStore (SQLite) de hallazgos de la sesión."""
+    return cast(SessionStore, request.app.state.session_findings)
 
 
 def get_diff_analyzer(request: Request) -> DiffAnalyzer:
@@ -38,5 +38,5 @@ def get_diff_analyzer(request: Request) -> DiffAnalyzer:
 
 TraductorDep = Annotated[TraductorSimbiotico, Depends(get_traductor)]
 GrafoDep = Annotated[object | None, Depends(get_grafo)]
-FindingsDep = Annotated[list[HallazgoMaestro], Depends(get_session_findings)]
+FindingsDep = Annotated[SessionStore, Depends(get_session_findings)]
 DiffAnalyzerDep = Annotated[DiffAnalyzer, Depends(get_diff_analyzer)]
