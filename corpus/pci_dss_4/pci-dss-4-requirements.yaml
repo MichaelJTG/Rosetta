@@ -1,0 +1,222 @@
+# Corpus PCI-DSS 4.0 — Payment Card Industry Data Security Standard v4.0
+# Fuente: PCI Security Standards Council, marzo 2022 — pcisecuritystandards.org
+# Licencia: PCI SSC — reproducción permitida para fines educativos y de cumplimiento
+# Formato: compatible con CorpusLoader._cargar_yaml_intuitem
+
+ref_id: "PCI-DSS-4.0"
+name: "PCI DSS v4.0 — Estándar de Seguridad de Datos para la Industria de Tarjetas de Pago"
+description: >
+  Payment Card Industry Data Security Standard versión 4.0 (marzo 2022).
+  12 requisitos organizados en 6 objetivos para proteger los datos de titulares
+  de tarjetas (CHD) y datos de autenticación sensibles (SAD).
+  Obligatorio para toda entidad que procese, almacene o transmita datos de tarjetas.
+objects:
+  reference_controls:
+    - ref_id: "Req.1.1"
+      name: "Procesos y mecanismos para instalar y mantener controles de seguridad de red"
+      description: >
+        All security policies and operational procedures that are identified in
+        Requirement 1 are documented, kept up to date, in use, and known to all
+        affected parties. Roles and responsibilities for performing activities
+        in Requirement 1 are documented, assigned, and understood.
+      category: "network_security"
+      translations:
+        es:
+          name: "Políticas y procedimientos de seguridad de red"
+          description: >
+            Se documentan y mantienen actualizadas todas las políticas y procedimientos
+            operativos relativos a los controles de seguridad de red. Los roles y
+            responsabilidades para las actividades del Requisito 1 están asignados y
+            son conocidos por todos los implicados.
+
+    - ref_id: "Req.1.3"
+      name: "Restricción del tráfico de red entrante y saliente"
+      description: >
+        Network access controls are implemented to restrict all traffic inbound
+        and outbound to/from the cardholder data environment (CDE). Network
+        connections between trusted and untrusted networks are controlled.
+        All other traffic is denied by default.
+      category: "network_security"
+      translations:
+        es:
+          name: "Control de tráfico hacia y desde el CDE"
+          description: >
+            Se implementan controles de acceso de red para restringir todo el tráfico
+            entrante y saliente hacia/desde el Entorno de Datos del Titular de Tarjeta
+            (CDE). Todo tráfico no explícitamente permitido se deniega por defecto.
+            Las conexiones entre redes de confianza y no confianza están controladas.
+
+    - ref_id: "Req.2.2"
+      name: "Configuración segura de todos los componentes del sistema"
+      description: >
+        System components are configured and managed securely. All system
+        components are protected from known vulnerabilities by installing
+        applicable security patches. System configuration standards address
+        changing of vendor defaults and elimination of unnecessary functionality.
+      category: "secure_configuration"
+      translations:
+        es:
+          name: "Estándares de configuración segura de sistemas"
+          description: >
+            Todos los componentes del sistema se configuran de forma segura:
+            se cambian las credenciales por defecto del fabricante, se eliminan
+            servicios y funciones innecesarias, se aplican parches de seguridad
+            aplicables y se documentan estándares de configuración segura.
+
+    - ref_id: "Req.3.4"
+      name: "Protección del número de cuenta principal (PAN) almacenado"
+      description: >
+        Primary account numbers (PAN) are secured with strong cryptography
+        wherever stored. The PAN is unreadable anywhere it is stored by using
+        strong cryptography. Stored SAD is not retained after authorization,
+        even if encrypted.
+      category: "data_protection"
+      translations:
+        es:
+          name: "Cifrado del PAN almacenado"
+          description: >
+            El Número de Cuenta Principal (PAN) se protege con criptografía robusta
+            en todos los almacenes. El PAN debe ser ilegible en reposo mediante
+            cifrado fuerte (AES-256, RSA-2048+) o tokenización. Los datos de
+            autenticación sensibles (SAD) no se retienen tras la autorización.
+
+    - ref_id: "Req.3.5"
+      name: "Protección del número de cuenta principal en tránsito"
+      description: >
+        Primary account numbers (PAN) are secured with strong cryptography during
+        transmission over open, public networks. Only trusted keys/certificates
+        are accepted. The proper encryption strength for the encryption methodology
+        in use is confirmed.
+      category: "data_protection"
+      translations:
+        es:
+          name: "Cifrado del PAN en tránsito por redes públicas"
+          description: >
+            El PAN se cifra con criptografía robusta durante la transmisión por redes
+            abiertas o públicas (TLS 1.2+). Solo se aceptan certificados y claves de
+            confianza. No se aceptan versiones inseguras de protocolos (SSL, TLS 1.0/1.1).
+
+    - ref_id: "Req.6.2"
+      name: "Desarrollo seguro de software"
+      description: >
+        Bespoke and custom software are developed securely. All software development
+        personnel are trained in secure software development techniques. Changes to
+        all software are tested for common vulnerabilities. Security vulnerabilities
+        are identified and addressed in bespoke and custom software.
+      category: "secure_development"
+      translations:
+        es:
+          name: "Desarrollo seguro de software a medida"
+          description: >
+            El software a medida se desarrolla de forma segura. El personal de
+            desarrollo recibe formación en técnicas de desarrollo seguro. Los cambios
+            en software se prueban para detectar vulnerabilidades comunes (OWASP Top 10).
+            Las vulnerabilidades identificadas se remedian antes de la puesta en producción.
+
+    - ref_id: "Req.6.4"
+      name: "Protección de aplicaciones web frente a ataques"
+      description: >
+        Public-facing web applications are protected against attacks. An automated
+        technical solution is deployed that can detect and prevent web-based attacks
+        in real time, such as a web application firewall (WAF). Security of all
+        public-facing web applications is reviewed.
+      category: "secure_development"
+      translations:
+        es:
+          name: "Protección de aplicaciones web públicas (WAF)"
+          description: >
+            Las aplicaciones web expuestas a internet se protegen contra ataques
+            mediante WAF (Web Application Firewall) en modo de prevención activa.
+            Se realizan revisiones de seguridad de todas las aplicaciones web
+            públicas al menos anualmente o tras cambios significativos.
+
+    - ref_id: "Req.7.1"
+      name: "Control de acceso a componentes del sistema y datos del titular"
+      description: >
+        Processes and mechanisms for restricting access to system components and
+        cardholder data by business need to know are defined and understood.
+        Access to system components and data is appropriately defined and assigned.
+        Access is assigned to individuals, job-functions, and/or systems based
+        on the least privilege necessary.
+      category: "access_control"
+      translations:
+        es:
+          name: "Control de acceso basado en necesidad de conocer"
+          description: >
+            El acceso a componentes del sistema y datos del titular se restringe
+            al mínimo necesario (principio de mínimo privilegio y necesidad de
+            conocer). Los accesos se definen, documentan y asignan a individuos
+            o funciones de trabajo específicas.
+
+    - ref_id: "Req.8.2"
+      name: "Gestión de cuentas de usuario y autenticación"
+      description: >
+        All user IDs and authentication factors for users and administrators are
+        strictly managed. User accounts and related credentials are managed
+        throughout the account lifecycle. Authentication credentials are protected
+        against misuse. Multi-factor authentication (MFA) is implemented for all
+        access into the CDE.
+      category: "access_control"
+      translations:
+        es:
+          name: "Gestión de cuentas y autenticación multifactor (MFA)"
+          description: >
+            Todos los IDs de usuario y factores de autenticación se gestionan
+            estrictamente durante su ciclo de vida. Se implementa MFA para todo
+            acceso al CDE. Las credenciales se protegen contra uso indebido:
+            longitud mínima, complejidad, no reutilización, bloqueo por intentos fallidos.
+
+    - ref_id: "Req.10.2"
+      name: "Registro de auditoría de accesos y actividades"
+      description: >
+        Audit logs capture all individual user access to cardholder data, all
+        actions taken by any individual with root or administrative privileges,
+        access to all audit trails, invalid logical access attempts, use of
+        identification and authentication mechanisms, initialization/stopping/pausing
+        of audit logs, and creation/deletion of system-level objects.
+      category: "logging_monitoring"
+      translations:
+        es:
+          name: "Registros de auditoría de eventos de seguridad"
+          description: >
+            Los logs de auditoría capturan: accesos individuales a datos del titular,
+            acciones de administradores/root, intentos de acceso inválidos, uso de
+            mecanismos de autenticación, y cambios en objetos a nivel de sistema.
+            Los logs se protegen contra modificación y se retienen un mínimo de 12 meses.
+
+    - ref_id: "Req.11.3"
+      name: "Pruebas de penetración externas e internas"
+      description: >
+        External and internal penetration testing is regularly performed, and
+        exploitable vulnerabilities and security weaknesses are corrected.
+        Penetration testing is performed on segmentation controls. Penetration
+        testing methodology includes coverage for the entire CDE perimeter and
+        critical systems.
+      category: "testing"
+      translations:
+        es:
+          name: "Pruebas de penetración periódicas"
+          description: >
+            Se realizan pruebas de penetración externas e internas al menos anualmente
+            y después de cambios significativos en la infraestructura o aplicaciones.
+            Las pruebas cubren todo el perímetro del CDE y sistemas críticos. Los
+            hallazgos se remedian y se realizan pruebas de verificación posterior.
+
+    - ref_id: "Req.12.1"
+      name: "Política de seguridad de la información"
+      description: >
+        A comprehensive information security policy that governs and provides
+        direction for protection of the entity's information assets is known
+        and current. Information security policy is reviewed at least once
+        every 12 months and updated as needed to reflect changes to business
+        objectives or the risk environment.
+      category: "governance"
+      translations:
+        es:
+          name: "Política de seguridad de la información"
+          description: >
+            Se mantiene una política de seguridad de la información completa que
+            rige la protección de los activos de información de la entidad. La política
+            se revisa al menos anualmente y se actualiza para reflejar cambios en los
+            objetivos de negocio o en el entorno de riesgo. Es conocida por todo el
+            personal afectado.

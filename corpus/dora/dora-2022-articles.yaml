@@ -1,0 +1,209 @@
+# Corpus DORA — Reglamento (UE) 2022/2554
+# Fuente: Diario Oficial de la UE, 27.12.2022, L 333/1 — EUR-Lex CELEX:32022R2554
+# Licencia: Dominio público — legislación europea de libre difusión
+# Formato: compatible con CorpusLoader._cargar_yaml_intuitem
+
+ref_id: "DORA-2022/2554"
+name: "Reglamento DORA — Resiliencia Operativa Digital del Sector Financiero"
+description: >
+  Reglamento (UE) 2022/2554 del Parlamento Europeo y del Consejo,
+  de 14 de diciembre de 2022, sobre la resiliencia operativa digital
+  del sector financiero (Digital Operational Resilience Act — DORA).
+  Aplicable a entidades financieras a partir del 17 de enero de 2025.
+objects:
+  reference_controls:
+    - ref_id: "Art.5.1"
+      name: "Marco de gestión de riesgos TIC — Responsabilidad del órgano de dirección"
+      description: >
+        Las entidades financieras dispondrán de un marco interno de gobernanza y control
+        sólido que garantice una gestión eficaz y prudente del riesgo de TIC, incluyendo
+        la responsabilidad plena del órgano de dirección en la gestión de dicho riesgo.
+      category: "governance"
+      translations:
+        es:
+          name: "Marco de gestión de riesgos TIC"
+          description: >
+            El órgano de dirección define, aprueba, supervisa e impulsa el marco de gestión
+            del riesgo TIC. Es responsable de todas las disposiciones relativas al mismo
+            y debe dedicar tiempo suficiente a su conocimiento y tratamiento.
+
+    - ref_id: "Art.6.1"
+      name: "Marco de gestión de riesgos TIC — Componentes obligatorios"
+      description: >
+        Las entidades financieras dispondrán de un marco de gestión del riesgo de TIC
+        sólido, completo y bien documentado como parte integrante de su sistema global
+        de gestión de riesgos, con estrategias, políticas, procedimientos y herramientas TIC.
+      category: "risk_management"
+      translations:
+        es:
+          name: "Marco integral de gestión del riesgo TIC"
+          description: >
+            El marco incluirá estrategias, políticas, procedimientos, protocolos y
+            herramientas TIC para proteger los activos de información e infraestructura:
+            software, hardware, servidores, locales y redes.
+
+    - ref_id: "Art.8.1"
+      name: "Identificación y clasificación de activos TIC"
+      description: >
+        Las entidades financieras identificarán, clasificarán y documentarán todas las
+        funciones, roles y activos TIC que apoyen sus operaciones, incluyendo las
+        dependencias entre sistemas, infraestructura y proveedores externos.
+      category: "identification"
+      translations:
+        es:
+          name: "Inventario y clasificación de activos TIC"
+          description: >
+            Se mantendrá un inventario actualizado de todos los activos TIC clasificados
+            por criticidad para los servicios financieros. Se identificarán las dependencias
+            entre funciones, sistemas e infraestructura TIC, incluyendo terceros proveedores.
+
+    - ref_id: "Art.9.2"
+      name: "Protección y prevención — Políticas de seguridad TIC"
+      description: >
+        Las entidades financieras establecerán políticas, procedimientos y controles de
+        seguridad TIC para garantizar la resiliencia, continuidad y disponibilidad de
+        los sistemas, especialmente los que apoyan funciones críticas o importantes.
+      category: "protection"
+      translations:
+        es:
+          name: "Protección y prevención de riesgos TIC"
+          description: >
+            Los controles de seguridad TIC incluirán: autenticación fuerte, gestión de
+            identidades y accesos, cifrado de datos en reposo y en tránsito, gestión de
+            parches y vulnerabilidades, y segmentación de redes.
+
+    - ref_id: "Art.9.4.b"
+      name: "Cifrado y controles criptográficos"
+      description: >
+        Las entidades financieras implantarán políticas de cifrado sobre la base de una
+        clasificación aprobada de datos y riesgos TIC, con controles criptográficos
+        apropiados para garantizar confidencialidad e integridad de los datos.
+      category: "cryptography"
+      translations:
+        es:
+          name: "Cifrado y criptografía en entidades financieras"
+          description: >
+            Se implantarán controles criptográficos según clasificación del dato: cifrado
+            de datos sensibles en reposo y en tránsito, gestión segura de claves, y revisión
+            periódica de estándares criptográficos para garantizar su vigencia.
+
+    - ref_id: "Art.10.1"
+      name: "Detección de anomalías en sistemas TIC"
+      description: >
+        Las entidades financieras establecerán mecanismos para detectar con prontitud
+        actividades anómalas, incluyendo problemas de rendimiento e incidentes TIC,
+        así como posibles puntos únicos de fallo material.
+      category: "detection"
+      translations:
+        es:
+          name: "Detección de anomalías TIC"
+          description: >
+            Las entidades implantarán monitorización continua para detectar comportamientos
+            anómalos en sus sistemas TIC. Los mecanismos de detección se someterán a
+            prueba periódica para garantizar su eficacia.
+
+    - ref_id: "Art.11.1"
+      name: "Políticas de continuidad de negocio TIC"
+      description: >
+        Las entidades financieras establecerán una política global de continuidad del
+        negocio en materia de TIC, adoptada por el órgano de dirección, que describa
+        cómo la entidad aborda los incidentes graves relacionados con las TIC.
+      category: "continuity"
+      translations:
+        es:
+          name: "Continuidad del negocio TIC"
+          description: >
+            La política de continuidad TIC incluirá planes de respuesta y recuperación,
+            objetivos de tiempo de recuperación (RTO) y objetivos de punto de recuperación
+            (RPO) para cada función crítica, y procedimientos de activación y cierre.
+
+    - ref_id: "Art.11.3"
+      name: "Objetivos de recuperación RTO y RPO"
+      description: >
+        Las entidades financieras establecerán objetivos de tiempo de recuperación (RTO)
+        y objetivos de punto de recuperación (RPO) para cada función crítica o importante,
+        fijando el límite de impacto aceptable.
+      category: "recovery"
+      translations:
+        es:
+          name: "RTO y RPO para funciones críticas DORA"
+          description: >
+            Para cada función crítica o importante se definirán RTO y RPO. Estos objetivos
+            se validarán periódicamente mediante pruebas de recuperación documentadas y
+            se ajustarán en función de los resultados obtenidos.
+
+    - ref_id: "Art.17.1"
+      name: "Proceso de gestión de incidentes TIC"
+      description: >
+        Las entidades financieras establecerán, implantarán y aplicarán un proceso
+        de gestión de incidentes TIC documentado para identificar, gestionar y notificar
+        los incidentes relacionados con las TIC.
+      category: "incident_management"
+      translations:
+        es:
+          name: "Gestión de incidentes TIC"
+          description: >
+            El proceso de gestión de incidentes TIC incluirá: detección y clasificación,
+            escalado interno, notificación a autoridades competentes, comunicación a
+            clientes afectados, y revisión post-incidente para extraer lecciones aprendidas.
+
+    - ref_id: "Art.19.1"
+      name: "Notificación de incidentes TIC graves a autoridades"
+      description: >
+        Las entidades financieras notificarán los incidentes TIC graves a la autoridad
+        competente dentro de los plazos establecidos: notificación inicial, informe
+        intermedio e informe final.
+      category: "incident_reporting"
+      translations:
+        es:
+          name: "Notificación de incidentes TIC graves DORA"
+          description: >
+            Plazos de notificación: notificación inicial en 4h desde clasificación como
+            grave (máximo 24h desde detección), informe intermedio y informe final.
+            El contenido mínimo incluye impacto estimado, medidas adoptadas y causa raíz.
+
+    - ref_id: "Art.24.1"
+      name: "Programa de pruebas de resiliencia operativa digital"
+      description: >
+        Las entidades financieras establecerán un programa completo de pruebas de
+        resiliencia operativa digital como parte integrante del marco de gestión del
+        riesgo TIC, con pruebas básicas anuales y avanzadas (TLPT) cada tres años.
+      category: "testing"
+      translations:
+        es:
+          name: "Pruebas de resiliencia digital DORA"
+          description: >
+            El programa incluirá pruebas básicas anuales (análisis de vulnerabilidades,
+            pruebas de rendimiento en red) y, para entidades significativas, pruebas
+            avanzadas basadas en amenazas (TLPT — threat-led penetration testing) cada 3 años.
+
+    - ref_id: "Art.28.1"
+      name: "Marco de gestión del riesgo de terceros proveedores TIC"
+      description: >
+        Las entidades financieras gestionarán el riesgo de terceros proveedores TIC
+        como parte integrante de su marco de gestión del riesgo TIC, con políticas
+        específicas sobre acuerdos contractuales con proveedores TIC.
+      category: "third_party_risk"
+      translations:
+        es:
+          name: "Gestión de riesgo de terceros TIC DORA"
+          description: >
+            Las entidades evaluarán el riesgo de concentración en proveedores TIC críticos,
+            establecerán estrategias de salida para servicios TIC críticos, y revisarán
+            regularmente la política sobre acuerdos contractuales con proveedores TIC.
+
+    - ref_id: "Art.30.1"
+      name: "Cláusulas contractuales obligatorias con proveedores TIC"
+      description: >
+        Los derechos y obligaciones de la entidad financiera y del proveedor TIC se
+        asignarán claramente en contratos escritos que incluirán cláusulas obligatorias
+        sobre servicios, SLAs, seguridad, auditoría y terminación.
+      category: "third_party_contracts"
+      translations:
+        es:
+          name: "Requisitos contractuales DORA con proveedores TIC"
+          description: >
+            Los contratos con proveedores TIC críticos incluirán obligatoriamente:
+            descripción de servicios y SLAs, ubicación y tratamiento de datos,
+            derechos de auditoría, requisitos de seguridad, planes de continuidad
+            del proveedor, condiciones de subcontratación y procedimientos de terminación.
