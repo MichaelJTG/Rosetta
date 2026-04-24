@@ -22,6 +22,15 @@ updated: 2026-04-18
 
 ---
 
+## 2026-04-23 · Inicio de sesión — retomando tras FASE 4, archivos blue pendientes de commit
+- **Hecho**: Sesión iniciada. Detectados `blue_enrichment.py` y `tests/test_blue.py` sin commitear (omitidos del commit `407be23`). `reports/` también untracked (artefacto runtime). Se procederá a commitear los archivos faltantes y continuar con FASE 5.
+- **Por qué**: El commit `407be23` incluyó wazuh.py, dashboard.py, main.py y schemas.py pero no el módulo de correlación ni sus tests — quedan pendientes antes de avanzar.
+- **Archivos**: `src/rosetta/core/blue_enrichment.py` · `tests/test_blue.py`
+- **Enlaces**: [[MOC_Roadmap]] · [[00_Dashboard]]
+- **Estado**: 🟡 parcial
+
+---
+
 ## 2026-04-22 11:30 · FASE 4 completada — Blue Team Wazuh + enriquecimiento Red↔Blue
 - **Hecho**: `adapters/blue/wazuh.py` completo (auth JWT, consultar_alertas, estado_activo, ingestar_json/csv offline). `core/blue_enrichment.py` (enriquecer() por IP match, resumen_cobertura()). `POST /blue/ingest` con correlación Red↔Blue. Panel Blue Team en dashboard. 39 tests nuevos → 253 total. ruff ✅ · mypy ✅. Commit `407be23`.
 - **Por qué**: PLAN_V4 FASE 4 — cobertura defensiva: cruzar hallazgos Red Team con alertas Wazuh para auditoría completa.

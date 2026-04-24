@@ -186,6 +186,18 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       <div id="blue-result" style="margin-top:.75rem"></div>
     </div>
 
+    <!-- Panel 7: Copilot normativo -->
+    <div class="card span-full">
+      <h2>&#129302; Copilot normativo</h2>
+      <label for="copilot-pregunta">Pregunta en lenguaje natural</label>
+      <textarea id="copilot-pregunta" style="min-height:80px" placeholder="¿Qué control ISO aplica cuando se expone una clave de cifrado en un repositorio público?"></textarea>
+      <label for="copilot-contexto" style="margin-top:.5rem">Contexto operativo (opcional)</label>
+      <textarea id="copilot-contexto" style="min-height:50px" placeholder="Ej: Sistema de pagos PCI-DSS en producción, sector financiero."></textarea>
+      <button id="btn-copilot" onclick="doCopilot()">Preguntar al Copilot</button>
+      <div id="copilot-msg"></div>
+      <div id="copilot-result" style="margin-top:.75rem; font-size:.85rem; line-height:1.5; white-space:pre-wrap"></div>
+    </div>
+
     <!-- Panel 4: Hallazgos de sesión (ancho completo) -->
     <div class="card span-full">
       <h2>&#9776; Hallazgos de sesión</h2>
@@ -445,6 +457,38 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
             '<tr><td>Sin cobertura Blue</td><td>' + (cob.sin_cobertura||0) + '</td></tr>' +
             '<tr><td>Alertas correlacionadas</td><td>' + (cob.total_alertas_correlacionadas||0) + '</td></tr>' +
             '</table>';
+        }
+      } catch (e) {
+        msgEl.innerHTML = '<span class="error">Error de red: ' + e.message + '</span>';
+      }
+      btn.disabled = false;
+    }
+
+    async function doCopilot() {
+      const btn = document.getElementById('btn-copilot');
+      const msgEl = document.getElementById('copilot-msg');
+      const resEl = document.getElementById('copilot-result');
+      const pregunta = document.getElementById('copilot-pregunta').value.trim();
+      const contexto = document.getElementById('copilot-contexto').value.trim();
+      if (!pregunta) { msgEl.innerHTML = '<span class="error">Escribe una pregunta primero.</span>'; return; }
+      btn.disabled = true;
+      msgEl.innerHTML = '<span style="color:#90cdf4">Consultando Copilot...</span>';
+      resEl.innerHTML = '';
+      try {
+        const r = await fetch(API + '/copilot/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pregunta, contexto })
+        });
+        const d = await r.json();
+        if (!r.ok) {
+          msgEl.innerHTML = '<span class="error">Error ' + r.status + ': ' + (d.detail || JSON.stringify(d)) + '</span>';
+        } else {
+          const pct = Math.round((d.confianza || 0) * 100);
+          const color = pct >= 70 ? '#68d391' : pct >= 40 ? '#f6ad55' : '#fc8181';
+          msgEl.innerHTML = '<span style="color:' + color + '">&#10003; Confianza: ' + pct + '%</span>' +
+            (d.fuentes && d.fuentes.length ? ' · Fuentes: <span style="color:#90cdf4">' + d.fuentes.join(', ') + '</span>' : '');
+          resEl.innerHTML = d.respuesta || '—';
         }
       } catch (e) {
         msgEl.innerHTML = '<span class="error">Error de red: ' + e.message + '</span>';
