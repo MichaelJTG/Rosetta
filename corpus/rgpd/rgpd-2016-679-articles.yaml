@@ -1,0 +1,176 @@
+# Corpus RGPD — Reglamento (UE) 2016/679
+# Fuente: Diario Oficial de la UE, 04.05.2016, L 119/1 — EUR-Lex CELEX:32016R0679
+# Licencia: Dominio público — legislación europea de libre difusión
+# Formato: compatible con CorpusLoader._cargar_yaml_intuitem
+
+ref_id: "RGPD-2016/679"
+name: "Reglamento General de Protección de Datos (RGPD)"
+description: >
+  Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo,
+  de 27 de abril de 2016, relativo a la protección de las personas
+  físicas en lo que respecta al tratamiento de datos personales y
+  a la libre circulación de estos datos (GDPR / RGPD).
+  Aplicable desde el 25 de mayo de 2018.
+objects:
+  reference_controls:
+    - ref_id: "Art.5.1"
+      name: "Principios relativos al tratamiento de datos personales"
+      description: >
+        Los datos personales serán tratados de manera lícita, leal y transparente;
+        recogidos con fines determinados, explícitos y legítimos; adecuados,
+        pertinentes y limitados a lo necesario; exactos y actualizados; conservados
+        durante no más tiempo del necesario; y tratados de tal manera que se garantice
+        su seguridad mediante medidas técnicas u organizativas apropiadas.
+      category: "principles"
+      translations:
+        es:
+          name: "Principios del tratamiento de datos personales"
+          description: >
+            Los seis principios RGPD rigen todo tratamiento: licitud/lealtad/transparencia,
+            limitación de la finalidad, minimización de datos, exactitud, limitación del
+            plazo de conservación, e integridad y confidencialidad. El responsable es
+            accountable de su cumplimiento (Art.5.2).
+
+    - ref_id: "Art.6.1"
+      name: "Licitud del tratamiento"
+      description: >
+        El tratamiento solo será lícito si se cumple al menos una de las condiciones
+        establecidas: consentimiento del interesado, ejecución de contrato, obligación
+        legal, protección de intereses vitales, misión de interés público o intereses
+        legítimos del responsable o de un tercero.
+      category: "lawfulness"
+      translations:
+        es:
+          name: "Bases jurídicas para el tratamiento"
+          description: >
+            Seis bases jurídicas: consentimiento (libre, específico, informado, inequívoco),
+            contrato, obligación legal, intereses vitales, interés público, e interés
+            legítimo (sujeto a ponderación contra los derechos del interesado).
+
+    - ref_id: "Art.25.1"
+      name: "Protección de datos desde el diseño y por defecto"
+      description: >
+        El responsable del tratamiento aplicará, desde el momento de la determinación
+        de los medios de tratamiento y durante el propio tratamiento, medidas técnicas
+        y organizativas apropiadas para aplicar de forma efectiva los principios de
+        protección de datos e integrar las garantías necesarias en el tratamiento.
+      category: "privacy_by_design"
+      translations:
+        es:
+          name: "Privacy by Design y Privacy by Default"
+          description: >
+            Privacy by Design: integrar controles de privacidad desde el diseño del
+            sistema, no como añadido posterior. Privacy by Default: configurar por
+            defecto el nivel máximo de privacidad, tratando solo los datos
+            estrictamente necesarios para cada finalidad específica.
+
+    - ref_id: "Art.32.1"
+      name: "Seguridad del tratamiento"
+      description: >
+        El responsable y el encargado del tratamiento aplicarán medidas técnicas y
+        organizativas apropiadas para garantizar un nivel de seguridad adecuado al
+        riesgo, incluyendo cifrado de datos, confidencialidad, integridad,
+        disponibilidad y resiliencia, recuperación ante incidentes, y verificación
+        periódica de la eficacia de las medidas.
+      category: "security"
+      translations:
+        es:
+          name: "Medidas de seguridad técnicas y organizativas (MSOT)"
+          description: >
+            Las medidas de seguridad incluyen: a) seudonimización y cifrado de datos;
+            b) confidencialidad, integridad, disponibilidad y resiliencia de sistemas;
+            c) restauración rápida de disponibilidad tras incidente; d) verificación
+            periódica de eficacia. El nivel de seguridad debe ser proporcional al
+            riesgo para los derechos de los interesados.
+
+    - ref_id: "Art.33.1"
+      name: "Notificación de violaciones de seguridad a la autoridad de control"
+      description: >
+        En caso de violación de la seguridad de los datos personales, el responsable
+        del tratamiento notificará a la autoridad de control competente sin dilación
+        indebida y, de ser posible, a más tardar 72 horas después de que haya tenido
+        constancia de ella, salvo que sea improbable que constituya un riesgo para
+        los derechos y libertades de las personas físicas.
+      category: "breach_notification"
+      translations:
+        es:
+          name: "Notificación de brecha a la autoridad de control (72h)"
+          description: >
+            Plazo máximo: 72 horas desde la constancia de la violación. La notificación
+            incluirá: naturaleza de la violación, categorías/número de interesados,
+            datos de contacto del DPO, consecuencias probables, medidas adoptadas.
+            Si supera las 72h, debe motivarse el retraso.
+
+    - ref_id: "Art.34.1"
+      name: "Comunicación de violaciones de seguridad al interesado"
+      description: >
+        Cuando sea probable que la violación de la seguridad de los datos personales
+        entrañe un alto riesgo para los derechos y libertades de las personas físicas,
+        el responsable del tratamiento comunicará la violación al interesado sin
+        dilación indebida.
+      category: "breach_notification"
+      translations:
+        es:
+          name: "Comunicación de brecha a los interesados"
+          description: >
+            Obligatoria cuando la brecha entraña alto riesgo para el interesado.
+            La comunicación debe ser en lenguaje claro y sencillo, describir la
+            naturaleza de la violación y las medidas recomendadas para mitigar
+            sus posibles efectos adversos. Exenciones: datos cifrados, medidas
+            ulteriores adoptadas, esfuerzo desproporcionado (comunicación pública).
+
+    - ref_id: "Art.35.1"
+      name: "Evaluación de Impacto relativa a la Protección de Datos (EIPD)"
+      description: >
+        Cuando sea probable que un tipo de tratamiento, en particular si utiliza nuevas
+        tecnologías, entrañe un alto riesgo para los derechos y libertades de las
+        personas físicas, el responsable realizará, antes del tratamiento, una evaluación
+        del impacto de las operaciones de tratamiento en la protección de datos personales.
+      category: "risk_assessment"
+      translations:
+        es:
+          name: "EIPD / DPIA — Evaluación de Impacto de Protección de Datos"
+          description: >
+            Obligatoria para: tratamientos a gran escala de categorías especiales,
+            evaluación sistemática de personas mediante perfiles, vigilancia sistemática
+            a gran escala de zonas de acceso público. Incluye: descripción del tratamiento,
+            evaluación de necesidad/proporcionalidad, riesgos para los interesados, medidas
+            previstas para afrontar los riesgos.
+
+    - ref_id: "Art.37.1"
+      name: "Designación del Delegado de Protección de Datos (DPD/DPO)"
+      description: >
+        El responsable y el encargado del tratamiento designarán un delegado de
+        protección de datos cuando el tratamiento lo lleve a cabo una autoridad u
+        organismo público, las actividades principales consistan en operaciones de
+        tratamiento a gran escala que requieran observación sistemática a gran escala,
+        o el tratamiento a gran escala de categorías especiales de datos.
+      category: "governance"
+      translations:
+        es:
+          name: "Delegado de Protección de Datos (DPD / DPO)"
+          description: >
+            El DPO informa y asesora sobre las obligaciones RGPD, supervisa el
+            cumplimiento, realiza evaluaciones de impacto, coopera con la autoridad
+            de control y actúa como punto de contacto. Debe tener conocimientos
+            especializados en derecho y práctica de protección de datos. No puede
+            ser destituido por ejercer sus funciones.
+
+    - ref_id: "Art.28.1"
+      name: "Encargado del tratamiento"
+      description: >
+        Cuando se vaya a realizar un tratamiento por cuenta del responsable, este
+        recurrirá únicamente a encargados que ofrezcan garantías suficientes para
+        aplicar medidas técnicas y organizativas apropiadas, de manera que el
+        tratamiento sea conforme al Reglamento y garantice la protección de los
+        derechos del interesado.
+      category: "third_party"
+      translations:
+        es:
+          name: "Contratos con encargados del tratamiento (DPA)"
+          description: >
+            Todo encargado del tratamiento debe estar vinculado por contrato escrito
+            (Data Processing Agreement / DPA) que establezca: objeto, duración,
+            naturaleza y finalidad del tratamiento, tipo de datos, categorías de
+            interesados, obligaciones y derechos del responsable. El encargado no
+            puede subcontratar sin autorización escrita del responsable.

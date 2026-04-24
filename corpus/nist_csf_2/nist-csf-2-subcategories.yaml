@@ -1,0 +1,242 @@
+# Corpus NIST CSF 2.0 — Cybersecurity Framework versión 2.0
+# Fuente: NIST CSWP 29, febrero 2024 — nist.gov/cyberframework
+# Licencia: Dominio público — publicación del gobierno federal de EE.UU.
+# Formato: compatible con CorpusLoader._cargar_yaml_intuitem
+
+ref_id: "NIST-CSF-2.0"
+name: "NIST Cybersecurity Framework 2.0"
+description: >
+  Marco de Ciberseguridad del NIST versión 2.0 (febrero 2024).
+  Organizado en 6 Funciones (GV, ID, PR, DE, RS, RC), 22 Categorías
+  y más de 100 Subcategorías. Aplicable a organizaciones de cualquier
+  tamaño y sector para gestionar y reducir el riesgo de ciberseguridad.
+objects:
+  reference_controls:
+    - ref_id: "GV.OC-01"
+      name: "Misión, objetivos y partes interesadas de ciberseguridad"
+      description: >
+        The organizational mission is understood and informs cybersecurity risk
+        management. The organizational cybersecurity risk strategy is established,
+        communicated, and monitored. The organization's risk appetite and tolerance
+        are established, communicated, and monitored.
+      category: "govern"
+      translations:
+        es:
+          name: "Contexto organizacional de ciberseguridad"
+          description: >
+            La misión organizacional y los objetivos estratégicos informan la gestión
+            del riesgo de ciberseguridad. Se identifican y documentan las partes
+            interesadas internas y externas con sus expectativas en materia de
+            ciberseguridad (clientes, reguladores, socios).
+
+    - ref_id: "GV.RM-01"
+      name: "Estrategia de gestión del riesgo de ciberseguridad"
+      description: >
+        Cybersecurity risk management objectives are established and agreed to by
+        organizational stakeholders. Risk appetite and risk tolerance statements
+        are established, reviewed, and updated. Cybersecurity risk management
+        activities and outcomes are included in enterprise risk management processes.
+      category: "govern"
+      translations:
+        es:
+          name: "Estrategia y apetito de riesgo de ciberseguridad"
+          description: >
+            Se establecen objetivos de gestión del riesgo de ciberseguridad consensuados
+            con las partes interesadas. El apetito y la tolerancia al riesgo se documentan,
+            revisan y actualizan periódicamente. La ciberseguridad se integra en la gestión
+            del riesgo empresarial.
+
+    - ref_id: "GV.SC-01"
+      name: "Gestión del riesgo en la cadena de suministro"
+      description: >
+        A cybersecurity supply chain risk management program, strategy, objectives,
+        policies, and processes are established and agreed to by organizational
+        stakeholders. Cybersecurity supply chain risk management roles and
+        responsibilities are designated.
+      category: "govern"
+      translations:
+        es:
+          name: "Programa de gestión del riesgo en cadena de suministro"
+          description: >
+            Se establece un programa de gestión del riesgo de ciberseguridad en la
+            cadena de suministro con estrategia, objetivos y políticas definidas.
+            Se asignan roles y responsabilidades específicas para la gestión de
+            riesgos en proveedores y terceros TIC.
+
+    - ref_id: "ID.AM-01"
+      name: "Inventario de activos físicos"
+      description: >
+        Inventories of hardware managed by the organization are maintained.
+        Physical devices and systems within the organization are inventoried
+        with sufficient detail to enable effective cybersecurity risk management.
+      category: "identify"
+      translations:
+        es:
+          name: "Inventario de hardware y dispositivos físicos"
+          description: >
+            Se mantiene un inventario actualizado de todos los dispositivos hardware
+            gestionados por la organización. El inventario incluye detalles suficientes
+            para gestionar el riesgo: ubicación, propietario, criticidad, conexiones
+            de red y estado del ciclo de vida.
+
+    - ref_id: "ID.AM-02"
+      name: "Inventario de activos de software"
+      description: >
+        Inventories of software, services, and systems managed by the organization
+        are maintained with sufficient detail to enable effective cybersecurity
+        risk management.
+      category: "identify"
+      translations:
+        es:
+          name: "Inventario de software, servicios y sistemas"
+          description: >
+            Se mantiene un inventario actualizado de todo el software, servicios y
+            sistemas gestionados. Incluye: versión, licencia, propietario, fecha de
+            fin de soporte y dependencias críticas. Permite detectar software no
+            autorizado o fuera de soporte.
+
+    - ref_id: "ID.RA-01"
+      name: "Identificación y documentación de vulnerabilidades"
+      description: >
+        Vulnerabilities in assets are identified, validated, and recorded.
+        Information about new cybersecurity vulnerabilities is gathered and
+        analyzed. Vulnerability assessments are performed.
+      category: "identify"
+      translations:
+        es:
+          name: "Identificación y registro de vulnerabilidades"
+          description: >
+            Las vulnerabilidades en activos se identifican, validan y registran
+            sistemáticamente. Se monitorean fuentes de inteligencia de amenazas
+            (CVE, CERT, proveedores) para conocer vulnerabilidades emergentes.
+            Se realizan evaluaciones periódicas de vulnerabilidades.
+
+    - ref_id: "PR.AA-01"
+      name: "Gestión de identidades y autenticación"
+      description: >
+        Identities and credentials for authorized users, services, and hardware
+        are managed by the organization. Authentication for users, services,
+        and hardware is managed by the organization. Authentication is resistant
+        to phishing attacks.
+      category: "protect"
+      translations:
+        es:
+          name: "Gestión de identidades, credenciales y autenticación"
+          description: >
+            Se gestionan las identidades y credenciales de usuarios, servicios y
+            hardware autorizados. La autenticación es robusta y resistente a phishing
+            (MFA, passkeys). Se aplica el principio de mínimo privilegio y se revisan
+            periódicamente los accesos.
+
+    - ref_id: "PR.DS-01"
+      name: "Protección de datos en reposo"
+      description: >
+        The confidentiality, integrity, and availability of data-at-rest are
+        protected. Data-at-rest is protected by cryptographic mechanisms or
+        other appropriate methods to meet organizational risk requirements.
+      category: "protect"
+      translations:
+        es:
+          name: "Cifrado y protección de datos en reposo"
+          description: >
+            Los datos en reposo se protegen mediante cifrado u otros mecanismos
+            apropiados según la clasificación del dato y el riesgo organizacional.
+            Se aplica gestión segura de claves criptográficas. Se verifican
+            periódicamente los controles de protección.
+
+    - ref_id: "PR.DS-02"
+      name: "Protección de datos en tránsito"
+      description: >
+        The confidentiality, integrity, and availability of data-in-transit
+        are protected. Data-in-transit is protected by cryptographic mechanisms
+        or other appropriate methods to meet organizational risk requirements.
+      category: "protect"
+      translations:
+        es:
+          name: "Cifrado y protección de datos en tránsito"
+          description: >
+            Los datos en tránsito se protegen mediante protocolos criptográficos
+            (TLS 1.2+, HTTPS). Se validan certificados y se evitan protocolos
+            inseguros (HTTP, FTP, Telnet). Las comunicaciones entre sistemas
+            críticos utilizan canales cifrados.
+
+    - ref_id: "PR.IR-01"
+      name: "Segmentación de red y arquitectura de mínima exposición"
+      description: >
+        Networks and environments are protected from unauthorized logical access
+        and usage. Network integrity is protected, incorporating network
+        segmentation where appropriate. Remote access is managed.
+      category: "protect"
+      translations:
+        es:
+          name: "Segmentación de red y control de acceso remoto"
+          description: >
+            Las redes se segmentan para limitar el movimiento lateral en caso de
+            compromiso. El acceso remoto se gestiona con controles robustos (VPN,
+            MFA, PAM). Se monitorizan las conexiones entre segmentos y hacia
+            internet.
+
+    - ref_id: "DE.CM-01"
+      name: "Monitorización de redes y sistemas"
+      description: >
+        Networks and network services are monitored to find potentially adverse
+        events. Computing hardware and software, runtime environments, and their
+        data are monitored to find potentially adverse events.
+      category: "detect"
+      translations:
+        es:
+          name: "Monitorización continua de redes y sistemas"
+          description: >
+            Se monitoriza continuamente el tráfico de red, los sistemas y los
+            entornos de ejecución para detectar eventos adversos. Se utilizan
+            herramientas de detección (IDS/IPS, EDR, SIEM) y se establecen
+            alertas para comportamientos anómalos.
+
+    - ref_id: "DE.AE-02"
+      name: "Análisis de eventos de ciberseguridad"
+      description: >
+        Potentially adverse events are analyzed to better characterize them.
+        The estimated impact and scope of adverse events are understood.
+        Event data are collected and correlated from multiple sources.
+      category: "detect"
+      translations:
+        es:
+          name: "Análisis y correlación de eventos de ciberseguridad"
+          description: >
+            Los eventos potencialmente adversos se analizan para caracterizarlos.
+            Se correlacionan datos de múltiples fuentes (logs, SIEM, alertas).
+            Se estima el impacto y alcance de los eventos detectados para priorizar
+            la respuesta.
+
+    - ref_id: "RS.MA-01"
+      name: "Gestión de incidentes de ciberseguridad"
+      description: >
+        The incident response plan is executed in coordination with relevant
+        third parties once an incident is declared. Incidents are categorized
+        and prioritized. Incidents are escalated or elevated as needed.
+      category: "respond"
+      translations:
+        es:
+          name: "Ejecución del plan de respuesta a incidentes"
+          description: >
+            El plan de respuesta a incidentes se ejecuta en coordinación con
+            terceros relevantes. Los incidentes se categorizan y priorizan según
+            impacto. Se escalan cuando superen la capacidad de respuesta local
+            o afecten a activos críticos.
+
+    - ref_id: "RC.RP-01"
+      name: "Plan de recuperación ante incidentes"
+      description: >
+        The recovery portion of the incident response plan is executed once
+        initiated from the incident response process. Recovery strategies
+        address the restoration of assets and operations affected by
+        cybersecurity incidents.
+      category: "recover"
+      translations:
+        es:
+          name: "Ejecución del plan de recuperación"
+          description: >
+            Se ejecuta la parte de recuperación del plan de respuesta a incidentes.
+            Las estrategias de recuperación abordan la restauración de activos y
+            operaciones afectadas. Se validan los RTO/RPO definidos en los planes
+            de continuidad de negocio.

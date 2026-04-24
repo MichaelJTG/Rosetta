@@ -191,3 +191,175 @@ def test_corpus_real_controles_clave_presentes() -> None:
     ids = {f.control_id for f in fragmentos}
     for control in ("A.5.15", "A.8.5", "A.8.16", "A.8.24"):
         assert control in ids, f"Control {control} no encontrado en el corpus"
+
+
+# ---------------------------------------------------------------------------
+# Tests corpus DORA (corpus/dora/dora-2022-articles.yaml)
+# ---------------------------------------------------------------------------
+
+CORPUS_DORA = Path("corpus/dora")
+
+
+@pytest.mark.skipif(
+    not (CORPUS_DORA / "dora-2022-articles.yaml").exists(),
+    reason="Corpus DORA no disponible",
+)
+def test_corpus_dora_carga_controles() -> None:
+    """El corpus DORA carga al menos 10 artículos estructurados."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.DORA, CORPUS_DORA)
+    assert len(fragmentos) >= 10
+
+
+@pytest.mark.skipif(
+    not (CORPUS_DORA / "dora-2022-articles.yaml").exists(),
+    reason="Corpus DORA no disponible",
+)
+def test_corpus_dora_controles_clave_presentes() -> None:
+    """Los artículos clave de DORA están presentes en el corpus."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.DORA, CORPUS_DORA)
+    ids = {f.control_id for f in fragmentos}
+    for art in ("Art.9.4.b", "Art.17.1", "Art.19.1", "Art.24.1"):
+        assert art in ids, f"Artículo DORA {art} no encontrado en el corpus"
+
+
+@pytest.mark.skipif(
+    not (CORPUS_DORA / "dora-2022-articles.yaml").exists(),
+    reason="Corpus DORA no disponible",
+)
+def test_corpus_dora_marco_correcto() -> None:
+    """Todos los fragmentos DORA llevan MarcoNormativo.DORA."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.DORA, CORPUS_DORA)
+    for f in fragmentos:
+        assert f.marco == MarcoNormativo.DORA
+
+
+# ---------------------------------------------------------------------------
+# Tests corpus RGPD (corpus/rgpd/rgpd-2016-679-articles.yaml)
+# ---------------------------------------------------------------------------
+
+CORPUS_RGPD = Path("corpus/rgpd")
+
+
+@pytest.mark.skipif(
+    not (CORPUS_RGPD / "rgpd-2016-679-articles.yaml").exists(),
+    reason="Corpus RGPD no disponible",
+)
+def test_corpus_rgpd_carga_controles() -> None:
+    """El corpus RGPD carga al menos 7 artículos estructurados."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.RGPD, CORPUS_RGPD)
+    assert len(fragmentos) >= 7
+
+
+@pytest.mark.skipif(
+    not (CORPUS_RGPD / "rgpd-2016-679-articles.yaml").exists(),
+    reason="Corpus RGPD no disponible",
+)
+def test_corpus_rgpd_controles_clave_presentes() -> None:
+    """Los artículos clave del RGPD están presentes en el corpus."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.RGPD, CORPUS_RGPD)
+    ids = {f.control_id for f in fragmentos}
+    for art in ("Art.5.1", "Art.32.1", "Art.33.1", "Art.35.1"):
+        assert art in ids, f"Artículo RGPD {art} no encontrado en el corpus"
+
+
+@pytest.mark.skipif(
+    not (CORPUS_RGPD / "rgpd-2016-679-articles.yaml").exists(),
+    reason="Corpus RGPD no disponible",
+)
+def test_corpus_rgpd_marco_correcto() -> None:
+    """Todos los fragmentos RGPD llevan MarcoNormativo.RGPD."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.RGPD, CORPUS_RGPD)
+    for f in fragmentos:
+        assert f.marco == MarcoNormativo.RGPD
+
+
+# ---------------------------------------------------------------------------
+# Tests corpus NIST CSF 2.0 (corpus/nist_csf_2/nist-csf-2-subcategories.yaml)
+# ---------------------------------------------------------------------------
+
+CORPUS_NIST = Path("corpus/nist_csf_2")
+
+
+@pytest.mark.skipif(
+    not (CORPUS_NIST / "nist-csf-2-subcategories.yaml").exists(),
+    reason="Corpus NIST CSF 2.0 no disponible",
+)
+def test_corpus_nist_carga_controles() -> None:
+    """El corpus NIST CSF 2.0 carga al menos 10 subcategorías."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.NIST_CSF_2, CORPUS_NIST)
+    assert len(fragmentos) >= 10
+
+
+@pytest.mark.skipif(
+    not (CORPUS_NIST / "nist-csf-2-subcategories.yaml").exists(),
+    reason="Corpus NIST CSF 2.0 no disponible",
+)
+def test_corpus_nist_controles_clave_presentes() -> None:
+    """Las subcategorías clave de NIST CSF 2.0 están presentes en el corpus."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.NIST_CSF_2, CORPUS_NIST)
+    ids = {f.control_id for f in fragmentos}
+    for sub in ("ID.AM-01", "PR.DS-01", "DE.CM-01", "RS.MA-01"):
+        assert sub in ids, f"Subcategoría NIST {sub} no encontrada en el corpus"
+
+
+@pytest.mark.skipif(
+    not (CORPUS_NIST / "nist-csf-2-subcategories.yaml").exists(),
+    reason="Corpus NIST CSF 2.0 no disponible",
+)
+def test_corpus_nist_marco_correcto() -> None:
+    """Todos los fragmentos NIST llevan MarcoNormativo.NIST_CSF_2."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.NIST_CSF_2, CORPUS_NIST)
+    for f in fragmentos:
+        assert f.marco == MarcoNormativo.NIST_CSF_2
+
+
+# ---------------------------------------------------------------------------
+# Tests corpus PCI-DSS 4.0 (corpus/pci_dss_4/pci-dss-4-requirements.yaml)
+# ---------------------------------------------------------------------------
+
+CORPUS_PCI = Path("corpus/pci_dss_4")
+
+
+@pytest.mark.skipif(
+    not (CORPUS_PCI / "pci-dss-4-requirements.yaml").exists(),
+    reason="Corpus PCI-DSS 4.0 no disponible",
+)
+def test_corpus_pci_carga_controles() -> None:
+    """El corpus PCI-DSS 4.0 carga al menos 10 requisitos estructurados."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.PCI_DSS_4, CORPUS_PCI)
+    assert len(fragmentos) >= 10
+
+
+@pytest.mark.skipif(
+    not (CORPUS_PCI / "pci-dss-4-requirements.yaml").exists(),
+    reason="Corpus PCI-DSS 4.0 no disponible",
+)
+def test_corpus_pci_controles_clave_presentes() -> None:
+    """Los requisitos clave de PCI-DSS 4.0 están presentes en el corpus."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.PCI_DSS_4, CORPUS_PCI)
+    ids = {f.control_id for f in fragmentos}
+    for req in ("Req.3.4", "Req.8.2", "Req.10.2", "Req.11.3"):
+        assert req in ids, f"Requisito PCI {req} no encontrado en el corpus"
+
+
+@pytest.mark.skipif(
+    not (CORPUS_PCI / "pci-dss-4-requirements.yaml").exists(),
+    reason="Corpus PCI-DSS 4.0 no disponible",
+)
+def test_corpus_pci_marco_correcto() -> None:
+    """Todos los fragmentos PCI llevan MarcoNormativo.PCI_DSS_4."""
+    loader = CorpusLoader()
+    fragmentos = loader.cargar(MarcoNormativo.PCI_DSS_4, CORPUS_PCI)
+    for f in fragmentos:
+        assert f.marco == MarcoNormativo.PCI_DSS_4
