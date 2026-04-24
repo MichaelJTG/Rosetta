@@ -22,6 +22,22 @@ updated: 2026-04-18
 
 ---
 
+## 2026-04-24 · FASE 7 completada — polish: auth, SQLite, vis.js, drift panel, responsive
+- **Hecho**: `auth.py` (BasicAuthMiddleware HTTP Basic, activable con `ROSETTA_USER`/`ROSETTA_PASSWORD`, dev-mode sin auth). `session_store.py` (SessionStore SQLite append-only implementando `MutableSequence[HallazgoMaestro]`, persistencia entre reinicios). Dashboard reescrito con 9 tabs (Traducir, Cumplimiento, Modo A, PDF, Blue, **Grafo**, **Drift**, Copilot, Hallazgos). Panel Grafo vis.js con filtro por marco + visualización activo→control. Panel Drift: formulario procedimiento + observaciones → resultado estructurado. CSS custom properties, función `esc()` anti-XSS. 22 tests nuevos (11 auth + 11 session_store). 332 tests ✅ · cobertura 80% · ruff ✅ · mypy ✅. Commit `bdb9516`.
+- **Por qué**: PLAN_V4 FASE 7 — polish: 5 puntos completados (responsive, auth, SQLite, grafo vis.js, panel Drift).
+- **Archivos**: `src/rosetta/api/auth.py` · `src/rosetta/core/session_store.py` · `src/rosetta/api/dashboard.py` · `src/rosetta/api/main.py` · `tests/test_auth.py` · `tests/test_session_store.py`
+- **Enlaces**: [[MOC_Roadmap]] · [[00_Dashboard]]
+- **Estado**: ✅ hecho
+
+---
+
+## 2026-04-24 · FASE 6 completada — corpus DORA, RGPD, NIST CSF 2.0, PCI-DSS 4.0
+- **Hecho**: 4 corpus YAML en formato intuitem creados desde los PDFs del directorio `corpus/`: DORA (13 artículos Art.5.1–Art.30.1), RGPD (9 artículos Art.5.1–Art.37.1), NIST CSF 2.0 (14 subcategorías GV/ID/PR/DE/RS/RC), PCI-DSS 4.0 (12 requisitos Req.1–Req.12). 12 tests nuevos en `test_corpus_loader.py` (3 por marco). 22 tests verdes · `CorpusLoader` 80% cobertura · ruff ✅ · mypy ✅. Commit `c7b46a6`.
+- **Por qué**: PLAN_V4 FASE 6 — corpus adicionales para que los 4 traductores especialistas (DORA, RGPD, NIST, PCI) tengan contexto RAG fundamentado al traducir hallazgos.
+- **Archivos**: `corpus/dora/dora-2022-articles.yaml` · `corpus/rgpd/rgpd-2016-679-articles.yaml` · `corpus/nist_csf_2/nist-csf-2-subcategories.yaml` · `corpus/pci_dss_4/pci-dss-4-requirements.yaml` · `tests/test_corpus_loader.py`
+- **Enlaces**: [[MOC_Normativas]] · [[MOC_Roadmap]]
+- **Estado**: ✅ hecho
+
 ## 2026-04-24 · FASE 5 completada — multi-agente + killer features
 - **Hecho**: 7 traductores especialistas (ISO, ENS, NIS2, DORA, RGPD, NIST, PCI) + Soundwave scheduler + Validador + RosettaOrchestrator. Killer features: `attack_chain.py` (MITRE ATT&CK), `remediation_validator.py`, `compliance_timeline.py`, `copilot.py` + `POST /copilot/ask`. 291 tests verdes · cobertura 80% · ruff ✅ · mypy ✅. Commit `6658b02`.
 - **Por qué**: PLAN_V4 FASE 5 — refactor Traductor monolítico a arquitectura multi-agente (ADR-004) + 4 killer features diferenciales de la plataforma.
