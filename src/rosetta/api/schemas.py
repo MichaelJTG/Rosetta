@@ -321,3 +321,42 @@ class CopilotApiResponse(BaseModel):
         le=1.0,
         description="Nivel de confianza (0-1) proporcional a fragmentos RAG disponibles.",
     )
+
+
+# ---------------------------------------------------------------------------
+# Procedure Drift — POST /drift/analyze
+# ---------------------------------------------------------------------------
+
+
+class DriftRequest(BaseModel):
+    """Cuerpo de la petición POST /drift/analyze."""
+
+    procedimiento: str = Field(
+        ...,
+        description="Texto del procedimiento interno de seguridad a analizar.",
+    )
+    observaciones: list[str] = Field(
+        ...,
+        min_length=1,
+        description="Observaciones reales del entorno (logs, alertas, hallazgos).",
+    )
+
+
+class DriftResponse(BaseModel):
+    """Respuesta de POST /drift/analyze."""
+
+    drift_detectado: bool = Field(..., description="True si existe desviación significativa.")
+    descripcion_drift: str = Field(..., description="Descripción del drift detectado.")
+    fragmento_afectado: str = Field(
+        ..., description="Fragmento del procedimiento que diverge de la realidad."
+    )
+    redaccion_propuesta: str = Field(
+        ..., description="Propuesta de actualización del procedimiento."
+    )
+    controles_afectados: list[str] = Field(
+        default_factory=list,
+        description="IDs de controles normativos afectados por el drift.",
+    )
+    severidad: str = Field(
+        ..., description="Severidad del drift: informativa/baja/media/alta/critica."
+    )
