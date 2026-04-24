@@ -3,13 +3,13 @@ title: Dashboard ROSETTA
 tags: [dashboard, rosetta]
 created: 2026-04-18
 updated: 2026-04-19
-sprint_actual: 3
-mvp_actual: MVP-7
-mvp_estado: completado
-proximo_mvp: MVP-8
+sprint_actual: 5
+mvp_actual: MVP-8
+mvp_estado: en_curso
+proximo_mvp: MVP-9
 llm_proveedor: ollama (desarrollo) / claude (validación)
-marcos_cargados: []
-adapters_activos: []
+marcos_cargados: [iso_27001_2022, ens_2022, nis2]
+adapters_activos: [nuclei, nmap, wazuh]
 ---
 
 # Dashboard ROSETTA
@@ -19,10 +19,10 @@ adapters_activos: []
 
 ## Estado actual
 
-- **MVP en curso**: MVP-8 ⚪ próximo (NIS2, DORA, NIST CSF 2)
-- **MVP anterior**: MVP-7 ✅ completado (`POST /analyze-diff` · GitHub Action · 141 tests)
-- **Sprint activo**: [[07_Sprints/2026-04-21_sprint-3|Sprint 3]] ✅ Gate CI/CD completo
-- **LLM provider**: [[02_ADR/002-abstraccion-llm|ADR-002]] ✅ aprobada · ollama (dev) / claude (validación)
+- **MVP en curso**: MVP-8 🟢 (corpus DORA, RGPD, NIST CSF 2 — FASE 6)
+- **MVP anterior**: FASE 5 ✅ completada (multi-agente 7 traductores + 4 killer features · 291 tests)
+- **Sprint activo**: Sprint 5 🟢 FASE 5 cerrada · próximo: FASE 6 corpus adicionales
+- **LLM provider**: [[02_ADR/002-abstraccion-llm|ADR-002]] ✅ · [[02_ADR/004-arquitectura-multi-agente|ADR-004]] ✅ aprobada
 
 ## Marcos normativos
 
@@ -45,7 +45,7 @@ adapters_activos: []
 - HIBP · ⚪ no empezado
 
 ### Blue Team
-- Wazuh · 🟡 esqueleto sin implementar
+- Wazuh · ✅ implementado (JWT auth, ingestar JSON/CSV, correlación Red↔Blue)
 - OpenSearch · ⚪ no empezado
 - Velociraptor · ⚪ no empezado
 
@@ -53,6 +53,7 @@ adapters_activos: []
 
 - [[02_ADR/001-orquestacion-sobre-fork|ADR-001]] · ✅ aprobada · Orquestación sobre fork
 - [[02_ADR/002-abstraccion-llm|ADR-002]] · ✅ aprobada · Abstracción de proveedor LLM
+- [[02_ADR/004-arquitectura-multi-agente|ADR-004]] · ✅ aprobada · Arquitectura multi-agente (FASE 5)
 
 ## Navegación rápida
 

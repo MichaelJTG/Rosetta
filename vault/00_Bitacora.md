@@ -22,6 +22,24 @@ updated: 2026-04-18
 
 ---
 
+## 2026-04-24 · FASE 5 completada — multi-agente + killer features
+- **Hecho**: 7 traductores especialistas (ISO, ENS, NIS2, DORA, RGPD, NIST, PCI) + Soundwave scheduler + Validador + RosettaOrchestrator. Killer features: `attack_chain.py` (MITRE ATT&CK), `remediation_validator.py`, `compliance_timeline.py`, `copilot.py` + `POST /copilot/ask`. 291 tests verdes · cobertura 80% · ruff ✅ · mypy ✅. Commit `6658b02`.
+- **Por qué**: PLAN_V4 FASE 5 — refactor Traductor monolítico a arquitectura multi-agente (ADR-004) + 4 killer features diferenciales de la plataforma.
+- **Archivos**: `src/rosetta/agents/` · `src/rosetta/core/attack_chain.py` · `src/rosetta/core/copilot.py` · `src/rosetta/core/compliance_timeline.py` · `src/rosetta/core/remediation_validator.py`
+- **Enlaces**: [[02_ADR/004-arquitectura-multi-agente]] · [[MOC_Roadmap]]
+- **Estado**: ✅ hecho
+
+---
+
+## 2026-04-24 · Inicio de sesión — continuando PLAN_V4 FASE 5
+- **Hecho**: Sesión iniciada. Detectados archivos de FASE 5 sin commitear. Se completaron los 4 traductores faltantes (DORA, RGPD, NIST, PCI), se corrigieron errores pre-commit (SIM105, mypy type-arg) y se cerró FASE 5.
+- **Por qué**: Retomando tras sesión anterior que dejó FASE 5 parcialmente implementada.
+- **Archivos**: `src/rosetta/agents/translator/dora.py` · `src/rosetta/agents/translator/rgpd.py` · `src/rosetta/agents/translator/nist.py` · `src/rosetta/agents/translator/pci.py`
+- **Enlaces**: [[MOC_Roadmap]] · [[00_Dashboard]]
+- **Estado**: ✅ hecho
+
+---
+
 ## 2026-04-23 · Inicio de sesión — retomando tras FASE 4, archivos blue pendientes de commit
 - **Hecho**: Sesión iniciada. Detectados `blue_enrichment.py` y `tests/test_blue.py` sin commitear (omitidos del commit `407be23`). `reports/` también untracked (artefacto runtime). Se procederá a commitear los archivos faltantes y continuar con FASE 5.
 - **Por qué**: El commit `407be23` incluyó wazuh.py, dashboard.py, main.py y schemas.py pero no el módulo de correlación ni sus tests — quedan pendientes antes de avanzar.
