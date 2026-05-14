@@ -36,11 +36,13 @@ from rosetta.api.schemas import (
     DiffViolationItem,
     DriftRequest,
     DriftResponse,
+    FindingEstadoUpdate,
     FindingItem,
     FindingsResponse,
     IngestPdfResponse,
     ReportGenerateRequest,
     ReportGenerateResponse,
+    StatsResponse,
     TranslateRequest,
 )
 from rosetta.core.diff_analyzer import DiffAnalysisResult, DiffViolation
@@ -139,9 +141,20 @@ async def health() -> dict[str, str]:
 
 
 @app.get("/dashboard", response_class=HTMLResponse, tags=["ui"], include_in_schema=False)
-async def dashboard() -> str:
-    """Panel visual para auditor — interfaz web sin CLI."""
-    return HTML_DASHBOARD
+async def dashboard() -> HTMLResponse:
+    """Panel visual para auditor — interfaz web sin CLI.
+
+    Cache-Control: no-store evita que el navegador sirva CSS/JS viejos tras
+    redeploys en desarrollo. En producción puede sustituirse por etag/hash.
+    """
+    return HTMLResponse(
+        content=HTML_DASHBOARD,
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -222,17 +235,67 @@ async def list_findings(
     findings: FindingsDep,
     offset: int = Query(0, ge=0, description="Número de hallazgos a saltar."),
     limit: int = Query(20, ge=1, le=100, description="Máximo de hallazgos a devolver."),
+    estado: str | None = Query(
+        None,
+        description="Filtra por estado: 'activo' | 'en_progreso' | 'solucionado' | 'all'.",
+    ),
+    desde: str | None = Query(None, description="ISO date — incluye hallazgos >= desde."),
+    hasta: str | None = Query(None, description="ISO date — incluye hallazgos <= hasta."),
 ) -> FindingsResponse:
-    """Lista los hallazgos traducidos en la sesión actual con paginación."""
-    total = len(findings)
-    page = findings[offset : offset + limit]
-    items = [_maestro_to_item(m) for m in page]
+    """Lista los hallazgos traducidos en la sesión actual con paginación y filtros."""
+    from datetime import datetime
+
+    estados_map = _get_estados_map(findings)
+    all_items: list[HallazgoMaestro] = list(findings)
+
+    # Date filter
+    if desde:
+        try:
+            d_from = datetime.fromisoformat(desde)
+            all_items = [m for m in all_items if m.timestamp >= d_from]
+        except ValueError:
+            pass
+    if hasta:
+        try:
+            d_to = datetime.fromisoformat(hasta)
+            all_items = [m for m in all_items if m.timestamp <= d_to]
+        except ValueError:
+            pass
+
+    # Estado filter (default: excluye solucionados)
+    estado_filter = estado or "active_or_progress"
+    if estado_filter == "all":
+        pass
+    elif estado_filter in ("activo", "en_progreso", "solucionado"):
+        all_items = [
+            m for m in all_items if estados_map.get(m.id_hallazgo, "activo") == estado_filter
+        ]
+    else:  # active_or_progress (default)
+        all_items = [
+            m for m in all_items if estados_map.get(m.id_hallazgo, "activo") != "solucionado"
+        ]
+
+    # Más recientes primero
+    all_items.sort(key=lambda m: m.timestamp, reverse=True)
+
+    total = len(all_items)
+    page = all_items[offset : offset + limit]
+    items = [_maestro_to_item(m, estados_map) for m in page]
     return FindingsResponse(total=total, offset=offset, limit=limit, items=items)
 
 
-def _maestro_to_item(m: HallazgoMaestro) -> FindingItem:
+def _get_estados_map(findings: Any) -> dict[str, str]:
+    """Lee el mapa id→estado de SessionStore si el backend lo soporta."""
+    try:
+        return findings.get_estados() if hasattr(findings, "get_estados") else {}
+    except Exception:
+        return {}
+
+
+def _maestro_to_item(m: HallazgoMaestro, estados_map: dict[str, str] | None = None) -> FindingItem:
     """Convierte un HallazgoMaestro en la proyección plana FindingItem."""
     compliance = m.compliance_data
+    estado = (estados_map or {}).get(m.id_hallazgo, "activo")
     return FindingItem(
         id_hallazgo=m.id_hallazgo,
         timestamp=m.timestamp,
@@ -241,6 +304,88 @@ def _maestro_to_item(m: HallazgoMaestro) -> FindingItem:
         marcos_aplicables=[mm.value for mm in compliance.marcos_aplicables] if compliance else [],
         controles_incumplidos=compliance.controles_incumplidos if compliance else [],
         impacto_legal=compliance.impacto_legal.value if compliance else Severidad.MEDIA.value,
+        estado=estado,
+    )
+
+
+@app.patch(
+    "/findings/{id_hallazgo}/estado",
+    response_model=FindingItem,
+    tags=["findings"],
+)
+async def update_finding_estado(
+    id_hallazgo: str,
+    body: FindingEstadoUpdate,
+    findings: FindingsDep,
+) -> FindingItem:
+    """Actualiza el estado de un hallazgo (lifecycle: activo → en_progreso → solucionado)."""
+    if not hasattr(findings, "set_estado"):
+        raise HTTPException(
+            status_code=501, detail="Backend de sesión no soporta cambio de estado."
+        )
+    maestro: HallazgoMaestro | None = None
+    for m in findings:
+        if m.id_hallazgo == id_hallazgo:
+            maestro = m
+            break
+    if maestro is None:
+        raise HTTPException(status_code=404, detail=f"Hallazgo {id_hallazgo!r} no encontrado.")
+
+    try:
+        findings.set_estado(id_hallazgo, body.estado)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    estados_map = _get_estados_map(findings)
+    return _maestro_to_item(maestro, estados_map)
+
+
+@app.get("/stats", response_model=StatsResponse, tags=["stats"])
+async def get_stats(findings: FindingsDep) -> StatsResponse:
+    """KPIs agregados para pantalla de inicio."""
+    estados_map = _get_estados_map(findings)
+    all_items: list[HallazgoMaestro] = list(findings)
+
+    sev_dist: dict[str, int] = {}
+    estado_dist: dict[str, int] = {"activo": 0, "en_progreso": 0, "solucionado": 0}
+    origen_dist: dict[str, int] = {}
+    marco_dist: dict[str, int] = {}
+    ctrl_counts: dict[str, int] = {}
+
+    for m in all_items:
+        estado = estados_map.get(m.id_hallazgo, "activo")
+        estado_dist[estado] = estado_dist.get(estado, 0) + 1
+        origen_dist[m.red_team_data.origen.value] = (
+            origen_dist.get(m.red_team_data.origen.value, 0) + 1
+        )
+        compliance = m.compliance_data
+        if compliance:
+            sev = compliance.impacto_legal.value
+            sev_dist[sev] = sev_dist.get(sev, 0) + 1
+            for mm in compliance.marcos_aplicables:
+                marco_dist[mm.value] = marco_dist.get(mm.value, 0) + 1
+            for ctrl in compliance.controles_incumplidos:
+                ctrl_counts[ctrl] = ctrl_counts.get(ctrl, 0) + 1
+
+    top_controles = sorted(ctrl_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+    controles_summary = [
+        ControlSummary(control_id=cid, total_hallazgos=cnt) for cid, cnt in top_controles
+    ]
+
+    ultimos = sorted(all_items, key=lambda m: m.timestamp, reverse=True)[:5]
+    ultimos_items = [_maestro_to_item(m, estados_map) for m in ultimos]
+
+    origenes_top = dict(sorted(origen_dist.items(), key=lambda x: x[1], reverse=True)[:5])
+    marcos_top = dict(sorted(marco_dist.items(), key=lambda x: x[1], reverse=True)[:7])
+
+    return StatsResponse(
+        total_hallazgos=len(all_items),
+        severidad_distribution=sev_dist,
+        estado_distribution=estado_dist,
+        origenes_top=origenes_top,
+        marcos_top=marcos_top,
+        controles_top=controles_summary,
+        ultimos_hallazgos=ultimos_items,
     )
 
 
@@ -886,6 +1031,10 @@ async def graph_data(
     marco: Annotated[
         MarcoNormativo | None, Query(description="Filtrar por marco normativo.")
     ] = None,
+    incluir_archivados: Annotated[
+        bool,
+        Query(description="Si True, incluye hallazgos con estado='solucionado'."),
+    ] = False,
 ) -> dict[str, Any]:
     """Devuelve nodos y aristas del grafo de correlación para vis.js.
 
@@ -895,10 +1044,21 @@ async def graph_data(
     nodes: list[dict[str, Any]] = []
     edges: list[dict[str, Any]] = []
     seen_nodes: set[str] = set()
+    node_marcos: dict[str, set[str]] = {}
+    control_aggregate: dict[str, dict[str, Any]] = {}
     edge_id = 0
+
+    _sev_rank = {"informativa": 0, "baja": 1, "media": 2, "alta": 3, "critica": 4}
+    estados_map = _get_estados_map(findings)
 
     for maestro in findings:
         if maestro.compliance_data is None:
+            continue
+        # Excluye hallazgos solucionados a menos que se pida incluirlos
+        if (
+            not incluir_archivados
+            and estados_map.get(maestro.id_hallazgo, "activo") == "solucionado"
+        ):
             continue
         compliance = maestro.compliance_data
 
@@ -908,6 +1068,12 @@ async def graph_data(
         activo = maestro.red_team_data.activo_detectado
         activo_id = f"asset:{maestro.id_hallazgo}"
         sev = compliance.impacto_legal.value
+        origen = maestro.red_team_data.origen.value
+
+        # Marcos that apply to this hallazgo (filtered if marco param set)
+        marcos_aplicables = (
+            [marco.value] if marco else [m.value for m in compliance.marcos_aplicables]
+        )
 
         color_map = {
             "critica": "#742a2a",
@@ -925,9 +1091,31 @@ async def graph_data(
                     "group": "asset",
                     "title": f"{maestro.id_hallazgo} · {activo}",
                     "color": color_map.get(sev, "#4a5568"),
+                    "origen": origen,
+                    "severidad": sev,
+                    "detail": {
+                        "hallazgo_id": maestro.id_hallazgo,
+                        "activo": activo,
+                        "evidencia": maestro.red_team_data.evidencia,
+                        "vector_ataque": maestro.red_team_data.vector_ataque,
+                        "dificultad_explotacion": (
+                            maestro.red_team_data.dificultad_explotacion.value
+                        ),
+                        "cve_relacionado": maestro.red_team_data.cve_relacionado,
+                        "origen": origen,
+                        "severidad": sev,
+                        "cita_normativa": compliance.cita_normativa,
+                        "justificacion": compliance.justificacion,
+                        "accion_mitigacion": compliance.accion_mitigacion,
+                        "evidencia_auditoria": compliance.evidencia_auditoria,
+                        "controles_incumplidos": list(compliance.controles_incumplidos),
+                        "marcos_aplicables": [m.value for m in compliance.marcos_aplicables],
+                        "timestamp": maestro.timestamp.isoformat(),
+                    },
                 }
             )
             seen_nodes.add(activo_id)
+        node_marcos.setdefault(activo_id, set()).update(marcos_aplicables)
 
         for ctrl_id in compliance.controles_incumplidos:
             ctrl_node_id = f"ctrl:{ctrl_id}"
@@ -942,6 +1130,40 @@ async def graph_data(
                     }
                 )
                 seen_nodes.add(ctrl_node_id)
+            node_marcos.setdefault(ctrl_node_id, set()).update(marcos_aplicables)
+
+            # Aggregate per-control info for rich detail panel
+            agg = control_aggregate.setdefault(
+                ctrl_id,
+                {
+                    "activos": [],
+                    "citas": [],
+                    "mitigaciones": [],
+                    "justificaciones": [],
+                    "severidad_max": "informativa",
+                    "marcos": set(),
+                },
+            )
+            agg["activos"].append(
+                {
+                    "hallazgo_id": maestro.id_hallazgo,
+                    "activo": activo,
+                    "severidad": sev,
+                    "origen": origen,
+                }
+            )
+            agg["marcos"].update(marcos_aplicables)
+            if compliance.cita_normativa and compliance.cita_normativa not in agg["citas"]:
+                agg["citas"].append(compliance.cita_normativa)
+            if (
+                compliance.accion_mitigacion
+                and compliance.accion_mitigacion not in agg["mitigaciones"]
+            ):
+                agg["mitigaciones"].append(compliance.accion_mitigacion)
+            if compliance.justificacion and compliance.justificacion not in agg["justificaciones"]:
+                agg["justificaciones"].append(compliance.justificacion)
+            if _sev_rank.get(sev, 0) > _sev_rank.get(agg["severidad_max"], 0):
+                agg["severidad_max"] = sev
 
             edges.append(
                 {
@@ -952,5 +1174,22 @@ async def graph_data(
                 }
             )
             edge_id += 1
+
+    # Attach sorted marcos list + control aggregate detail to every node
+    for node in nodes:
+        node["marcos"] = sorted(node_marcos.get(node["id"], set()))
+        if node["group"] == "control":
+            ctrl_id = node["label"]
+            agg = control_aggregate.get(ctrl_id, {})
+            node["detail"] = {
+                "control_id": ctrl_id,
+                "marcos": sorted(agg.get("marcos", set())),
+                "total_hallazgos": len(agg.get("activos", [])),
+                "severidad_max": agg.get("severidad_max", "media"),
+                "activos_afectados": agg.get("activos", []),
+                "citas_normativas": agg.get("citas", [])[:3],
+                "acciones_mitigacion": agg.get("mitigaciones", [])[:3],
+                "justificaciones": agg.get("justificaciones", [])[:3],
+            }
 
     return {"nodes": nodes, "edges": edges}

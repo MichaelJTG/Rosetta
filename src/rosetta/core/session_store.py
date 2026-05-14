@@ -50,7 +50,47 @@ class SessionStore(MutableSequence):  # type: ignore[type-arg]
                 )
                 """
             )
+            self._conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS finding_estados (
+                    id_hallazgo TEXT PRIMARY KEY,
+                    estado      TEXT NOT NULL,
+                    updated_at  TEXT NOT NULL
+                )
+                """
+            )
             self._conn.commit()
+
+    # ------------------------------------------------------------------
+    # Estados (lifecycle: activo | en_progreso | solucionado)
+    # ------------------------------------------------------------------
+
+    def set_estado(self, id_hallazgo: str, estado: str) -> None:
+        """Actualiza el estado de un hallazgo. Default implícito = 'activo'."""
+        if estado not in {"activo", "en_progreso", "solucionado"}:
+            raise ValueError(f"Estado inválido: {estado!r}")
+        from datetime import datetime
+
+        ts = datetime.utcnow().isoformat()
+        with self._lock:
+            self._conn.execute(
+                "INSERT OR REPLACE INTO finding_estados (id_hallazgo, estado, updated_at) "
+                "VALUES (?, ?, ?)",
+                (id_hallazgo, estado, ts),
+            )
+            self._conn.commit()
+
+    def get_estado(self, id_hallazgo: str) -> str:
+        row = self._conn.execute(
+            "SELECT estado FROM finding_estados WHERE id_hallazgo = ?",
+            (id_hallazgo,),
+        ).fetchone()
+        return str(row[0]) if row else "activo"
+
+    def get_estados(self) -> dict[str, str]:
+        """Devuelve mapa id_hallazgo → estado para todos los hallazgos con estado registrado."""
+        rows = self._conn.execute("SELECT id_hallazgo, estado FROM finding_estados").fetchall()
+        return {str(r[0]): str(r[1]) for r in rows}
 
     # ------------------------------------------------------------------
     # MutableSequence interface
