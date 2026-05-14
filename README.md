@@ -218,4 +218,4 @@ Proprietary provisional · ver [LICENSE](./LICENSE). Sujeta a revisión a licenc
 
 **Mj** · michael.jt.pro@gmail.com
 
-Proyecto desarrollado durante el Master en Ciberseguridad de Evolve, bajo la mentoría informal de Carlos Gómez Pintado (CEO, Cyberxia).
+Proyecto desarrollado durante el Master en Ciberseguridad de Evolve.
