@@ -41,6 +41,10 @@ class FindingItem(BaseModel):
     marcos_aplicables: list[str]
     controles_incumplidos: list[str]
     impacto_legal: str
+    estado: str = Field(
+        default="activo",
+        description="Estado del hallazgo: 'activo', 'en_progreso' o 'solucionado'.",
+    )
 
 
 class FindingsResponse(BaseModel):
@@ -50,6 +54,28 @@ class FindingsResponse(BaseModel):
     offset: int
     limit: int
     items: list[FindingItem]
+
+
+class FindingEstadoUpdate(BaseModel):
+    """Cuerpo de la petición PATCH /findings/{id_hallazgo}/estado."""
+
+    estado: str = Field(
+        ...,
+        description="Nuevo estado: 'activo' | 'en_progreso' | 'solucionado'.",
+        pattern="^(activo|en_progreso|solucionado)$",
+    )
+
+
+class StatsResponse(BaseModel):
+    """Respuesta de GET /stats — KPIs agregados para pantalla de inicio."""
+
+    total_hallazgos: int
+    severidad_distribution: dict[str, int]
+    estado_distribution: dict[str, int]
+    origenes_top: dict[str, int]
+    marcos_top: dict[str, int]
+    controles_top: list[ControlSummary]
+    ultimos_hallazgos: list[FindingItem]
 
 
 class ComplianceStateResponse(BaseModel):
