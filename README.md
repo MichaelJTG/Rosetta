@@ -8,18 +8,6 @@ Plataforma que traduce hallazgos técnicos de Red Team y Blue Team en evidencia 
 
 ---
 
-## Capturas del proyecto
-
-### Dashboard de cumplimiento
-
-![Dashboard principal de ROSETTA](caverman.png)
-
-### Grafo de correlación activo → control normativo
-
-![Grafo de correlación](ejemplo_de_grafos.png)
-
----
-
 ## El problema
 
 Red Team, Blue Team y Normativa trabajan en silos. El pentester entrega PDFs, el SOC se ahoga en falsos positivos, y el responsable de cumplimiento rellena Excels con mapeos estáticos. Traducir un hallazgo técnico a un control normativo incumplido con su cita legal y su mitigación concreta se hace a mano, tarda días, y es la fuente principal de errores en auditorías.
