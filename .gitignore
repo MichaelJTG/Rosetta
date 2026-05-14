@@ -101,3 +101,17 @@ logs/
 *.pem
 *.key
 secrets/
+
+# Vault de Obsidian — notas internas, no para repo público
+vault/
+
+# Configuración interna de Claude Code
+.claude/
+
+# Documentos internos de trabajo
+HANDOFF.md
+PLAN_V4.md
+ROSETTA_FLUJO_COMPLETO.md
+START_HERE.md
+NEXT_STEPS.md
+CLAUDE.md
