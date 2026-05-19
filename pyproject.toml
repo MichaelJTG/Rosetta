@@ -30,6 +30,9 @@ dependencies = [
     # API
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.32.0",
+    # Auth + rate limiting
+    "pyjwt>=2.8.0",
+    "slowapi>=0.1.9",
     # CLI
     "typer>=0.12.0",
     "rich>=13.9.0",
@@ -122,9 +125,18 @@ module = [
     "pypdfium2.*",
     "pdf2image.*",
     "weasyprint.*",
+    "jwt",
+    "jwt.*",
+    "slowapi",
+    "slowapi.*",
 ]
 ignore_missing_imports = true
 follow_imports = "skip"
+
+# slowapi decoradores no estan tipados; permitimos en el modulo de la API.
+[[tool.mypy.overrides]]
+module = ["rosetta.api.main"]
+disallow_untyped_decorators = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

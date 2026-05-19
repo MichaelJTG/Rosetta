@@ -1249,6 +1249,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       <div class="nav-footer-row"><span>marco</span><span class="v">iso_27001_2022</span></div>
       <div class="nav-footer-row"><span>llm</span><span class="v" id="footer-llm">claude</span></div>
       <div class="nav-footer-row"><span>session</span><span class="v">sqlite</span></div>
+      <button onclick="doLogout()" style="margin-top:6px; padding:5px 10px; background:transparent; border:1px solid var(--line-2); color:var(--fg-3); border-radius:var(--r-1); font-family:var(--font-mono); font-size:10.5px; cursor:pointer; text-align:left">Cerrar sesión</button>
     </div>
   </nav>
 
@@ -1693,6 +1694,28 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
 
   </div><!-- /.main -->
 
+  <!-- LOGIN OVERLAY (mostrado cuando no hay token o JWT expirado sin refresh) -->
+  <div class="modal-overlay login-overlay" id="login-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="login-title" style="max-width:380px">
+      <div class="modal-head">
+        <h2 id="login-title">Acceso a ROSETTA</h2>
+      </div>
+      <form class="modal-body" onsubmit="submitLogin(event)">
+        <p class="field-help" style="margin-top:0">
+          Introduce las credenciales del panel para acceder a la API.
+        </p>
+        <label class="mt-3" for="login-user">Usuario</label>
+        <input type="text" id="login-user" autocomplete="username" required>
+        <label class="mt-3" for="login-pass">Contraseña</label>
+        <input type="password" id="login-pass" autocomplete="current-password" required>
+        <div id="login-msg" style="margin-top: var(--s-3); color: var(--sev-critica); font-family: var(--font-mono); font-size: 11.5px; min-height: 18px"></div>
+        <div class="btn-row mt-4">
+          <button type="submit" class="btn" id="login-btn" style="width:100%; justify-content:center">Entrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     const API = '';
     const TAB_LABELS = {
@@ -1722,6 +1745,92 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     function msgInfo(id, t) { setMsg(id, '<div class="msg-info">'    + t + '</div>'); }
     function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function badgeHtml(sev) { const s = sev || 'media'; return '<span class="badge badge-' + s + '">' + s + '</span>'; }
+
+    /* ── Auth: JWT en localStorage + authedFetch con refresh automatico ── */
+    const TOK_KEY = 'rosetta:access';
+    const REF_KEY = 'rosetta:refresh';
+    function getAccessToken() { try { return localStorage.getItem(TOK_KEY) || ''; } catch (_) { return ''; } }
+    function setTokens(a, r) {
+      try {
+        if (a) localStorage.setItem(TOK_KEY, a);
+        if (r) localStorage.setItem(REF_KEY, r);
+      } catch (_) {}
+    }
+    function clearTokens() { try { localStorage.removeItem(TOK_KEY); localStorage.removeItem(REF_KEY); } catch (_) {} }
+
+    async function authedFetch(url, opts) {
+      opts = opts || {};
+      const headers = Object.assign({}, opts.headers || {});
+      const tok = getAccessToken();
+      if (tok) headers['Authorization'] = 'Bearer ' + tok;
+      let r = await fetch(url, Object.assign({}, opts, { headers }));
+      if (r.status !== 401) return r;
+      /* Intenta refresh y reintenta una vez */
+      const ref = (function(){ try { return localStorage.getItem(REF_KEY) || ''; } catch(_) { return ''; } })();
+      if (ref) {
+        try {
+          const rr = await authedFetch(API + '/auth/refresh', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: ref }),
+          });
+          if (rr.ok) {
+            const d = await rr.json();
+            setTokens(d.access_token, d.refresh_token);
+            headers['Authorization'] = 'Bearer ' + d.access_token;
+            r = await fetch(url, Object.assign({}, opts, { headers }));
+            if (r.status !== 401) return r;
+          }
+        } catch (_) {}
+      }
+      clearTokens();
+      showLoginOverlay();
+      return r;
+    }
+
+    async function doLogin(user, pass) {
+      const r = await authedFetch(API + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, password: pass }),
+      });
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(d.detail || ('HTTP ' + r.status));
+      }
+      const d = await r.json();
+      setTokens(d.access_token, d.refresh_token);
+    }
+
+    function showLoginOverlay() {
+      const o = document.getElementById('login-overlay');
+      if (o) o.classList.add('open');
+    }
+    function hideLoginOverlay() {
+      const o = document.getElementById('login-overlay');
+      if (o) o.classList.remove('open');
+    }
+    async function submitLogin(ev) {
+      ev.preventDefault();
+      const u = document.getElementById('login-user').value.trim();
+      const p = document.getElementById('login-pass').value;
+      const msg = document.getElementById('login-msg');
+      const btn = document.getElementById('login-btn');
+      msg.textContent = '';
+      btn.disabled = true;
+      try {
+        await doLogin(u, p);
+        hideLoginOverlay();
+        document.getElementById('login-pass').value = '';
+        try { updateFindingsCount(); } catch (_) {}
+        try { loadInicio(); } catch (_) {}
+      } catch (e) {
+        msg.textContent = e.message || 'Error de inicio de sesión';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+    function doLogout() { clearTokens(); showLoginOverlay(); }
 
     function switchTab(name, btn) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -1775,7 +1884,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       const dot = document.getElementById('status-dot');
       const lbl = document.getElementById('status-label');
       try {
-        const r = await fetch(API + '/health');
+        const r = await authedFetch(API + '/health');
         const d = await r.json();
         dot.className = 'status-dot ok';
         lbl.textContent = 'API ' + (d.version || 'ok');
@@ -1874,7 +1983,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       const cnt = document.getElementById('recent-count');
       if (!wrap) return;
       try {
-        const r = await fetch(API + '/findings?limit=6&estado=all');
+        const r = await authedFetch(API + '/findings?limit=6&estado=all');
         const d = await r.json();
         const items = d.items || [];
         if (cnt) cnt.textContent = (d.total || 0) + ' en total';
@@ -1922,7 +2031,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       setMsg('translate-result', '<div class="empty">Procesando traducción…</div>');
       const body = { hallazgo, marcos: opts };
       try {
-        const r = await fetch(API + '/translate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        const r = await authedFetch(API + '/translate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
         const data = await r.json();
         if (!r.ok) {
           msgErr('translate-msg', 'Error ' + r.status + ': ' + esc(data.detail || JSON.stringify(data)));
@@ -1961,7 +2070,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       const marco = document.getElementById('state-marco').value;
       setMsg('state-result', '<div class="empty">Consultando…</div>');
       try {
-        const r = await fetch(API + '/compliance/state/' + marco);
+        const r = await authedFetch(API + '/compliance/state/' + marco);
         const d = await r.json();
         if (!r.ok) { setMsg('state-result', '<div class="msg-error">Error ' + r.status + ': ' + esc(d.detail || JSON.stringify(d)) + '</div>'); return; }
         renderComplianceState(d);
@@ -2022,7 +2131,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       msgInfo('audit-msg', 'Iniciando auditoría…');
       let auditId;
       try {
-        const r = await fetch(API + '/audit/start', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ objetivos, adaptadores, declaracion_alcance: alcance }) });
+        const r = await authedFetch(API + '/audit/start', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ objetivos, adaptadores, declaracion_alcance: alcance }) });
         const d = await r.json();
         if (!r.ok) { msgErr('audit-msg', 'Error ' + r.status + ': ' + esc(d.detail || JSON.stringify(d))); btn.disabled = false; return; }
         auditId = d.audit_id;
@@ -2064,7 +2173,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       setMsg('ingest-result', '<div class="empty">Procesando…</div>');
       const form = new FormData(); form.append('file', file);
       try {
-        const r = await fetch(API + '/ingest/pdf', { method:'POST', body: form });
+        const r = await authedFetch(API + '/ingest/pdf', { method:'POST', body: form });
         const d = await r.json();
         if (!r.ok) { msgErr('ingest-msg', 'Error ' + r.status + ': ' + esc(d.detail || JSON.stringify(d))); setMsg('ingest-result', '<div class="empty">—</div>'); }
         else {
@@ -2099,7 +2208,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         catch (e) { msgErr('blue-msg', 'JSON inválido: ' + esc(e.message)); btn.disabled = false; return; }
       } else { body = { formato:'csv', datos_csv: rawData }; }
       try {
-        const r = await fetch(API + '/blue/ingest', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        const r = await authedFetch(API + '/blue/ingest', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
         const d = await r.json();
         if (!r.ok) { msgErr('blue-msg', 'Error ' + r.status + ': ' + esc(d.detail || JSON.stringify(d))); }
         else {
@@ -2120,13 +2229,17 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     /* ── GRAFO ─────────────────────────────────────────────────────── */
     async function loadGraph() {
       const marco = document.getElementById('graph-marco').value;
+      const includeArch = document.getElementById('graph-incluir-archivados');
       const msgEl = document.getElementById('graph-msg');
       const infoEl = document.getElementById('graph-node-info');
       infoEl.style.display = 'none';
       msgEl.textContent = 'Cargando grafo…';
-      const url = API + '/graph/data' + (marco ? '?marco=' + marco : '');
+      const params = new URLSearchParams();
+      if (marco) params.set('marco', marco);
+      params.set('incluir_archivados', includeArch && includeArch.checked ? 'true' : 'false');
+      const url = API + '/graph/data?' + params.toString();
       try {
-        const r = await fetch(url);
+        const r = await authedFetch(url);
         const d = await r.json();
         if (!r.ok) { msgEl.textContent = 'Error: ' + (d.detail || ''); return; }
 
@@ -2550,7 +2663,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       btn.disabled = true; msgInfo('drift-msg', 'Analizando drift…');
       setMsg('drift-result', '<div class="empty">Analizando…</div>');
       try {
-        const r = await fetch(API + '/drift/analyze', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ procedimiento: proc, observaciones }) });
+        const r = await authedFetch(API + '/drift/analyze', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ procedimiento: proc, observaciones }) });
         const d = await r.json();
         if (!r.ok) { msgErr('drift-msg', 'Error ' + r.status + ': ' + esc(d.detail || JSON.stringify(d))); setMsg('drift-result', '<div class="empty">Error.</div>'); }
         else { msgOk('drift-msg', 'Análisis completado'); setMsg('drift-result', renderDrift(d)); }
@@ -2580,7 +2693,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       if (!pregunta) { msgErr('copilot-msg', 'Escribe una pregunta primero.'); return; }
       btn.disabled = true; msgInfo('copilot-msg', 'Consultando Copilot…'); setMsg('copilot-result', '');
       try {
-        const r = await fetch(API + '/copilot/ask', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ pregunta, contexto }) });
+        const r = await authedFetch(API + '/copilot/ask', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ pregunta, contexto }) });
         const d = await r.json();
         if (!r.ok) { msgErr('copilot-msg', 'Error ' + r.status + ': ' + esc(d.detail || JSON.stringify(d))); }
         else {
@@ -2625,7 +2738,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       if (desde)  params.set('desde', desde);
       if (hasta)  params.set('hasta', hasta + 'T23:59:59');
       try {
-        const r = await fetch(API + '/findings?' + params.toString());
+        const r = await authedFetch(API + '/findings?' + params.toString());
         const d = await r.json();
         const total = d.total || 0;
         document.getElementById('findings-count').textContent = total + ' hallazgo(s)';
@@ -2665,7 +2778,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
 
     async function setFindingEstado(id, estado) {
       try {
-        const r = await fetch(API + '/findings/' + encodeURIComponent(id) + '/estado', {
+        const r = await authedFetch(API + '/findings/' + encodeURIComponent(id) + '/estado', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ estado }),
@@ -2684,7 +2797,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
 
     async function updateFindingsCount() {
       try {
-        const r = await fetch(API + '/findings?limit=1&estado=all');
+        const r = await authedFetch(API + '/findings?limit=1&estado=all');
         const d = await r.json();
         document.getElementById('tb-findings').textContent = d.total || 0;
       } catch (_) {}
@@ -2694,7 +2807,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     async function loadInicio() {
       const wrap = document.getElementById('inicio-kpis');
       try {
-        const r = await fetch(API + '/stats');
+        const r = await authedFetch(API + '/stats');
         if (!r.ok) { wrap.innerHTML = '<div class="msg-error">No se pudieron cargar estadísticas.</div>'; return; }
         const d = await r.json();
         wrap.innerHTML = renderInicio(d);
@@ -2864,27 +2977,18 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       if (name === 'traductor') loadRecentTranslations();
     };
 
-    /* ── Hook loadGraph param archivados ──────────────────────────── */
-    const _origLoadGraph = loadGraph;
-    loadGraph = async function() {
-      /* monkey-patch fetch param incluir_archivados */
-      const includeArch = document.getElementById('graph-incluir-archivados');
-      const orig = window.fetch;
-      window.fetch = function(url, opts) {
-        if (typeof url === 'string' && url.indexOf('/graph/data') === 0) {
-          const sep = url.indexOf('?') >= 0 ? '&' : '?';
-          url = url + sep + 'incluir_archivados=' + (includeArch && includeArch.checked ? 'true' : 'false');
-        }
-        return orig.apply(this, arguments);
-      };
-      try { await _origLoadGraph(); } finally { window.fetch = orig; }
-    };
+    /* loadGraph ya inyecta incluir_archivados directamente en su URL;
+       no se necesita monkey-patch sobre window.fetch (rompía authedFetch). */
 
     /* ── Boot ──────────────────────────────────────────────────────── */
     checkHealth();
-    updateFindingsCount();
-    loadInicio();
     syncMarcoAll();
+    if (!getAccessToken()) {
+      showLoginOverlay();
+    } else {
+      updateFindingsCount();
+      loadInicio();
+    }
     try {
       const saved = sessionStorage.getItem('rosetta:tab');
       if (saved && saved !== 'inicio') {

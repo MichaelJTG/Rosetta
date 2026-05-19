@@ -13,11 +13,30 @@ from typing import Annotated, Any
 
 import structlog
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    Query,
+    Request,
+    UploadFile,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from fastapi.responses import HTMLResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
 
 from rosetta import __version__
-from rosetta.api.auth import BasicAuthMiddleware
+from rosetta.api.auth import (
+    BasicAuthMiddleware,
+    access_ttl_seconds,
+    create_access_token,
+    create_refresh_token,
+    decode_token,
+    verify_credentials,
+)
 from rosetta.api.dashboard import HTML_DASHBOARD
 from rosetta.api.deps import DiffAnalyzerDep, FindingsDep, GrafoDep, TraductorDep
 from rosetta.api.schemas import (
@@ -40,9 +59,12 @@ from rosetta.api.schemas import (
     FindingItem,
     FindingsResponse,
     IngestPdfResponse,
+    LoginRequest,
+    RefreshRequest,
     ReportGenerateRequest,
     ReportGenerateResponse,
     StatsResponse,
+    TokenResponse,
     TranslateRequest,
 )
 from rosetta.core.diff_analyzer import DiffAnalysisResult, DiffViolation
@@ -130,6 +152,62 @@ app.add_middleware(BasicAuthMiddleware)
 
 
 # ---------------------------------------------------------------------------
+# Rate limiting (slowapi) — honra X-Forwarded-For (nginx delante)
+# ---------------------------------------------------------------------------
+
+
+def _client_ip(request: Request) -> str:
+    """Extrae la IP real cuando hay un reverse proxy delante (nginx)."""
+    xff = request.headers.get("x-forwarded-for", "")
+    if xff:
+        return xff.split(",")[0].strip()
+    return str(get_remote_address(request))
+
+
+limiter = Limiter(key_func=_client_ip, default_limits=["120/minute"])
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
+
+# ---------------------------------------------------------------------------
+# Auth — JWT login + refresh
+# ---------------------------------------------------------------------------
+
+
+@app.post("/auth/login", response_model=TokenResponse, tags=["auth"])
+@limiter.limit("5/minute")
+async def login(request: Request, body: LoginRequest) -> TokenResponse:  # noqa: ARG001
+    """Autentica usuario/contraseña y devuelve un par access + refresh JWT.
+
+    Rate-limited a 5 intentos por minuto por IP (anti brute-force).
+    """
+    if not verify_credentials(body.username, body.password):
+        raise HTTPException(status_code=401, detail="Credenciales inválidas")
+    return TokenResponse(
+        access_token=create_access_token(body.username),
+        refresh_token=create_refresh_token(body.username),
+        token_type="bearer",
+        expires_in=access_ttl_seconds(),
+    )
+
+
+@app.post("/auth/refresh", response_model=TokenResponse, tags=["auth"])
+@limiter.limit("20/minute")
+async def refresh(request: Request, body: RefreshRequest) -> TokenResponse:  # noqa: ARG001
+    """Canjea un refresh token válido por un nuevo access token."""
+    payload = decode_token(body.refresh_token, expected_type="refresh")
+    if payload is None:
+        raise HTTPException(status_code=401, detail="Refresh token inválido o expirado")
+    username = str(payload["sub"])
+    return TokenResponse(
+        access_token=create_access_token(username),
+        token_type="bearer",
+        expires_in=access_ttl_seconds(),
+    )
+
+
+# ---------------------------------------------------------------------------
 # Meta
 # ---------------------------------------------------------------------------
 
@@ -163,7 +241,9 @@ async def dashboard() -> HTMLResponse:
 
 
 @app.post("/translate", response_model=DatosCompliance, tags=["traductor"])
+@limiter.limit("30/minute")
 async def translate(
+    request: Request,  # noqa: ARG001
     body: TranslateRequest,
     traductor: TraductorDep,
     grafo: GrafoDep,
@@ -661,10 +741,11 @@ async def ingest_pdf(
 
 
 @app.post("/audit/start", response_model=AuditStartResponse, tags=["audit"])
+@limiter.limit("5/hour")
 async def audit_start(
+    request: Request,
     body: AuditStartRequest,
     findings: FindingsDep,
-    request: Any,
 ) -> AuditStartResponse:
     """Inicia una auditoría automática Red Team en segundo plano.
 
@@ -951,7 +1032,8 @@ def _state_from_memory(
 
 
 @app.post("/copilot/ask", response_model=CopilotApiResponse, tags=["copilot"])
-async def copilot_ask(request: CopilotRequest) -> CopilotApiResponse:
+@limiter.limit("30/minute")
+async def copilot_ask(request: Request, body: CopilotRequest) -> CopilotApiResponse:  # noqa: ARG001
     """Consulta al Copilot normativo en lenguaje natural.
 
     Recibe una pregunta libre, recupera contexto RAG del corpus normativo
@@ -966,7 +1048,7 @@ async def copilot_ask(request: CopilotRequest) -> CopilotApiResponse:
     chroma_path = os.getenv("CHROMADB_PATH", ".chroma")
     rag = NormativaRAG(chromadb_path=chroma_path)
 
-    query = CopilotQuery(pregunta=request.pregunta, contexto=request.contexto)
+    query = CopilotQuery(pregunta=body.pregunta, contexto=body.contexto)
 
     try:
         response = await consultar_copilot(query=query, llm=llm, rag=rag)
