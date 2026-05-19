@@ -517,6 +517,50 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     }
     .mode-toggle:hover { color: var(--accent-hi); }
 
+    /* Empty state guiado */
+    .empty-guide {
+      padding: var(--s-6) var(--s-4);
+      text-align: center;
+    }
+    .empty-guide-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--fg-1);
+      margin-bottom: var(--s-4);
+    }
+    .empty-guide-steps {
+      display: inline-block;
+      text-align: left;
+      max-width: 460px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: g;
+    }
+    .empty-guide-steps li {
+      counter-increment: g;
+      position: relative;
+      padding: var(--s-2) 0 var(--s-2) var(--s-6);
+      font-size: 13px;
+      color: var(--fg-3);
+      line-height: 1.55;
+      border-bottom: 1px solid var(--line-1);
+    }
+    .empty-guide-steps li:last-child { border-bottom: none; }
+    .empty-guide-steps li::before {
+      content: counter(g);
+      position: absolute; left: 0; top: var(--s-2);
+      width: 20px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--accent-bg);
+      border: 1px solid #d8b98a;
+      border-radius: var(--r-pill);
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 600;
+      color: var(--accent);
+    }
+    .empty-guide-steps strong { color: var(--fg-1); font-weight: 600; }
+
     /* Marco checkbox grid */
     .marco-toggle-all {
       display: inline-flex; align-items: center; gap: 8px;
@@ -1252,11 +1296,26 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       <div class="content">
         <div class="card">
           <div class="card-head">
-            <h2>Evidencia normativa</h2>
+            <h2>Última evidencia normativa</h2>
             <button class="btn" onclick="openFindingModal()">+ Traducir hallazgo</button>
           </div>
           <div class="card-body">
-            <div id="translate-result"><div class="empty">Aún no hay traducción. Pulsa "Traducir hallazgo" para registrar un hallazgo.</div></div>
+            <div id="translate-result">
+              <div class="empty-guide">
+                <div class="empty-guide-title">Traduce tu primer hallazgo</div>
+                <ol class="empty-guide-steps">
+                  <li>Pulsa <strong>+ Traducir hallazgo</strong> arriba a la derecha.</li>
+                  <li>Rellena los datos del activo afectado y marca los marcos normativos.</li>
+                  <li>ROSETTA devuelve los controles incumplidos, la cita literal y la acción de mitigación.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:var(--s-4)">
+          <div class="card-head"><h2>Traducciones de la sesión</h2><span class="meta" id="recent-count"></span></div>
+          <div class="card-body">
+            <div id="recent-translations"><div class="empty">Cargando…</div></div>
           </div>
         </div>
       </div>
@@ -1809,6 +1868,39 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       all.indeterminate = checked > 0 && checked < cbs.length;
     }
 
+    /* ── Traducciones recientes (tab Traducir) ─────────────────────── */
+    async function loadRecentTranslations() {
+      const wrap = document.getElementById('recent-translations');
+      const cnt = document.getElementById('recent-count');
+      if (!wrap) return;
+      try {
+        const r = await fetch(API + '/findings?limit=6&estado=all');
+        const d = await r.json();
+        const items = d.items || [];
+        if (cnt) cnt.textContent = (d.total || 0) + ' en total';
+        if (!items.length) {
+          wrap.innerHTML = '<div class="empty">Sin traducciones todavía.</div>';
+          return;
+        }
+        const rows = items.map(f =>
+          '<tr>' +
+            '<td class="mono">' + esc(f.id_hallazgo) + '</td>' +
+            '<td>' + esc(f.activo_detectado) + '</td>' +
+            '<td class="mono">' + (f.controles_incumplidos || []).map(esc).join(', ') + '</td>' +
+            '<td>' + badgeHtml(f.impacto_legal) + '</td>' +
+            '<td class="mono">' + esc((f.timestamp || '').replace('T', ' ').slice(0, 16)) + '</td>' +
+          '</tr>'
+        ).join('');
+        wrap.innerHTML =
+          '<div class="table-wrap"><table>' +
+            '<thead><tr><th>ID</th><th>Activo</th><th>Controles</th><th>Impacto</th><th>Fecha</th></tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+          '</table></div>';
+      } catch (e) {
+        wrap.innerHTML = '<div class="msg-error">Error: ' + esc(e.message) + '</div>';
+      }
+    }
+
     async function doTranslate() {
       const btn = document.getElementById('btn-translate');
       let hallazgo;
@@ -1838,6 +1930,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         } else {
           renderTranslate(data);
           updateFindingsCount();
+          loadRecentTranslations();
           setMsg('translate-msg', '');
           closeFindingModal();
         }
@@ -2768,6 +2861,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     switchTab = function(name, btn) {
       _origSwitchTab(name, btn);
       if (name === 'inicio') loadInicio();
+      if (name === 'traductor') loadRecentTranslations();
     };
 
     /* ── Hook loadGraph param archivados ──────────────────────────── */
