@@ -90,6 +90,15 @@ corpus/**/raw/
 .chroma/
 chroma_db/
 
+# SQLite — almacén de sesión, no versionar
+*.db
+*.db.bak
+*.sqlite
+*.sqlite3
+
+# Informe PDF — se regenera desde el HTML; entrega aparte en campus
+docs/informe/*.pdf
+
 # Neo4j datos locales
 neo4j_data/
 

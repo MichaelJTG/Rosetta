@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROSETTA — Informe Práctica 1 · Ciberseguridad Avanzada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ink: #14171f;
+    --ink-2: #3a4150;
+    --ink-3: #6b7280;
+    --ink-4: #9aa1ad;
+    --paper: #ffffff;
+    --paper-2: #f7f6f2;
+    --line: #e3e1d8;
+    --line-2: #cdcabd;
+    --navy: #1e3a5f;
+    --copper: #9a6635;
+    --copper-bg: #f5ece0;
+    --crit: #a8312a;
+    --alta: #b8702a;
+    --ok: #3d7d4a;
+    --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-mono: 'JetBrains Mono', Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 10.5pt;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--paper);
+  }
+
+  @page {
+    size: A4;
+    margin: 20mm 18mm 20mm 18mm;
+  }
+  @page :first { margin: 0; }
+
+  /* COVER */
+  .cover {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 auto;
+    background: linear-gradient(160deg, #11151f 0%, #1a2030 55%, #14171f 100%);
+    color: #f5f5f6;
+    display: flex;
+    flex-direction: column;
+    padding: 30mm 24mm;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -120mm; right: -80mm;
+    width: 240mm; height: 240mm;
+    background: radial-gradient(circle, rgba(154,102,53,.28), transparent 62%);
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -100mm; left: -70mm;
+    width: 200mm; height: 200mm;
+    background: radial-gradient(circle, rgba(30,58,95,.4), transparent 62%);
+  }
+  .cover-mark {
+    width: 56px; height: 56px;
+    background: var(--copper);
+    border-radius: 8px;
+    position: relative;
+    z-index: 2;
+  }
+  .cover-mark::before {
+    content: '';
+    position: absolute; inset: 13px;
+    background: #11151f; border-radius: 2px;
+  }
+  .cover-mark::after {
+    content: '';
+    position: absolute; left: 21px; top: 21px;
+    width: 14px; height: 14px;
+    background: var(--copper); border-radius: 2px;
+  }
+  .cover-eyebrow {
+    position: relative; z-index: 2;
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-size: 10pt;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #c79a6a;
+  }
+  .cover h1 {
+    position: relative; z-index: 2;
+    font-family: var(--font-display);
+    font-size: 58pt;
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    margin: 6mm 0 4mm;
+  }
+  .cover .cover-sub {
+    position: relative; z-index: 2;
+    font-size: 15pt;
+    color: #c4c5c8;
+    font-weight: 400;
+    max-width: 130mm;
+    line-height: 1.4;
+  }
+  .cover-divider {
+    position: relative; z-index: 2;
+    height: 2px; width: 60mm;
+    background: linear-gradient(90deg, var(--copper), transparent);
+    margin: 12mm 0;
+  }
+  .cover-meta {
+    position: relative; z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6mm 12mm;
+    font-size: 10pt;
+  }
+  .cover-meta .label {
+    font-family: var(--font-mono);
+    font-size: 8pt;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #8a8d98;
+    margin-bottom: 1.5mm;
+  }
+  .cover-meta .value { color: #f5f5f6; font-weight: 500; }
+  .cover-foot {
+    position: relative; z-index: 2;
+    margin-top: 14mm;
+    font-family: var(--font-mono);
+    font-size: 8.5pt;
+    color: #6b7280;
+    border-top: 1px solid rgba(255,255,255,.1);
+    padding-top: 5mm;
+  }
+
+  .doc { max-width: 174mm; margin: 0 auto; }
+
+  section { page-break-before: always; padding-top: 4mm; }
+  section.no-break { page-break-before: auto; }
+
+  .sec-num {
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 2mm;
+  }
+  h1.sec {
+    font-family: var(--font-display);
+    font-size: 24pt;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 5mm;
+    padding-bottom: 4mm;
+    border-bottom: 2px solid var(--line);
+  }
+  h2 {
+    font-family: var(--font-sans);
+    font-size: 13pt;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 7mm 0 2.5mm;
+  }
+  h3 {
+    font-size: 11pt;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 5mm 0 2mm;
+  }
+  p { margin-bottom: 3mm; }
+  p.lead {
+    font-size: 12pt;
+    color: var(--ink-2);
+    line-height: 1.55;
+  }
+  strong { font-weight: 600; color: var(--ink); }
+  a { color: var(--copper); text-decoration: none; }
+
+  ul, ol { margin: 0 0 3mm 5mm; }
+  li { margin-bottom: 1.5mm; }
+
+  .callout {
+    background: var(--copper-bg);
+    border-left: 3px solid var(--copper);
+    border-radius: 0 4px 4px 0;
+    padding: 3.5mm 5mm;
+    margin: 4mm 0;
+    font-size: 10pt;
+  }
+  .callout.navy {
+    background: #eaeef4;
+    border-left-color: var(--navy);
+  }
+  .callout .co-title {
+    font-family: var(--font-mono);
+    font-size: 8pt;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 1.5mm;
+  }
+  .callout.navy .co-title { color: var(--navy); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+    margin: 4mm 0;
+  }
+  th {
+    text-align: left;
+    background: var(--paper-2);
+    border-bottom: 1.5px solid var(--line-2);
+    padding: 2.5mm 3mm;
+    font-family: var(--font-mono);
+    font-size: 7.5pt;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  td {
+    padding: 2.5mm 3mm;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  tr { page-break-inside: avoid; }
+
+  pre {
+    background: #14171f;
+    color: #d4d4d8;
+    border-radius: 4px;
+    padding: 4mm 5mm;
+    font-family: var(--font-mono);
+    font-size: 8pt;
+    line-height: 1.55;
+    overflow-x: auto;
+    margin: 4mm 0;
+    white-space: pre-wrap;
+    page-break-inside: avoid;
+  }
+  pre .c { color: #6b7280; }
+  pre .k { color: #c79a6a; }
+  pre .s { color: #86b986; }
+  code {
+    font-family: var(--font-mono);
+    font-size: 8.5pt;
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.3mm 1.5mm;
+    color: var(--navy);
+  }
+
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3mm;
+    margin: 5mm 0;
+  }
+  .kpi {
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 3.5mm 4mm;
+    background: var(--paper-2);
+  }
+  .kpi .v {
+    font-family: var(--font-display);
+    font-size: 21pt;
+    font-weight: 600;
+    color: var(--copper);
+    line-height: 1;
+  }
+  .kpi .l {
+    font-family: var(--font-mono);
+    font-size: 7.5pt;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-top: 1.5mm;
+  }
+
+  .toc-list { list-style: none; margin: 4mm 0 0; }
+  .toc-list li {
+    display: flex;
+    align-items: baseline;
+    padding: 2mm 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .toc-list .tn {
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    color: var(--copper);
+    width: 12mm;
+    flex-shrink: 0;
+  }
+  .toc-list .tt { font-weight: 500; }
+  .toc-list .tdots {
+    flex: 1;
+    border-bottom: 1px dotted var(--line-2);
+    margin: 0 3mm;
+    transform: translateY(-1mm);
+  }
+  .toc-list .tp {
+    font-family: var(--font-mono);
+    font-size: 9pt;
+    color: var(--ink-3);
+  }
+
+  .phase {
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    margin: 4mm 0;
+    page-break-inside: avoid;
+    overflow: hidden;
+  }
+  .phase-head {
+    background: var(--paper-2);
+    padding: 3mm 4mm;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 3mm;
+  }
+  .phase-tag {
+    font-family: var(--font-mono);
+    font-size: 7.5pt;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--navy);
+    color: #fff;
+    padding: 0.8mm 2.5mm;
+    border-radius: 3px;
+  }
+  .phase-head h3 { margin: 0; }
+  .phase-body { padding: 3.5mm 4mm; }
+
+  .evidence {
+    border: 1.5px dashed var(--line-2);
+    border-radius: 4px;
+    background: var(--paper-2);
+    padding: 8mm 4mm;
+    text-align: center;
+    margin: 3mm 0;
+    color: var(--ink-4);
+    font-family: var(--font-mono);
+    font-size: 8.5pt;
+  }
+  .evidence .ev-label {
+    color: var(--copper);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 7.5pt;
+    margin-bottom: 1.5mm;
+  }
+
+  .roadmap-phase {
+    display: grid;
+    grid-template-columns: 26mm 1fr;
+    gap: 4mm;
+    margin: 3mm 0;
+    page-break-inside: avoid;
+  }
+  .rp-marker {
+    text-align: right;
+    padding-right: 4mm;
+    border-right: 2px solid var(--copper);
+  }
+  .rp-q {
+    font-family: var(--font-display);
+    font-size: 13pt;
+    font-weight: 600;
+    color: var(--copper);
+  }
+  .rp-when {
+    font-family: var(--font-mono);
+    font-size: 7.5pt;
+    color: var(--ink-3);
+  }
+  .rp-body h3 { margin-top: 0; }
+
+  .diagram {
+    margin: 5mm 0;
+    padding: 4mm;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    background: var(--paper-2);
+  }
+  .diagram svg { width: 100%; height: auto; display: block; }
+  .fig-caption {
+    font-size: 8pt;
+    color: var(--ink-3);
+    font-style: italic;
+    text-align: center;
+    margin-top: 2mm;
+  }
+
+  .muted { color: var(--ink-3); }
+  .small { font-size: 9pt; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+  .pill {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 7.5pt;
+    padding: 0.6mm 2mm;
+    border-radius: 99px;
+    background: var(--copper-bg);
+    color: var(--copper);
+    border: 1px solid #e0d4bd;
+    margin: 0 1mm 1mm 0;
+  }
+
+  .doc-footer {
+    margin-top: 8mm;
+    padding-top: 3mm;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 7.5pt;
+    color: var(--ink-4);
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<!-- PORTADA -->
+<div class="cover">
+  <div class="cover-mark"></div>
+  <div class="cover-eyebrow">Práctica 1 · Ciberseguridad Avanzada · Curso 2026</div>
+  <h1>ROSETTA</h1>
+  <div class="cover-sub">
+    Orquestador de cumplimiento continuo. Traduce hallazgos técnicos de seguridad
+    a evidencia normativa auditable para 7 marcos regulatorios mediante IA.
+  </div>
+  <div class="cover-divider"></div>
+  <div class="cover-meta">
+    <div>
+      <div class="label">Línea de trabajo</div>
+      <div class="value">Normativa y Cumplimiento</div>
+    </div>
+    <div>
+      <div class="label">Integrante</div>
+      <div class="value">[ TU NOMBRE COMPLETO ]</div>
+    </div>
+    <div>
+      <div class="label">Fecha de entrega</div>
+      <div class="value">25 de mayo de 2026</div>
+    </div>
+    <div>
+      <div class="label">Repositorio</div>
+      <div class="value">github.com/MichaelJTG/Rosetta</div>
+    </div>
+  </div>
+  <div class="cover-foot">
+    Informe de documentación · Diseño, desarrollo y despliegue de herramienta de
+    ciberseguridad con asistencia de Inteligencia Artificial
+  </div>
+</div>
+
+<div class="doc">
+
+<!-- 2. ÍNDICE -->
+<section>
+  <div class="sec-num">Documento</div>
+  <h1 class="sec">Índice de contenidos</h1>
+  <ol class="toc-list">
+    <li><span class="tn">01</span><span class="tt">Resumen ejecutivo</span><span class="tdots"></span><span class="tp">p. 3</span></li>
+    <li><span class="tn">02</span><span class="tt">Descripción del problema y justificación de la solución</span><span class="tdots"></span><span class="tp">p. 4</span></li>
+    <li><span class="tn">03</span><span class="tt">Arquitectura técnica</span><span class="tdots"></span><span class="tp">p. 6</span></li>
+    <li><span class="tn">04</span><span class="tt">Proceso de desarrollo (fase a fase)</span><span class="tdots"></span><span class="tp">p. 9</span></li>
+    <li><span class="tn">05</span><span class="tt">Guía de despliegue paso a paso</span><span class="tdots"></span><span class="tp">p. 13</span></li>
+    <li><span class="tn">06</span><span class="tt">Manual de uso de la herramienta</span><span class="tdots"></span><span class="tp">p. 16</span></li>
+    <li><span class="tn">07</span><span class="tt">Conclusiones y lecciones aprendidas</span><span class="tdots"></span><span class="tp">p. 19</span></li>
+    <li><span class="tn">08</span><span class="tt">Road map de mejora — Práctica 2</span><span class="tdots"></span><span class="tp">p. 20</span></li>
+  </ol>
+  <div class="callout navy" style="margin-top:8mm">
+    <div class="co-title">Nota de lectura</div>
+    Este informe documenta el proceso completo de construcción de ROSETTA. Los bloques
+    marcados <strong>[ EVIDENCIA ]</strong> deben sustituirse por capturas de pantalla
+    reales antes de la entrega final. La portada contiene un campo
+    <strong>[ TU NOMBRE COMPLETO ]</strong> pendiente de rellenar.
+  </div>
+</section>
+
+<!-- 3. RESUMEN EJECUTIVO -->
+<section>
+  <div class="sec-num">Sección 01</div>
+  <h1 class="sec">Resumen ejecutivo</h1>
+
+  <p class="lead">
+    ROSETTA es una plataforma de inteligencia de cumplimiento que elimina el cuello
+    de botella más caro de la auditoría de seguridad: el tiempo entre detectar un
+    fallo técnico y demostrar formalmente qué norma incumple.
+  </p>
+
+  <p>
+    En las organizaciones reguladas, el equipo de seguridad ofensiva detecta una
+    vulnerabilidad en segundos, pero traducir ese hallazgo a evidencia que un auditor
+    externo acepte —citando el control exacto de ISO 27001, la medida del ENS o el
+    artículo de DORA que se incumple— consume horas de trabajo manual. ROSETTA
+    automatiza esa traducción mediante un pipeline de IA con recuperación aumentada
+    (RAG) sobre un corpus normativo y un sistema multi-agente con validación crítica.
+  </p>
+
+  <p>
+    La herramienta ingiere hallazgos de sensores Red Team (Nuclei, Nmap, Amass) y
+    Blue Team (Wazuh), los unifica en un objeto de dominio tipado —el
+    <em>Hallazgo Maestro</em>— y produce un dosier de cumplimiento multi-marco listo
+    para incluir en una auditoría externa. Cubre <strong>siete marcos regulatorios</strong>:
+    ISO 27001:2022, ISO 27002:2022, ENS 2022, NIS2, DORA, RGPD y NIST CSF 2.0,
+    además de PCI-DSS 4.0.
+  </p>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="v">7</div><div class="l">marcos normativos</div></div>
+    <div class="kpi"><div class="v">&lt;4s</div><div class="l">por traducción</div></div>
+    <div class="kpi"><div class="v">15</div><div class="l">endpoints REST</div></div>
+    <div class="kpi"><div class="v">24</div><div class="l">archivos de test</div></div>
+  </div>
+
+  <h2>Resultado entregado</h2>
+  <p>
+    Una aplicación funcional con interfaz web (FastAPI + dashboard SPA de 10 paneles),
+    API REST documentada con OpenAPI, persistencia en SQLite y grafo de correlación
+    en Neo4j. El proyecto se enmarca en la línea <strong>Normativa y Cumplimiento</strong>
+    de la práctica y supera el alcance de los ejemplos orientativos del enunciado:
+    no es un asistente de un único marco, sino un orquestador multi-marco con
+    arquitectura multi-agente.
+  </p>
+
+  <div class="callout">
+    <div class="co-title">Tesis del proyecto</div>
+    El cumplimiento normativo es el último eslabón de la cadena de seguridad que
+    sigue siendo completamente manual. ROSETTA demuestra que la traducción
+    hallazgo&nbsp;&rarr;&nbsp;evidencia puede automatizarse sin sacrificar la trazabilidad
+    que un auditor exige.
+  </div>
+</section>
+
+<!-- 4. PROBLEMA Y JUSTIFICACIÓN -->
+<section>
+  <div class="sec-num">Sección 02</div>
+  <h1 class="sec">Descripción del problema y justificación de la solución</h1>
+
+  <h2>El problema</h2>
+  <p>
+    Las herramientas modernas de seguridad detectan vulnerabilidades de forma
+    automática y casi instantánea. Sin embargo, el trabajo que convierte esos
+    hallazgos técnicos en <strong>evidencia normativa</strong> —el material que
+    realmente exige un auditor o un regulador— sigue siendo manual, lento y propenso
+    a error. Se identifican tres fallos estructurales:
+  </p>
+
+  <h3>1. Coste por hallazgo</h3>
+  <p>
+    Un auditor dedica entre 2 y 4 horas a mapear cada vulnerabilidad a los controles
+    que incumple en cada marco aplicable. Una organización sujeta a ISO 27001, ENS y
+    NIS2 simultáneamente multiplica ese esfuerzo por tres. Con cientos de hallazgos
+    por trimestre, el coste es considerable y no aporta valor analítico: es pura
+    traducción.
+  </p>
+
+  <h3>2. Silos que no se comunican</h3>
+  <p>
+    Red Team encuentra, Blue Team defiende y Compliance certifica. Son tres equipos
+    con tres vocabularios distintos y, normalmente, sin un modelo de datos común. La
+    información se degrada en cada traspaso: lo que el pentester describe con
+    precisión técnica llega al dosier de auditoría como una frase genérica.
+  </p>
+
+  <h3>3. Deriva de la evidencia</h3>
+  <p>
+    Cuando un hallazgo llega finalmente al expediente de cumplimiento, el contexto
+    técnico se ha perdido. El auditor acaba citando un control genérico en lugar del
+    fallo real, lo que debilita la evidencia y puede invalidarla ante un regulador.
+  </p>
+
+  <h2>Justificación de la solución</h2>
+  <p>
+    ROSETTA ataca el problema en su raíz con un principio de diseño: un
+    <strong>único objeto de datos unificado</strong> —el Hallazgo Maestro— que
+    atraviesa todo el sistema y reúne las tres perspectivas (Red Team, Blue Team y
+    Compliance) en un solo registro tipado. Sobre esa base, un pipeline de IA traduce
+    el hallazgo a evidencia normativa con tres garantías:
+  </p>
+  <ul>
+    <li><strong>Trazabilidad.</strong> Cada traducción se fundamenta en fragmentos
+        concretos del corpus normativo recuperados por RAG, no en conocimiento
+        paramétrico opaco del modelo.</li>
+    <li><strong>Estructura forzada.</strong> El LLM responde mediante
+        <em>tool-use</em> con un esquema Pydantic estricto. No se parsea texto libre:
+        o devuelve una estructura válida o falla de forma explícita.</li>
+    <li><strong>Validación crítica.</strong> Un segundo agente audita la traducción
+        del primero y detecta controles alucinados antes de que lleguen al dosier.</li>
+  </ul>
+
+  <h2>Por qué la línea Normativa y Cumplimiento</h2>
+  <p>
+    El enunciado de la práctica propone como ejemplos un «Asistente de cumplimiento
+    ISO 27001», un «Chatbot experto en normativa» y un «Dashboard de cumplimiento
+    ENS». ROSETTA <strong>integra y supera</strong> los tres: es asistente de
+    cumplimiento, copiloto conversacional y panel de estado a la vez, pero
+    multi-marco y con un pipeline de IA verificable. Es la línea en la que la
+    aportación de la Inteligencia Artificial es más diferencial, porque el problema
+    —traducir lenguaje técnico a lenguaje regulatorio— es intrínsecamente lingüístico.
+  </p>
+
+  <div class="callout navy">
+    <div class="co-title">Mercado objetivo</div>
+    Empresas reguladas (banca, sanidad, infraestructura crítica) y consultoras de
+    auditoría GRC. El usuario tipo es el auditor, el CISO o el responsable de
+    cumplimiento — no el desarrollador.
+  </div>
+</section>
+
+<!-- 5. ARQUITECTURA TÉCNICA -->
+<section>
+  <div class="sec-num">Sección 03</div>
+  <h1 class="sec">Arquitectura técnica</h1>
+
+  <p class="lead">
+    ROSETTA es una aplicación Python construida sobre FastAPI, con un pipeline de IA
+    desacoplado del proveedor de LLM y una capa de persistencia dual
+    (SQLite + Neo4j).
+  </p>
+
+  <h2>Diagrama de arquitectura</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif">
+      <defs>
+        <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L7,3 L0,6 Z" fill="#9a6635"/>
+        </marker>
+      </defs>
+      <rect x="14" y="20" width="150" height="92" rx="7" fill="#eaeef4" stroke="#cdcabd"/>
+      <text x="89" y="40" text-anchor="middle" font-size="11" font-weight="600" fill="#1e3a5f">Sensores</text>
+      <text x="89" y="58" text-anchor="middle" font-size="8.5" fill="#3a4150">Red Team:</text>
+      <text x="89" y="71" text-anchor="middle" font-size="8" fill="#6b7280">Nuclei · Nmap · Amass</text>
+      <text x="89" y="88" text-anchor="middle" font-size="8.5" fill="#3a4150">Blue Team:</text>
+      <text x="89" y="101" text-anchor="middle" font-size="8" fill="#6b7280">Wazuh (JSON/CSV)</text>
+
+      <rect x="14" y="128" width="150" height="58" rx="7" fill="#eaeef4" stroke="#cdcabd"/>
+      <text x="89" y="150" text-anchor="middle" font-size="11" font-weight="600" fill="#1e3a5f">Ingesta</text>
+      <text x="89" y="167" text-anchor="middle" font-size="8" fill="#6b7280">PDF auditoría · manual</text>
+
+      <rect x="232" y="60" width="150" height="90" rx="7" fill="#f5ece0" stroke="#9a6635" stroke-width="1.5"/>
+      <text x="307" y="86" text-anchor="middle" font-size="11" font-weight="700" fill="#9a6635">Hallazgo Maestro</text>
+      <text x="307" y="104" text-anchor="middle" font-size="8" fill="#3a4150">objeto de dominio unificado</text>
+      <text x="307" y="121" text-anchor="middle" font-size="8" fill="#6b7280">RedTeam + BlueTeam</text>
+      <text x="307" y="134" text-anchor="middle" font-size="8" fill="#6b7280">+ Compliance</text>
+
+      <rect x="450" y="20" width="296" height="150" rx="7" fill="#ffffff" stroke="#cdcabd"/>
+      <text x="598" y="42" text-anchor="middle" font-size="11" font-weight="600" fill="#1e3a5f">Traductor Simbiótico</text>
+      <rect x="466" y="54" width="128" height="48" rx="5" fill="#f7f6f2" stroke="#e3e1d8"/>
+      <text x="530" y="73" text-anchor="middle" font-size="8.5" font-weight="600" fill="#3a4150">RAG</text>
+      <text x="530" y="88" text-anchor="middle" font-size="7.5" fill="#6b7280">ChromaDB · top-5</text>
+      <rect x="602" y="54" width="128" height="48" rx="5" fill="#f7f6f2" stroke="#e3e1d8"/>
+      <text x="666" y="73" text-anchor="middle" font-size="8.5" font-weight="600" fill="#3a4150">LLM tool-use</text>
+      <text x="666" y="88" text-anchor="middle" font-size="7.5" fill="#6b7280">Claude · OpenAI · Ollama</text>
+      <rect x="466" y="110" width="264" height="44" rx="5" fill="#eaeef4" stroke="#cdcabd"/>
+      <text x="598" y="128" text-anchor="middle" font-size="8.5" font-weight="600" fill="#1e3a5f">Orquestador multi-agente</text>
+      <text x="598" y="143" text-anchor="middle" font-size="7.5" fill="#6b7280">Soundwave (paralelo) + Validador crítico</text>
+
+      <rect x="450" y="190" width="296" height="56" rx="7" fill="#f5ece0" stroke="#9a6635" stroke-width="1.5"/>
+      <text x="598" y="212" text-anchor="middle" font-size="11" font-weight="700" fill="#9a6635">DatosCompliance</text>
+      <text x="598" y="229" text-anchor="middle" font-size="8" fill="#6b7280">controles · cita · justificación · mitigación</text>
+
+      <rect x="232" y="270" width="150" height="56" rx="7" fill="#eaeef4" stroke="#cdcabd"/>
+      <text x="307" y="292" text-anchor="middle" font-size="10" font-weight="600" fill="#1e3a5f">SQLite</text>
+      <text x="307" y="309" text-anchor="middle" font-size="7.5" fill="#6b7280">sesión · append-only</text>
+      <rect x="402" y="270" width="150" height="56" rx="7" fill="#eaeef4" stroke="#cdcabd"/>
+      <text x="477" y="292" text-anchor="middle" font-size="10" font-weight="600" fill="#1e3a5f">Neo4j</text>
+      <text x="477" y="309" text-anchor="middle" font-size="7.5" fill="#6b7280">grafo correlación</text>
+
+      <rect x="232" y="346" width="320" height="56" rx="7" fill="#ffffff" stroke="#cdcabd"/>
+      <text x="392" y="368" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1e3a5f">FastAPI — 15 endpoints REST + WebSocket</text>
+      <text x="392" y="385" text-anchor="middle" font-size="8" fill="#6b7280">Dashboard SPA (10 paneles) · CLI Typer · Gate CI/CD</text>
+
+      <line x1="164" y1="66" x2="228" y2="92" stroke="#9a6635" stroke-width="1.4" marker-end="url(#ah)"/>
+      <line x1="164" y1="150" x2="228" y2="116" stroke="#9a6635" stroke-width="1.4" marker-end="url(#ah)"/>
+      <line x1="382" y1="100" x2="446" y2="95" stroke="#9a6635" stroke-width="1.4" marker-end="url(#ah)"/>
+      <line x1="598" y1="170" x2="598" y2="186" stroke="#9a6635" stroke-width="1.4" marker-end="url(#ah)"/>
+      <line x1="500" y1="246" x2="360" y2="284" stroke="#9a6635" stroke-width="1.4" marker-end="url(#ah)"/>
+      <line x1="540" y1="246" x2="490" y2="266" stroke="#9a6635" stroke-width="1.4" marker-end="url(#ah)"/>
+      <line x1="307" y1="326" x2="340" y2="342" stroke="#9a6635" stroke-width="1.4" marker-end="url(#ah)"/>
+      <line x1="477" y1="326" x2="450" y2="342" stroke="#9a6635" stroke-width="1.4" marker-end="url(#ah)"/>
+    </svg>
+    <div class="fig-caption">Figura 1 — Flujo de datos de ROSETTA: del sensor al dosier de auditoría.</div>
+  </div>
+
+  <h2>Componentes principales</h2>
+  <table>
+    <thead><tr><th style="width:34mm">Componente</th><th>Responsabilidad</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Adaptadores</strong></td><td>Normalizan la salida de Nuclei, Nmap, Amass y Wazuh a <code>DatosRedTeam</code> / alertas Blue Team. Diseño extensible mediante clase base abstracta.</td></tr>
+      <tr><td><strong>Traductor Simbiótico</strong></td><td>Pipeline central: reformula el hallazgo como consulta semántica, recupera fragmentos RAG por marco y fuerza al LLM a emitir un <code>DatosCompliance</code> tipado vía tool-use.</td></tr>
+      <tr><td><strong>Orquestador multi-agente</strong></td><td>Despacha traductores especializados (uno por marco) en paralelo mediante el scheduler <em>Soundwave</em>; un agente <em>Validador</em> puntúa cada traducción.</td></tr>
+      <tr><td><strong>RAG</strong></td><td>ChromaDB con embeddings multilingües. El corpus normativo se indexa con IDs estables <code>marco:control</code> y se filtra por <code>framework_id</code> para no mezclar marcos.</td></tr>
+      <tr><td><strong>Capa LLM</strong></td><td>Abstracción multi-proveedor: Claude (producción), Ollama (desarrollo on-premise sin coste) y OpenAI/Azure. Selección en runtime por variable de entorno.</td></tr>
+      <tr><td><strong>SessionStore</strong></td><td>Lista persistente de hallazgos respaldada por SQLite, <em>append-only</em>, segura ante concurrencia. Sobrevive a reinicios del servidor.</td></tr>
+      <tr><td><strong>Grafo Neo4j</strong></td><td>Persiste la relación activo&nbsp;&rarr;&nbsp;control. Opcional: si Neo4j no está disponible, el sistema degrada de forma grácil a agregación en memoria.</td></tr>
+      <tr><td><strong>API + Dashboard</strong></td><td>FastAPI expone 15 endpoints REST y un WebSocket de progreso. El dashboard es una SPA embebida de 10 paneles servida desde el propio backend.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Pila tecnológica</h2>
+  <p>
+    <span class="pill">Python 3.11</span><span class="pill">FastAPI</span>
+    <span class="pill">Pydantic v2</span><span class="pill">Anthropic Claude</span>
+    <span class="pill">OpenAI</span><span class="pill">Ollama</span>
+    <span class="pill">ChromaDB</span><span class="pill">sentence-transformers</span>
+    <span class="pill">Neo4j</span><span class="pill">SQLite</span>
+    <span class="pill">Uvicorn</span><span class="pill">Typer CLI</span>
+    <span class="pill">pdfplumber</span><span class="pill">WeasyPrint</span>
+    <span class="pill">pytest</span><span class="pill">Ruff</span>
+    <span class="pill">mypy strict</span><span class="pill">Docker</span>
+  </p>
+
+  <h2>Decisiones de diseño relevantes</h2>
+  <h3>Tool-use forzado frente a parseo de texto</h3>
+  <p>
+    Parsear JSON incrustado en la respuesta libre de un LLM es frágil. ROSETTA define
+    una herramienta <code>registrar_traduccion</code> con esquema Pydantic: el modelo
+    está obligado a invocarla con una estructura tipada o la petición falla de forma
+    limpia. Esto eliminó prácticamente los errores de parseo.
+  </p>
+  <h3>Validador como agente separado</h3>
+  <p>
+    El LLM principal optimiza por traducir bien, no por detectar sus propios errores.
+    Un agente crítico independiente, especializado en encontrar controles alucinados
+    y justificaciones débiles, reduce las alucinaciones de forma medible.
+  </p>
+</section>
+
+<!-- 6. PROCESO DE DESARROLLO -->
+<section>
+  <div class="sec-num">Sección 04</div>
+  <h1 class="sec">Proceso de desarrollo (fase a fase)</h1>
+
+  <p class="lead">
+    ROSETTA se construyó de forma incremental en siete fases, cada una cerrada con un
+    commit etiquetado en el repositorio. El historial de Git documenta la trazabilidad
+    completa del desarrollo.
+  </p>
+
+  <div class="callout">
+    <div class="co-title">Metodología</div>
+    Desarrollo asistido por IA con Claude Code como asistente principal. Cada fase
+    siguió el ciclo: investigación de soluciones existentes &rarr; diseño &rarr; implementación
+    con tests &rarr; revisión &rarr; commit. Calidad reforzada con <code>ruff</code>,
+    <code>mypy --strict</code> y <code>pytest</code> con cobertura de rama.
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Fase 0</span><h3>MVP — núcleo del traductor</h3></div>
+    <div class="phase-body">
+      <p>Definición del modelo de dominio (<code>HallazgoMaestro</code>,
+      <code>DatosCompliance</code>) y del Traductor Simbiótico básico sobre ISO 27001.
+      Primer pipeline RAG con ChromaDB y tool-use sobre Claude. Endpoint
+      <code>POST /translate</code>.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Fase 1</span><h3>Corpus NIS2 + generador de informes</h3></div>
+    <div class="phase-body">
+      <p>Ampliación del corpus normativo con NIS2. Implementación del
+      <code>ReportGenerator</code> con salida Markdown y PDF, y endpoint
+      <code>POST /reports/generate</code>.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Fase 2</span><h3>Ingesta de PDF de auditoría</h3></div>
+    <div class="phase-body">
+      <p>Capacidad de extraer hallazgos de informes de auditoría humanos en PDF.
+      <code>pdfplumber</code> para documentos digitales con respaldo de visión LLM
+      para páginas escaneadas. Endpoint <code>POST /ingest/pdf</code>.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Fase 3</span><h3>Modo Auditoría — Red Team automático</h3></div>
+    <div class="phase-body">
+      <p>Orquestador de auditoría que ejecuta adaptadores Red Team (Nmap, Nuclei)
+      contra objetivos autorizados. Validación de alcance, ejecución asíncrona y
+      WebSocket de progreso en tiempo real con <em>replay</em> de eventos.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Fase 4</span><h3>Blue Team — correlación Red ↔ Blue</h3></div>
+    <div class="phase-body">
+      <p>Adaptador Wazuh (JSON y CSV) y módulo de enriquecimiento que cruza alertas
+      defensivas con hallazgos ofensivos para medir cobertura. Endpoint
+      <code>POST /blue/ingest</code>.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Fase 5</span><h3>Arquitectura multi-agente</h3></div>
+    <div class="phase-body">
+      <p>Refactor a sistema multi-agente: traductores especializados por marco,
+      scheduler de ejecución paralela <em>Soundwave</em> y agente <em>Validador</em>
+      crítico. Funcionalidades diferenciales: Copilot normativo y detección de
+      <em>procedure drift</em>.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Fase 6</span><h3>Corpus completo — 7 marcos</h3></div>
+    <div class="phase-body">
+      <p>Incorporación de los corpus de DORA, RGPD, NIST CSF 2.0 y PCI-DSS 4.0,
+      completando la cobertura de siete marcos regulatorios.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Fase 7</span><h3>Polish — autenticación, sesiones y grafo</h3></div>
+    <div class="phase-body">
+      <p>Autenticación HTTP Basic opcional, persistencia de sesión en SQLite, grafo
+      de correlación interactivo con vis.js y panel de <em>drift</em>. Rediseño
+      completo del dashboard a un sistema de diseño profesional y responsive.</p>
+    </div>
+  </div>
+
+  <h2>Gate de CI/CD</h2>
+  <p>
+    De forma transversal se desarrolló un Gate de integración continua: el endpoint
+    <code>POST /analyze-diff</code> analiza el <em>diff</em> de un Pull Request y
+    bloquea la fusión si introduce incumplimientos normativos. Se incluye una GitHub
+    Action que lo invoca automáticamente.
+  </p>
+
+  <div class="evidence">
+    <div class="ev-label">[ Evidencia ]</div>
+    Captura del historial de commits en GitHub mostrando las fases etiquetadas
+    (<code>feat(fase-1)</code> … <code>feat(fase-7)</code>).
+  </div>
+
+  <div class="evidence">
+    <div class="ev-label">[ Evidencia ]</div>
+    Captura de la suite de tests pasando: <code>pytest --cov=rosetta</code>
+    con el porcentaje de cobertura.
+  </div>
+</section>
+
+<!-- 7. GUÍA DE DESPLIEGUE -->
+<section>
+  <div class="sec-num">Sección 05</div>
+  <h1 class="sec">Guía de despliegue paso a paso</h1>
+
+  <p class="lead">
+    ROSETTA se despliega en un VPS de Hetzner Cloud mediante Docker. Esta guía cubre
+    el aprovisionamiento del servidor, la contenedorización y la publicación con
+    HTTPS y dominio propio.
+  </p>
+
+  <h2>Paso 1 — Aprovisionar el VPS en Hetzner</h2>
+  <ol>
+    <li>Crear una cuenta en <a>console.hetzner.cloud</a> y un proyecto nuevo.</li>
+    <li>Crear un servidor: imagen <strong>Ubuntu 24.04</strong>, tipo
+        <strong>CX22</strong> (2 vCPU, 4 GB RAM) — suficiente para la aplicación y
+        el contenedor Neo4j.</li>
+    <li>Añadir la clave SSH pública para acceso sin contraseña.</li>
+    <li>Anotar la IP pública asignada.</li>
+  </ol>
+
+  <h2>Paso 2 — Preparar el entorno</h2>
+  <pre><span class="c"># Conectar por SSH</span>
+ssh root@&lt;IP_DEL_SERVIDOR&gt;
+
+<span class="c"># Actualizar e instalar Docker</span>
+apt update &amp;&amp; apt upgrade -y
+curl -fsSL https://get.docker.com | sh
+apt install -y docker-compose-plugin git</pre>
+
+  <h2>Paso 3 — Clonar el repositorio</h2>
+  <pre>git clone https://github.com/MichaelJTG/Rosetta.git
+cd Rosetta
+cp .env.example .env
+<span class="c"># Editar .env: ANTHROPIC_API_KEY, NEO4J_PASSWORD, ROSETTA_USER/PASSWORD</span>
+nano .env</pre>
+
+  <h2>Paso 4 — Contenedorizar la aplicación</h2>
+  <p>
+    El repositorio incluye un <code>docker-compose.yml</code> con el servicio Neo4j.
+    Para el despliegue se añade un <code>Dockerfile</code> de la aplicación y un
+    servicio <code>app</code> al compose:
+  </p>
+  <pre><span class="c"># Dockerfile</span>
+<span class="k">FROM</span> python:3.11-slim
+<span class="k">WORKDIR</span> /app
+<span class="k">COPY</span> pyproject.toml ./
+<span class="k">RUN</span> pip install --no-cache-dir -e ".[dev]"
+<span class="k">COPY</span> . .
+<span class="k">EXPOSE</span> 8000
+<span class="k">CMD</span> ["uvicorn", "rosetta.api.main:app", "--host", "0.0.0.0", "--port", "8000"]</pre>
+
+  <h2>Paso 5 — Levantar los servicios</h2>
+  <pre>docker compose up -d --build
+<span class="c"># Verificar</span>
+docker compose ps
+curl http://localhost:8000/health</pre>
+
+  <h2>Paso 6 — Reverse proxy con HTTPS</h2>
+  <p>
+    Se instala Nginx como proxy inverso y Certbot para el certificado TLS gratuito de
+    Let's Encrypt. El dominio (o subdominio) se apunta previamente a la IP del VPS
+    mediante un registro <code>A</code> en el proveedor de DNS.
+  </p>
+  <pre>apt install -y nginx certbot python3-certbot-nginx
+<span class="c"># Configurar el server block que hace proxy_pass a localhost:8000</span>
+certbot --nginx -d rosetta.tudominio.com</pre>
+
+  <h2>Paso 7 — Indexar el corpus normativo</h2>
+  <pre>docker compose exec app rosetta indexar-corpus ./corpus</pre>
+
+  <div class="callout navy">
+    <div class="co-title">Resultado</div>
+    Aplicación accesible en <code>https://rosetta.tudominio.com/dashboard</code>,
+    documentación OpenAPI en <code>/docs</code>, contenedores Docker gestionados y
+    certificado HTTPS con renovación automática.
+  </div>
+
+  <div class="evidence">
+    <div class="ev-label">[ Evidencia ]</div>
+    Captura del panel de Hetzner Cloud con el VPS activo + <code>docker compose ps</code>
+    mostrando los contenedores <code>app</code> y <code>neo4j</code> saludables.
+  </div>
+</section>
+
+<!-- 8. MANUAL DE USO -->
+<section>
+  <div class="sec-num">Sección 06</div>
+  <h1 class="sec">Manual de uso de la herramienta</h1>
+
+  <p class="lead">
+    El dashboard de ROSETTA organiza la funcionalidad en diez paneles agrupados por
+    propósito. Se accede en <code>/dashboard</code>; la API REST se documenta en
+    <code>/docs</code>.
+  </p>
+
+  <h2>Paneles del dashboard</h2>
+  <table>
+    <thead><tr><th style="width:30mm">Panel</th><th>Función</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Inicio</strong></td><td>Vista general con KPIs: total de hallazgos, distribución por severidad y estado, marcos más afectados y controles con mayor incidencia.</td></tr>
+      <tr><td><strong>Traducir</strong></td><td>Introduce un hallazgo técnico (JSON) y selecciona los marcos; devuelve la evidencia normativa completa.</td></tr>
+      <tr><td><strong>Ingesta PDF</strong></td><td>Sube un informe de auditoría en PDF y extrae los hallazgos automáticamente.</td></tr>
+      <tr><td><strong>Modo Auditoría</strong></td><td>Lanza un escaneo Red Team automático sobre objetivos autorizados con progreso en tiempo real.</td></tr>
+      <tr><td><strong>Procedure Drift</strong></td><td>Compara un procedimiento escrito con observaciones reales y detecta divergencias.</td></tr>
+      <tr><td><strong>Cumplimiento</strong></td><td>Estado de cumplimiento agregado por marco normativo.</td></tr>
+      <tr><td><strong>Blue Team</strong></td><td>Ingesta de alertas Wazuh y cálculo de cobertura defensiva Red↔Blue.</td></tr>
+      <tr><td><strong>Grafo</strong></td><td>Visualización interactiva de la correlación activo&nbsp;&rarr;&nbsp;control.</td></tr>
+      <tr><td><strong>Copilot</strong></td><td>Preguntas en lenguaje natural sobre normativa, con citas y nivel de confianza.</td></tr>
+      <tr><td><strong>Hallazgos</strong></td><td>Listado persistente con filtros por fecha y estado, y ciclo de vida de remediación.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Flujo de trabajo típico</h2>
+  <ol>
+    <li><strong>Traducir un hallazgo.</strong> En el panel <em>Traducir</em> se pega
+        el hallazgo en formato JSON y se seleccionan los marcos. ROSETTA devuelve los
+        controles incumplidos, la cita normativa literal, la justificación y la acción
+        de mitigación.</li>
+    <li><strong>Revisar el estado.</strong> El panel <em>Cumplimiento</em> agrega los
+        hallazgos por marco y muestra los controles más incumplidos.</li>
+    <li><strong>Explorar el grafo.</strong> El panel <em>Grafo</em> permite ver la
+        relación entre activos y controles; al hacer clic en un nodo se despliega el
+        detalle completo.</li>
+    <li><strong>Gestionar el ciclo de vida.</strong> En <em>Hallazgos</em> cada
+        registro se marca como <em>activo</em>, <em>en progreso</em> o
+        <em>solucionado</em>; los resueltos se archivan y dejan de aparecer en el grafo.</li>
+    <li><strong>Generar el dosier.</strong> El endpoint <code>POST /reports/generate</code>
+        produce el informe de auditoría en Markdown y PDF.</li>
+  </ol>
+
+  <h2>Ejemplo de petición a la API</h2>
+  <pre><span class="c"># Traducir un hallazgo a múltiples marcos</span>
+curl -X POST https://rosetta.tudominio.com/translate \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"hallazgo": {"origen": "github_secrets",
+        "activo_detectado": "Clave AWS expuesta en repo público",
+        "evidencia": "https://github.com/org/repo/commit/abc",
+        "vector_ataque": "Exposición de credencial cloud",
+        "dificultad_explotacion": "baja"},
+       "marcos": ["iso_27001_2022", "ens_2022", "nis2"]}'</span></pre>
+
+  <div class="evidence">
+    <div class="ev-label">[ Evidencia ]</div>
+    Captura del panel <em>Inicio</em> con los KPIs y del panel <em>Grafo</em>
+    mostrando la correlación activo &rarr; control.
+  </div>
+</section>
+
+<!-- 9. CONCLUSIONES -->
+<section>
+  <div class="sec-num">Sección 07</div>
+  <h1 class="sec">Conclusiones y lecciones aprendidas</h1>
+
+  <h2>Conclusiones</h2>
+  <p>
+    ROSETTA demuestra que la traducción de hallazgos técnicos a evidencia normativa
+    —una tarea hoy completamente manual— puede automatizarse sin renunciar a la
+    trazabilidad. El proyecto cumple los objetivos de la práctica: una herramienta de
+    ciberseguridad funcional, con dashboard web, repositorio versionado y un pipeline
+    de IA verificable, en la línea de Normativa y Cumplimiento.
+  </p>
+  <p>
+    El elemento más valioso no fue la IA en sí, sino el <strong>modelo de datos</strong>.
+    Unificar las tres perspectivas de seguridad en un único objeto tipado eliminó la
+    clase entera de errores de integración entre silos.
+  </p>
+
+  <h2>Lecciones aprendidas</h2>
+  <h3>Lo que funcionó</h3>
+  <ul>
+    <li><strong>Tool-use forzado.</strong> Obligar al LLM a responder mediante una
+        herramienta con esquema Pydantic convirtió un componente frágil (parseo de
+        texto) en uno fiable.</li>
+    <li><strong>Desarrollo incremental por fases.</strong> Cerrar cada fase con un
+        commit etiquetado mantuvo el proyecto siempre en estado desplegable.</li>
+    <li><strong>Abstracción del proveedor de LLM.</strong> Poder cambiar entre Claude,
+        OpenAI y Ollama por variable de entorno permitió desarrollar sin coste con
+        modelos locales y validar en producción con el mejor modelo.</li>
+    <li><strong>Degradación grácil.</strong> Que Neo4j sea opcional evitó que un
+        servicio caído tumbara toda la aplicación.</li>
+  </ul>
+  <h3>Lo que se haría diferente</h3>
+  <ul>
+    <li>El Validador funcionaría en <em>streaming</em> en lugar de esperar a la
+        traducción completa, reduciendo la latencia percibida.</li>
+    <li>El corpus normativo se versionaría con <em>hashes</em> para garantizar la
+        reproducibilidad de auditorías pasadas.</li>
+    <li>Se introduciría una suite de evaluación automática (<em>eval harness</em>)
+        para medir objetivamente la tasa de alucinación entre versiones.</li>
+  </ul>
+
+  <div class="callout">
+    <div class="co-title">Limitación honesta</div>
+    ROSETTA acelera el trabajo del auditor; no lo sustituye. La evidencia generada
+    por IA debe ser revisada y firmada por un profesional. La herramienta está
+    diseñada como copiloto, no como sustituto del juicio experto.
+  </div>
+</section>
+
+<!-- 10. ROAD MAP -->
+<section>
+  <div class="sec-num">Sección 08</div>
+  <h1 class="sec">Road map de mejora — Práctica 2</h1>
+
+  <p class="lead">
+    Plan de evolución de ROSETTA estructurado en tres fases trimestrales, con cinco
+    nuevas funcionalidades y mejoras transversales de rendimiento y seguridad.
+  </p>
+
+  <h2>Línea temporal</h2>
+
+  <div class="roadmap-phase">
+    <div class="rp-marker"><div class="rp-q">Fase A</div><div class="rp-when">Semanas 1-3</div></div>
+    <div class="rp-body">
+      <h3>Fundamentos de producto</h3>
+      <p><strong>F1 · Eval harness de alucinación.</strong> Suite automática que mide
+      la tasa de controles alucinados frente a un conjunto de hallazgos de referencia
+      etiquetado por un auditor. <span class="muted small">Est.: 1 desarrollador · 2 semanas.</span></p>
+      <p><strong>F2 · Versionado del corpus normativo.</strong> Cada fragmento RAG con
+      <em>hash</em> e historial, garantizando la reproducibilidad de auditorías
+      pasadas. <span class="muted small">Est.: 1 desarrollador · 1 semana.</span></p>
+    </div>
+  </div>
+
+  <div class="roadmap-phase">
+    <div class="rp-marker"><div class="rp-q">Fase B</div><div class="rp-when">Semanas 4-7</div></div>
+    <div class="rp-body">
+      <h3>Integraciones y escalabilidad</h3>
+      <p><strong>F3 · Integración con Jira y ServiceNow.</strong> Cada hallazgo
+      genera automáticamente un ticket de remediación en el ITSM del cliente, con
+      sincronización bidireccional del estado.
+      <span class="muted small">Est.: 1 desarrollador · 2 semanas.</span></p>
+      <p><strong>F4 · Adaptadores Red Team adicionales.</strong> Shodan, Have I Been
+      Pwned y escaneo de secretos en GitHub, ampliando las fuentes OSINT.
+      <span class="muted small">Est.: 1 desarrollador · 1,5 semanas.</span></p>
+      <p><strong>Escalabilidad.</strong> Migración de SQLite a PostgreSQL y cola de
+      tareas con Redis + workers para procesar traducciones en lote sin bloquear la
+      API. <span class="muted small">Est.: 1 desarrollador · 1,5 semanas.</span></p>
+    </div>
+  </div>
+
+  <div class="roadmap-phase">
+    <div class="rp-marker"><div class="rp-q">Fase C</div><div class="rp-when">Semanas 8-12</div></div>
+    <div class="rp-body">
+      <h3>Plataforma y seguridad</h3>
+      <p><strong>F5 · Modo SaaS multi-tenant.</strong> Segregación de datos por
+      organización, autenticación SSO (OIDC) y panel de administración.
+      <span class="muted small">Est.: 1 desarrollador · 3 semanas.</span></p>
+      <p><strong>Seguridad de la propia herramienta.</strong> Sustitución de HTTP
+      Basic por JWT con refresh tokens, <em>rate limiting</em> por IP, registro de
+      auditoría inmutable de todas las acciones y cifrado en reposo de la base de
+      datos de sesión. <span class="muted small">Est.: 1 desarrollador · 2 semanas.</span></p>
+    </div>
+  </div>
+
+  <h2>Resumen de hitos</h2>
+  <table>
+    <thead><tr><th>Hito</th><th style="width:24mm">Tipo</th><th style="width:22mm">Esfuerzo</th><th style="width:20mm">Prioridad</th></tr></thead>
+    <tbody>
+      <tr><td>F1 — Eval harness de alucinación</td><td>Funcionalidad</td><td>2 semanas</td><td>Alta</td></tr>
+      <tr><td>F2 — Versionado del corpus</td><td>Funcionalidad</td><td>1 semana</td><td>Alta</td></tr>
+      <tr><td>F3 — Integración Jira / ServiceNow</td><td>Integración</td><td>2 semanas</td><td>Media</td></tr>
+      <tr><td>F4 — Adaptadores Shodan / HIBP / GitHub</td><td>Funcionalidad</td><td>1,5 semanas</td><td>Media</td></tr>
+      <tr><td>F5 — Modo SaaS multi-tenant</td><td>Funcionalidad</td><td>3 semanas</td><td>Media</td></tr>
+      <tr><td>Migración PostgreSQL + Redis</td><td>Escalabilidad</td><td>1,5 semanas</td><td>Alta</td></tr>
+      <tr><td>JWT + rate limiting + audit log</td><td>Seguridad</td><td>2 semanas</td><td>Alta</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Recursos estimados</h2>
+  <p>
+    El road map completo se estima en <strong>13 semanas-persona</strong> de
+    desarrollo. Con un equipo de dos personas, el calendario se comprime a un
+    trimestre. Coste de infraestructura adicional: instancia PostgreSQL gestionada y
+    Redis (~30&nbsp;€/mes en Hetzner) más el consumo de API del LLM, proporcional al
+    volumen de traducciones.
+  </p>
+
+  <div class="doc-footer">
+    <span>ROSETTA · Informe Práctica 1</span>
+    <span>Ciberseguridad Avanzada · Curso 2026</span>
+  </div>
+</section>
+
+</div>
+</body>
+</html>
