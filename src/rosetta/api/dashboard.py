@@ -488,6 +488,35 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     input[type="file"]::file-selector-button:hover { background: var(--surface-hi); }
     input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width: auto; }
 
+    /* Form layout helpers */
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); }
+    @media (max-width: 560px) { .field-grid { grid-template-columns: 1fr; } }
+    .field-help {
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      color: var(--fg-3);
+      line-height: 1.5;
+      margin: -2px 0 var(--s-2);
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .field-help strong { color: var(--fg-2); font-weight: 600; }
+    .mode-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: var(--s-3);
+      padding: 4px 0;
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .mode-toggle:hover { color: var(--accent-hi); }
+
     /* BUTTONS */
     .btn, button.btn {
       display: inline-flex; align-items: center; gap: var(--s-2);
@@ -1136,21 +1165,71 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       <div class="content">
         <div class="grid-12">
           <div class="card col-span-7">
-            <div class="card-head"><h2>Input</h2><span class="meta">DatosRedTeam · JSON</span></div>
+            <div class="card-head"><h2>Hallazgo de seguridad</h2><span class="meta">datos del activo afectado</span></div>
             <div class="card-body">
-              <div class="row-flex" style="margin-bottom:var(--s-3)">
-                <label for="example-select" style="margin-bottom:0">Ejemplo</label>
+              <div class="row-flex" style="margin-bottom:var(--s-4)">
+                <label for="example-select" style="margin-bottom:0">Cargar ejemplo</label>
                 <select id="example-select" onchange="loadExample(this.value)" style="width:auto; min-width:240px">
-                  <option value="critica">Crítica · AWS root + PII (todos los marcos)</option>
+                  <option value="">Ninguno · empezar en blanco</option>
+                  <option value="critica">Crítica · clave AWS root + PII</option>
                   <option value="alta">Alta · SQLi en login producción</option>
                   <option value="media">Media · TLS 1.0 en ERP staging</option>
-                  <option value="baja">Baja · X-Powered-By revelando stack</option>
-                  <option value="informativa">Informativa · Cookie sin SameSite</option>
+                  <option value="baja">Baja · cabecera revela el stack</option>
+                  <option value="informativa">Informativa · cookie sin SameSite</option>
                 </select>
               </div>
-              <label for="finding-json">Hallazgo</label>
-              <textarea id="finding-json" spellcheck="false"></textarea>
-              <label class="mt-4" for="marcos-select">Marcos normativos <small>· selecciona uno o varios</small></label>
+
+              <!-- MODO FORMULARIO -->
+              <div id="finding-form">
+                <div class="field-grid">
+                  <div>
+                    <label for="f-origen">Origen</label>
+                    <select id="f-origen">
+                      <option value="nuclei">nuclei · escáner vulnerabilidades</option>
+                      <option value="nmap">nmap · escaneo de red</option>
+                      <option value="amass">amass · enumeración dominios</option>
+                      <option value="subfinder">subfinder · subdominios</option>
+                      <option value="theharvester">theharvester · OSINT</option>
+                      <option value="shodan">shodan · activos expuestos</option>
+                      <option value="hibp">hibp · credenciales filtradas</option>
+                      <option value="github_secrets">github_secrets · secretos en repos</option>
+                      <option value="manual">manual · revisión humana</option>
+                      <option value="otro">otro</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="f-dificultad">Dificultad de explotación</label>
+                    <select id="f-dificultad">
+                      <option value="informativa">informativa</option>
+                      <option value="baja">baja</option>
+                      <option value="media" selected>media</option>
+                      <option value="alta">alta</option>
+                      <option value="critica">crítica</option>
+                    </select>
+                  </div>
+                </div>
+                <label class="mt-3" for="f-activo">Activo detectado</label>
+                <input type="text" id="f-activo" placeholder="URL, IP, subdominio o nombre del activo afectado">
+                <label class="mt-3" for="f-evidencia">Evidencia</label>
+                <input type="text" id="f-evidencia" placeholder="Enlace, hash o log que prueba el hallazgo">
+                <label class="mt-3" for="f-vector">Vector de ataque</label>
+                <textarea id="f-vector" style="min-height:80px" placeholder="Descripción breve de cómo se explota o qué expone"></textarea>
+                <label class="mt-3" for="f-cve">CVE / CWE relacionado <small>· opcional</small></label>
+                <input type="text" id="f-cve" placeholder="CVE-2024-XXXXX o CWE-XXX · déjalo vacío si no aplica">
+              </div>
+
+              <!-- MODO JSON AVANZADO -->
+              <div id="finding-json-wrap" style="display:none">
+                <label for="finding-json">Hallazgo · DatosRedTeam (JSON)</label>
+                <textarea id="finding-json" spellcheck="false"></textarea>
+              </div>
+
+              <button type="button" class="mode-toggle" onclick="toggleFindingMode()">
+                <span id="mode-toggle-label">Cambiar a modo JSON avanzado</span>
+              </button>
+
+              <label class="mt-4" for="marcos-select">Marcos normativos</label>
+              <p class="field-help">Marcos regulatorios contra los que traducir <strong>este</strong> hallazgo. Mantén Ctrl (Cmd en Mac) para elegir varios.</p>
               <select id="marcos-select" multiple size="7">
                 <option value="iso_27001_2022" selected>ISO 27001:2022</option>
                 <option value="iso_27002_2022">ISO 27002:2022</option>
@@ -1163,13 +1242,13 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
               </select>
               <div class="btn-row mt-4">
                 <button class="btn" id="btn-translate" onclick="doTranslate()">Traducir hallazgo</button>
-                <button class="btn btn--ghost" onclick="document.getElementById('finding-json').value=''">Limpiar</button>
+                <button class="btn btn--ghost" onclick="clearFinding()">Limpiar</button>
               </div>
               <div id="translate-msg"></div>
             </div>
           </div>
           <div class="card col-span-5">
-            <div class="card-head"><h2>Output</h2><span class="meta">DatosCompliance</span></div>
+            <div class="card-head"><h2>Evidencia normativa</h2><span class="meta">resultado de la traducción</span></div>
             <div class="card-body">
               <div id="translate-result"><div class="empty">Ejecuta la traducción para ver la evidencia normativa.</div></div>
             </div>
@@ -1191,7 +1270,8 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
           <div class="card-body">
             <div class="row-flex">
               <div style="flex:1; min-width:220px">
-                <label for="state-marco">Marco</label>
+                <label for="state-marco">Marco a consultar</label>
+                <p class="field-help">Estado de cumplimiento global de <strong>todos</strong> los hallazgos contra el marco elegido.</p>
                 <select id="state-marco">
                   <option value="iso_27001_2022">ISO 27001:2022</option>
                   <option value="ens_2022">ENS 2022</option>
@@ -1313,8 +1393,8 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         <div class="card card-body--flush" style="position:relative">
           <div class="graph-toolbar">
             <div style="display:flex; align-items:center; gap:8px">
-              <label for="graph-marco" style="margin-bottom:0">Marco</label>
-              <select id="graph-marco">
+              <label for="graph-marco" style="margin-bottom:0">Filtrar por marco</label>
+              <select id="graph-marco" title="Muestra solo los nodos activo y control del marco elegido. 'Todos' no filtra.">
                 <option value="">Todos los marcos</option>
                 <option value="iso_27001_2022">ISO 27001:2022</option>
                 <option value="ens_2022">ENS 2022</option>
@@ -1546,14 +1626,80 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       }
     }
 
+    /* ── Modo formulario vs JSON avanzado ──────────────────────────── */
+    let _findingJsonMode = false;
+
+    function buildFindingFromForm() {
+      const cve = document.getElementById('f-cve').value.trim();
+      const h = {
+        origen: document.getElementById('f-origen').value,
+        activo_detectado: document.getElementById('f-activo').value.trim(),
+        evidencia: document.getElementById('f-evidencia').value.trim(),
+        vector_ataque: document.getElementById('f-vector').value.trim(),
+        dificultad_explotacion: document.getElementById('f-dificultad').value,
+      };
+      if (cve) h.cve_relacionado = cve;
+      return h;
+    }
+
+    function fillFindingForm(h) {
+      h = h || {};
+      if (h.origen) document.getElementById('f-origen').value = h.origen;
+      if (h.dificultad_explotacion) document.getElementById('f-dificultad').value = h.dificultad_explotacion;
+      document.getElementById('f-activo').value = h.activo_detectado || '';
+      document.getElementById('f-evidencia').value = h.evidencia || '';
+      document.getElementById('f-vector').value = h.vector_ataque || '';
+      document.getElementById('f-cve').value = h.cve_relacionado || '';
+    }
+
+    function toggleFindingMode() {
+      const form = document.getElementById('finding-form');
+      const jsonWrap = document.getElementById('finding-json-wrap');
+      const label = document.getElementById('mode-toggle-label');
+      _findingJsonMode = !_findingJsonMode;
+      if (_findingJsonMode) {
+        /* form → json: vuelca el formulario al textarea */
+        document.getElementById('finding-json').value = JSON.stringify(buildFindingFromForm(), null, 2);
+        form.style.display = 'none';
+        jsonWrap.style.display = 'block';
+        label.textContent = 'Volver al modo formulario';
+      } else {
+        /* json → form: intenta parsear el textarea al formulario */
+        try {
+          const parsed = JSON.parse(document.getElementById('finding-json').value || '{}');
+          fillFindingForm(parsed);
+        } catch (_) {}
+        jsonWrap.style.display = 'none';
+        form.style.display = 'block';
+        label.textContent = 'Cambiar a modo JSON avanzado';
+      }
+    }
+
+    function clearFinding() {
+      fillFindingForm({ dificultad_explotacion: 'media', origen: 'nuclei' });
+      document.getElementById('finding-json').value = '';
+      document.getElementById('example-select').value = '';
+      setMsg('translate-msg', '');
+      setMsg('translate-result', '<div class="empty">Ejecuta la traducción para ver la evidencia normativa.</div>');
+    }
+
     async function doTranslate() {
       const btn = document.getElementById('btn-translate');
+      let hallazgo;
+      if (_findingJsonMode) {
+        try { hallazgo = JSON.parse(document.getElementById('finding-json').value); }
+        catch (e) { msgErr('translate-msg', 'JSON inválido: ' + esc(e.message)); return; }
+      } else {
+        hallazgo = buildFindingFromForm();
+        const faltan = [];
+        if (!hallazgo.activo_detectado) faltan.push('Activo detectado');
+        if (!hallazgo.evidencia) faltan.push('Evidencia');
+        if (!hallazgo.vector_ataque) faltan.push('Vector de ataque');
+        if (faltan.length) { msgErr('translate-msg', 'Faltan campos: ' + faltan.join(', ')); return; }
+      }
       btn.disabled = true;
       msgInfo('translate-msg', 'Traduciendo hallazgo a marcos seleccionados…');
       setMsg('translate-result', '<div class="empty">Procesando…</div>');
-      let hallazgo;
-      try { hallazgo = JSON.parse(document.getElementById('finding-json').value); }
-      catch (e) { msgErr('translate-msg', 'JSON inválido: ' + esc(e.message)); btn.disabled = false; setMsg('translate-result','<div class="empty">—</div>'); return; }
       const opts = Array.from(document.getElementById('marcos-select').selectedOptions).map(o => o.value);
       const body = { hallazgo, marcos: opts.length ? opts : ['iso_27001_2022'] };
       try {
@@ -2474,12 +2620,20 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     };
 
     function loadExample(key) {
+      if (!key) { clearFinding(); return; }
       const ex = EXAMPLES[key];
       if (!ex) return;
+      /* Rellena el formulario y mantiene el textarea JSON sincronizado */
+      fillFindingForm(ex);
       document.getElementById('finding-json').value = JSON.stringify(ex, null, 2);
     }
     /* Cargar ejemplo crítica por defecto al inicializar */
-    setTimeout(function() { try { loadExample('critica'); } catch (_) {} }, 0);
+    setTimeout(function() {
+      try {
+        loadExample('critica');
+        document.getElementById('example-select').value = 'critica';
+      } catch (_) {}
+    }, 0);
 
     /* ── Hook switchTab para refrescar Inicio + Hallazgos ─────────── */
     const _origSwitchTab = switchTab;
