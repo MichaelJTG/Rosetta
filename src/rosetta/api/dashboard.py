@@ -597,9 +597,9 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       display: none;
       position: fixed; inset: 0;
       z-index: var(--z-modal);
-      background: rgba(26, 32, 48, .42);
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
+      /* Sin backdrop-filter: el blur re-componia toda la pagina en cada
+         repintado (cada tecla) y provocaba lag al escribir. */
+      background: rgba(20, 24, 38, .58);
       align-items: flex-start; justify-content: center;
       padding: var(--s-7) var(--s-4);
       overflow-y: auto;
