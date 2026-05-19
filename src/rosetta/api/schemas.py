@@ -56,6 +56,34 @@ class FindingsResponse(BaseModel):
     items: list[FindingItem]
 
 
+class LoginRequest(BaseModel):
+    """Cuerpo de POST /auth/login."""
+
+    username: str = Field(..., min_length=1, max_length=128)
+    password: str = Field(..., min_length=1, max_length=256)
+
+
+class RefreshRequest(BaseModel):
+    """Cuerpo de POST /auth/refresh."""
+
+    refresh_token: str = Field(..., min_length=1)
+
+
+class TokenResponse(BaseModel):
+    """Respuesta de POST /auth/login y POST /auth/refresh."""
+
+    access_token: str
+    refresh_token: str | None = Field(
+        default=None,
+        description=(
+            "Refresh token. /auth/login lo devuelve siempre; /auth/refresh "
+            "puede omitirlo si no rota el refresh token."
+        ),
+    )
+    token_type: str = Field(default="bearer")
+    expires_in: int = Field(..., description="Segundos hasta expirar del access token.")
+
+
 class FindingEstadoUpdate(BaseModel):
     """Cuerpo de la petición PATCH /findings/{id_hallazgo}/estado."""
 
