@@ -3,9 +3,8 @@
 Panel único servido por FastAPI en GET /dashboard. Usa vis.js (CDN) para
 el grafo y vanilla JS para el resto. Sin dependencias de npm.
 
-Dirección visual: Editorial Industrial Dark — referencias Linear, Vercel,
-Bloomberg terminal y Maltego/n8n. Sistema de design tokens con Inter +
-JetBrains Mono desde Google Fonts.
+Dirección visual: bone cálido + acento copper, tipografía Geist sans
+(UI y display) y Geist Mono (datos). Sistema de design tokens; sin serif.
 """
 
 from __future__ import annotations
@@ -15,13 +14,13 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ROSETTA — Compliance Intelligence Platform</title>
+  <title>ROSETTA · Compliance Intelligence Platform</title>
 
-  <!-- Tipografía: Inter (UI) + Fraunces (display) + JetBrains Mono (data) -->
+  <!-- Tipografia: Geist (UI) + Geist Mono (data) - sans tecnico, sin serif -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 
   <style>
@@ -29,10 +28,10 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
        DESIGN TOKENS
        ════════════════════════════════════════════════════════════════════ */
     :root {
-      /* Surfaces — warm bone palette (Confidential Luxury) */
+      /* Surfaces - warm bone palette (neutrales tintados, sin blanco puro) */
       --bg-0: #f5f2eb;
       --bg-1: #efebe2;
-      --surface-1: #ffffff;
+      --surface-1: #fffdf8;
       --surface-2: #faf7f0;
       --surface-3: #f0ece2;
       --surface-hi: #f7f3eb;
@@ -73,10 +72,10 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       --sev-info: #5a6470;
       --sev-info-bg: #eceef1;
 
-      /* Type — display serif + sans + mono */
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      --font-display: 'Fraunces', 'Source Serif 4', Georgia, serif;
-      --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+      /* Type - Geist sans (UI + display) + Geist Mono (datos). Sin serif. */
+      --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-display: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'Geist Mono', 'SF Mono', Menlo, Consolas, monospace;
 
       /* Spacing (4px base) */
       --s-1: 4px;  --s-2: 8px;  --s-3: 12px;  --s-4: 16px;
@@ -116,7 +115,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
 
-    ::selection { background: var(--accent); color: #fff; }
+    ::selection { background: var(--accent); color: #fffdf8; }
     ::-webkit-scrollbar { width: 10px; height: 10px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 999px; border: 2px solid var(--bg-0); }
@@ -320,14 +319,12 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     }
     h1 {
       font-family: var(--font-display);
-      font-size: clamp(28px, 2vw + 16px, 38px);
-      font-weight: 500;
-      font-style: normal;
-      line-height: 1.1;
-      letter-spacing: -0.025em;
+      font-size: clamp(26px, 1.8vw + 15px, 34px);
+      font-weight: 600;
+      line-height: 1.12;
+      letter-spacing: -0.022em;
       color: var(--fg-1);
       margin-bottom: var(--s-3);
-      font-variation-settings: 'opsz' 60;
     }
     .lead {
       font-size: 15px;
@@ -428,8 +425,11 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       font-size: 11px; color: var(--fg-3);
       margin-top: var(--s-2);
     }
-    .kpi--accent::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); }
-    .kpi--sky::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--sky); }
+    /* KPI destacados: borde completo tintado + valor en color (sin side-stripe) */
+    .kpi--accent { border-color: #d8b98a; background: var(--accent-bg); }
+    .kpi--accent .kpi-value { color: var(--accent); }
+    .kpi--sky { border-color: #b8c4d6; background: var(--sky-bg); }
+    .kpi--sky .kpi-value { color: var(--sky); }
 
     /* FORMS */
     label {
@@ -493,7 +493,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       display: inline-flex; align-items: center; gap: var(--s-2);
       padding: 8px var(--s-4);
       background: var(--accent);
-      color: #ffffff;
+      color: #fffdf8;
       border: none;
       border-radius: var(--r-1);
       font-family: var(--font-sans);
@@ -521,7 +521,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       display: inline-flex; align-items: center; gap: var(--s-2);
       padding: 8px var(--s-4);
       background: var(--accent);
-      color: #ffffff;
+      color: #fffdf8;
       border: none;
       border-radius: var(--r-1);
       font-family: var(--font-sans);
@@ -637,9 +637,12 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     .bar-track { height: 6px; background: var(--surface-2); border-radius: 2px; overflow: hidden; }
     .bar-fill {
       height: 100%;
+      width: 100%;
       background: linear-gradient(90deg, var(--accent-lo), var(--accent));
       border-radius: 2px;
-      transition: width 600ms var(--ease);
+      transform-origin: left center;
+      transform: scaleX(0);
+      transition: transform 600ms var(--ease);
     }
     .sev-stack {
       display: flex;
@@ -753,7 +756,6 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       max-height: calc(100% - var(--s-5));
       background: var(--surface-1);
       border: 1px solid var(--line-2);
-      border-left: 3px solid var(--sky);
       border-radius: var(--r-2);
       overflow: hidden;
       box-shadow:
@@ -766,7 +768,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       from { opacity: 0; transform: translateX(8px); }
       to   { opacity: 1; transform: translateX(0); }
     }
-    #graph-node-info.is-asset { border-left-color: var(--accent); }
+    /* Tipo activo/control se distingue por el badge de la cabecera, no por stripe */
     #graph-node-info .gni-head {
       padding: var(--s-4) var(--s-4) var(--s-3);
       border-bottom: 1px solid var(--line-1);
@@ -941,8 +943,9 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       font-size: 12px;
       white-space: pre-wrap;
     }
-    .drift-section.diff-old p { border-left: 3px solid var(--sev-critica); }
-    .drift-section.diff-new p { border-left: 3px solid var(--sev-baja); }
+    /* Diff: distincion por tinte de fondo + borde completo (sin side-stripe) */
+    .drift-section.diff-old p { border-color: #e0b0ac; background: var(--sev-critica-bg); }
+    .drift-section.diff-new p { border-color: #b9d6bc; background: var(--sev-baja-bg); }
 
     /* COPILOT */
     .copilot-meta {
@@ -958,7 +961,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       border-radius: 2px;
       overflow: hidden;
     }
-    .conf-bar > div { height: 100%; transition: width 500ms var(--ease); }
+    .conf-bar > div { height: 100%; width: 100%; transform-origin: left center; transform: scaleX(0); transition: transform 500ms var(--ease); }
     .copilot-sources { display: flex; flex-wrap: wrap; gap: 6px; }
     .copilot-sources .src {
       display: inline-block;
@@ -975,7 +978,6 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       padding: var(--s-4);
       background: var(--surface-2);
       border: 1px solid var(--line-2);
-      border-left: 3px solid var(--accent);
       border-radius: var(--r-2);
       font-size: 14px;
       line-height: 1.7;
@@ -1617,7 +1619,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         html += '<div class="mt-5"><label>Top controles incumplidos</label>';
         d.controles_incumplidos.forEach(c => {
           const pct = Math.round((c.total_hallazgos / max) * 100);
-          html += '<div class="bar-row"><span class="k">' + esc(c.control_id) + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><span class="n">' + c.total_hallazgos + '</span></div>';
+          html += '<div class="bar-row"><span class="k">' + esc(c.control_id) + '</span><div class="bar-track"><div class="bar-fill" style="transform:scaleX(' + (pct/100) + ')"></div></div><span class="n">' + c.total_hallazgos + '</span></div>';
         });
         html += '</div>';
       }
@@ -1905,7 +1907,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
                 ctx.shadowOffsetY = 2;
               }
               rrect(ctx, left, top, W, H, R);
-              ctx.fillStyle = '#ffffff';
+              ctx.fillStyle = '#fffdf8';
               ctx.fill();
               ctx.strokeStyle = selected ? '#9a6635' : (hover ? '#a8a18d' : '#d8d2c0');
               ctx.lineWidth = selected ? 1.5 : 1;
@@ -1921,7 +1923,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
               /* Title */
               ctx.save();
               ctx.fillStyle = '#1a2030';
-              ctx.font = '600 14.5px Inter, system-ui, sans-serif';
+              ctx.font = '600 14.5px Geist, system-ui, sans-serif';
               ctx.textBaseline = 'top';
               ctx.textAlign = 'left';
               const titleX = iconX + 24;
@@ -1933,7 +1935,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
               if (subtitle) {
                 ctx.save();
                 ctx.fillStyle = '#6b7280';
-                ctx.font = '500 11.5px "JetBrains Mono", monospace';
+                ctx.font = '500 11.5px "Geist Mono", monospace';
                 ctx.textBaseline = 'top';
                 ctx.textAlign = 'left';
                 ctx.fillText(ellipsize(ctx, subtitle, titleMaxW), titleX, iconY + 19);
@@ -1956,7 +1958,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
               drawIconCheck(ctx, left + PAD, statusY, '#3d7d4a');
               ctx.save();
               ctx.fillStyle = '#3a4254';
-              ctx.font = '500 11.5px Inter, system-ui, sans-serif';
+              ctx.font = '500 11.5px Geist, system-ui, sans-serif';
               ctx.textBaseline = 'top';
               ctx.textAlign = 'left';
               ctx.fillText(ellipsize(ctx, statusText, W - PAD * 2 - 18), left + PAD + 18, statusY + 1);
@@ -1968,7 +1970,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
 
               /* Render marco chips inline (overflow → "+N") */
               ctx.save();
-              ctx.font = '500 10.5px "JetBrains Mono", monospace';
+              ctx.font = '500 10.5px "Geist Mono", monospace';
               ctx.textBaseline = 'top';
               ctx.textAlign = 'left';
               const chipsStartX = left + PAD + 18;
@@ -2033,7 +2035,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
             font: {
               size: 11,
               color: '#6b7280',
-              face: 'JetBrains Mono, monospace',
+              face: 'Geist Mono, monospace',
               strokeWidth: 4,
               strokeColor: '#faf7f0',
               align: 'middle',
@@ -2088,7 +2090,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
           infoEl.style.display = 'block';
         });
 
-        if (nodeCount === 0) msgEl.textContent = 'Sin hallazgos con compliance — traduce uno primero.';
+        if (nodeCount === 0) msgEl.textContent = 'Sin hallazgos con compliance: traduce uno primero.';
       } catch (e) { msgEl.textContent = 'Error de red: ' + e.message; }
     }
 
@@ -2219,7 +2221,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
           const color = pct >= 70 ? 'var(--sev-baja)' : pct >= 40 ? 'var(--sev-alta)' : 'var(--sev-critica)';
           const sources = (d.fuentes || []).map(s => '<span class="src">' + esc(s) + '</span>').join('');
           const meta = '<div class="copilot-meta">' +
-            '<div class="conf-meter">Confianza ' + pct + '% <div class="conf-bar"><div style="width:' + pct + '%; background:' + color + '"></div></div></div>' +
+            '<div class="conf-meter">Confianza ' + pct + '% <div class="conf-bar"><div style="transform:scaleX(' + (pct/100) + '); background:' + color + '"></div></div></div>' +
             (sources ? '<div class="copilot-sources">' + sources + '</div>' : '') +
           '</div>';
           setMsg('copilot-msg', meta);
@@ -2372,7 +2374,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       estadoRows.forEach(r => {
         const cnt = estado[r.k] || 0;
         const pct = Math.round((cnt / eMax) * 100);
-        html += '<div class="bar-row"><span class="k">' + r.label + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%; background:' + r.color + '"></div></div><span class="n">' + cnt + '</span></div>';
+        html += '<div class="bar-row"><span class="k">' + r.label + '</span><div class="bar-track"><div class="bar-fill" style="transform:scaleX(' + (pct/100) + '); background:' + r.color + '"></div></div><span class="n">' + cnt + '</span></div>';
       });
       html += '</div></div>';
 
@@ -2385,7 +2387,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       } else {
         Object.entries(marcosTop).forEach(([m, cnt]) => {
           const pct = Math.round((cnt / marcoMax) * 100);
-          html += '<div class="bar-row"><span class="k">' + esc(marcoShort(m)) + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><span class="n">' + cnt + '</span></div>';
+          html += '<div class="bar-row"><span class="k">' + esc(marcoShort(m)) + '</span><div class="bar-track"><div class="bar-fill" style="transform:scaleX(' + (pct/100) + ')"></div></div><span class="n">' + cnt + '</span></div>';
         });
       }
       html += '</div></div>';
@@ -2399,7 +2401,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         const ctrlMax = Math.max(1, ...ctrlsTop.map(c => c.total_hallazgos));
         ctrlsTop.forEach(c => {
           const pct = Math.round((c.total_hallazgos / ctrlMax) * 100);
-          html += '<div class="bar-row"><span class="k">' + esc(c.control_id) + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><span class="n">' + c.total_hallazgos + '</span></div>';
+          html += '<div class="bar-row"><span class="k">' + esc(c.control_id) + '</span><div class="bar-track"><div class="bar-fill" style="transform:scaleX(' + (pct/100) + ')"></div></div><span class="n">' + c.total_hallazgos + '</span></div>';
         });
       }
       html += '</div></div>';
