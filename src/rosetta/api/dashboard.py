@@ -517,6 +517,93 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     }
     .mode-toggle:hover { color: var(--accent-hi); }
 
+    /* Marco checkbox grid */
+    .marco-toggle-all {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-bottom: var(--s-2);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--fg-2);
+      text-transform: none; letter-spacing: 0; font-weight: 500;
+      cursor: pointer;
+    }
+    .marco-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px var(--s-3);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-1);
+      padding: var(--s-2) var(--s-3);
+    }
+    @media (max-width: 520px) { .marco-grid { grid-template-columns: 1fr; } }
+    .marco-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 0;
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      color: var(--fg-2);
+      text-transform: none; letter-spacing: 0; font-weight: 400;
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    .marco-item:hover { color: var(--fg-1); }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      z-index: var(--z-modal);
+      background: rgba(26, 32, 48, .42);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      align-items: flex-start; justify-content: center;
+      padding: var(--s-7) var(--s-4);
+      overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; animation: overlayIn 160ms var(--ease); }
+    @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal {
+      width: 100%;
+      max-width: 600px;
+      background: var(--surface-1);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-3);
+      box-shadow: 0 24px 64px -16px rgba(26, 25, 12, .4);
+      display: flex; flex-direction: column;
+      max-height: calc(100vh - var(--s-8));
+      animation: modalIn 220ms var(--ease);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(12px) scale(.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--s-4) var(--s-5);
+      border-bottom: 1px solid var(--line-1);
+    }
+    .modal-head h2 { font-size: 15px; font-weight: 600; color: var(--fg-1); }
+    .modal-close {
+      width: 28px; height: 28px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: transparent; border: 1px solid var(--line-2);
+      border-radius: var(--r-1);
+      color: var(--fg-3);
+      font-size: 18px; line-height: 1;
+      cursor: pointer;
+      transition: background var(--d-fast), color var(--d-fast);
+    }
+    .modal-close:hover { background: var(--surface-2); color: var(--fg-1); }
+    .modal-body { padding: var(--s-5); overflow-y: auto; }
+    .modal-foot {
+      display: flex; align-items: center; justify-content: flex-end; gap: var(--s-2);
+      padding: var(--s-3) var(--s-5);
+      border-top: 1px solid var(--line-1);
+      background: var(--surface-2);
+      border-radius: 0 0 var(--r-3) var(--r-3);
+    }
+    .modal-foot #translate-msg { margin: 0 auto 0 0; }
+
     /* BUTTONS */
     .btn, button.btn {
       display: inline-flex; align-items: center; gap: var(--s-2);
@@ -1163,10 +1250,26 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         <p class="lead">Convierte un hallazgo Red Team en controles incumplidos, citas literales y acciones de mitigación auditables. Tool-use forzado sobre Claude Sonnet 4.6 con RAG por marco.</p>
       </div>
       <div class="content">
-        <div class="grid-12">
-          <div class="card col-span-7">
-            <div class="card-head"><h2>Hallazgo de seguridad</h2><span class="meta">datos del activo afectado</span></div>
-            <div class="card-body">
+        <div class="card">
+          <div class="card-head">
+            <h2>Evidencia normativa</h2>
+            <button class="btn" onclick="openFindingModal()">+ Traducir hallazgo</button>
+          </div>
+          <div class="card-body">
+            <div id="translate-result"><div class="empty">Aún no hay traducción. Pulsa "Traducir hallazgo" para registrar un hallazgo.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: nuevo hallazgo -->
+    <div class="modal-overlay" id="finding-modal" aria-hidden="true" onclick="if(event.target===this)closeFindingModal()">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="finding-modal-title">
+        <div class="modal-head">
+          <h2 id="finding-modal-title">Nuevo hallazgo</h2>
+          <button class="modal-close" onclick="closeFindingModal()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="modal-body">
               <div class="row-flex" style="margin-bottom:var(--s-4)">
                 <label for="example-select" style="margin-bottom:0">Cargar ejemplo</label>
                 <select id="example-select" onchange="loadExample(this.value)" style="width:auto; min-width:240px">
@@ -1228,31 +1331,24 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
                 <span id="mode-toggle-label">Cambiar a modo JSON avanzado</span>
               </button>
 
-              <label class="mt-4" for="marcos-select">Marcos normativos</label>
-              <p class="field-help">Marcos regulatorios contra los que traducir <strong>este</strong> hallazgo. Mantén Ctrl (Cmd en Mac) para elegir varios.</p>
-              <select id="marcos-select" multiple size="7">
-                <option value="iso_27001_2022" selected>ISO 27001:2022</option>
-                <option value="iso_27002_2022">ISO 27002:2022</option>
-                <option value="ens_2022">ENS 2022</option>
-                <option value="nis2">NIS2</option>
-                <option value="dora">DORA</option>
-                <option value="rgpd">RGPD</option>
-                <option value="nist_csf_2">NIST CSF 2.0</option>
-                <option value="pci_dss_4">PCI-DSS 4.0</option>
-              </select>
-              <div class="btn-row mt-4">
-                <button class="btn" id="btn-translate" onclick="doTranslate()">Traducir hallazgo</button>
-                <button class="btn btn--ghost" onclick="clearFinding()">Limpiar</button>
+              <label class="mt-4">Marcos normativos</label>
+              <p class="field-help">Marcos regulatorios contra los que traducir <strong>este</strong> hallazgo.</p>
+              <label class="marco-toggle-all"><input type="checkbox" id="marco-all" onchange="toggleAllMarcos()"> Seleccionar todos los marcos</label>
+              <div class="marco-grid">
+                <label class="marco-item"><input type="checkbox" class="marco-cb" value="iso_27001_2022" checked onchange="syncMarcoAll()"> ISO 27001:2022</label>
+                <label class="marco-item"><input type="checkbox" class="marco-cb" value="iso_27002_2022" onchange="syncMarcoAll()"> ISO 27002:2022</label>
+                <label class="marco-item"><input type="checkbox" class="marco-cb" value="ens_2022" onchange="syncMarcoAll()"> ENS 2022</label>
+                <label class="marco-item"><input type="checkbox" class="marco-cb" value="nis2" onchange="syncMarcoAll()"> NIS2</label>
+                <label class="marco-item"><input type="checkbox" class="marco-cb" value="dora" onchange="syncMarcoAll()"> DORA</label>
+                <label class="marco-item"><input type="checkbox" class="marco-cb" value="rgpd" onchange="syncMarcoAll()"> RGPD</label>
+                <label class="marco-item"><input type="checkbox" class="marco-cb" value="nist_csf_2" onchange="syncMarcoAll()"> NIST CSF 2.0</label>
+                <label class="marco-item"><input type="checkbox" class="marco-cb" value="pci_dss_4" onchange="syncMarcoAll()"> PCI-DSS 4.0</label>
               </div>
-              <div id="translate-msg"></div>
-            </div>
-          </div>
-          <div class="card col-span-5">
-            <div class="card-head"><h2>Evidencia normativa</h2><span class="meta">resultado de la traducción</span></div>
-            <div class="card-body">
-              <div id="translate-result"><div class="empty">Ejecuta la traducción para ver la evidencia normativa.</div></div>
-            </div>
-          </div>
+        </div>
+        <div class="modal-foot">
+          <div id="translate-msg"></div>
+          <button class="btn btn--ghost" onclick="clearFinding()">Limpiar</button>
+          <button class="btn" id="btn-translate" onclick="doTranslate()">Traducir hallazgo</button>
         </div>
       </div>
     </div>
@@ -1601,6 +1697,10 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     } catch (_) {}
 
     document.addEventListener('keydown', function(ev) {
+      if (ev.key === 'Escape') {
+        const m = document.getElementById('finding-modal');
+        if (m && m.classList.contains('open')) { closeFindingModal(); return; }
+      }
       if (ev.target.matches('textarea, input, select')) return;
       if (ev.key === '\\\\') { ev.preventDefault(); toggleSidebar(); return; }
       const map = { '0':'inicio','1':'traductor','2':'pdf','3':'auditoria','4':'drift','5':'cumplimiento','6':'blue','7':'grafo','8':'copilot','9':'hallazgos' };
@@ -1680,7 +1780,33 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       document.getElementById('finding-json').value = '';
       document.getElementById('example-select').value = '';
       setMsg('translate-msg', '');
-      setMsg('translate-result', '<div class="empty">Ejecuta la traducción para ver la evidencia normativa.</div>');
+    }
+
+    /* ── Modal de hallazgo ─────────────────────────────────────────── */
+    function openFindingModal() {
+      const m = document.getElementById('finding-modal');
+      m.classList.add('open');
+      m.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeFindingModal() {
+      const m = document.getElementById('finding-modal');
+      m.classList.remove('open');
+      m.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    /* ── Marcos: seleccionar todos / sincronizar ───────────────────── */
+    function toggleAllMarcos() {
+      const all = document.getElementById('marco-all').checked;
+      document.querySelectorAll('.marco-cb').forEach(cb => { cb.checked = all; });
+    }
+    function syncMarcoAll() {
+      const cbs = Array.from(document.querySelectorAll('.marco-cb'));
+      const checked = cbs.filter(cb => cb.checked).length;
+      const all = document.getElementById('marco-all');
+      all.checked = checked === cbs.length;
+      all.indeterminate = checked > 0 && checked < cbs.length;
     }
 
     async function doTranslate() {
@@ -1697,11 +1823,12 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         if (!hallazgo.vector_ataque) faltan.push('Vector de ataque');
         if (faltan.length) { msgErr('translate-msg', 'Faltan campos: ' + faltan.join(', ')); return; }
       }
+      const opts = Array.from(document.querySelectorAll('.marco-cb:checked')).map(c => c.value);
+      if (!opts.length) { msgErr('translate-msg', 'Selecciona al menos un marco normativo.'); return; }
       btn.disabled = true;
       msgInfo('translate-msg', 'Traduciendo hallazgo a marcos seleccionados…');
-      setMsg('translate-result', '<div class="empty">Procesando…</div>');
-      const opts = Array.from(document.getElementById('marcos-select').selectedOptions).map(o => o.value);
-      const body = { hallazgo, marcos: opts.length ? opts : ['iso_27001_2022'] };
+      setMsg('translate-result', '<div class="empty">Procesando traducción…</div>');
+      const body = { hallazgo, marcos: opts };
       try {
         const r = await fetch(API + '/translate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
         const data = await r.json();
@@ -1709,9 +1836,10 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
           msgErr('translate-msg', 'Error ' + r.status + ': ' + esc(data.detail || JSON.stringify(data)));
           setMsg('translate-result', '<div class="empty">Sin resultado.</div>');
         } else {
-          msgOk('translate-msg', 'Traducción registrada en sesión');
           renderTranslate(data);
           updateFindingsCount();
+          setMsg('translate-msg', '');
+          closeFindingModal();
         }
       } catch (e) { msgErr('translate-msg', 'Error de red: ' + esc(e.message)); }
       btn.disabled = false;
@@ -2662,6 +2790,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     checkHealth();
     updateFindingsCount();
     loadInicio();
+    syncMarcoAll();
     try {
       const saved = sessionStorage.getItem('rosetta:tab');
       if (saved && saved !== 'inicio') {
