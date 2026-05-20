@@ -791,6 +791,49 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     }
     button.secondary:hover { background: var(--surface-2) !important; color: var(--fg-1) !important; }
 
+    /* MARCO PICKER (chips de selección) */
+    .marco-picker {
+      display: flex; flex-wrap: wrap; gap: var(--s-2);
+      margin-top: var(--s-3);
+    }
+    .marco-chip {
+      display: inline-flex !important; align-items: center; gap: 6px;
+      padding: 7px 13px !important;
+      background: var(--surface-1) !important;
+      border: 1px solid var(--line-2) !important;
+      border-radius: var(--r-pill) !important;
+      color: var(--fg-2) !important;
+      font-family: var(--font-mono) !important;
+      font-size: 11px !important; font-weight: 500 !important;
+      letter-spacing: .02em;
+      box-shadow: none !important;
+      cursor: pointer;
+      transition: border-color var(--d-fast) var(--ease),
+                  background var(--d-fast) var(--ease),
+                  color var(--d-fast) var(--ease);
+    }
+    .marco-chip:hover {
+      background: var(--surface-2) !important;
+      border-color: var(--line-3) !important;
+      color: var(--fg-1) !important;
+    }
+    .marco-chip.active {
+      background: var(--accent) !important;
+      border-color: var(--accent-lo) !important;
+      color: #fffdf8 !important;
+      box-shadow: 0 1px 2px rgba(122, 79, 40, .22) !important;
+    }
+    .marco-chip-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-bg);
+    }
+    .marco-chip.active .marco-chip-dot {
+      background: #fffdf8;
+      box-shadow: 0 0 0 3px rgba(255, 253, 248, .22);
+    }
+    .marco-chip--all { padding-left: 11px !important; }
+
     /* MESSAGES */
     .msg-error, .msg-success, .msg-info {
       display: inline-flex; align-items: center; gap: var(--s-2);
@@ -1516,23 +1559,23 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         <div class="card">
           <div class="card-head"><h2>Consulta</h2><span class="meta">GET /compliance/state/{marco}</span></div>
           <div class="card-body">
-            <div class="row-flex">
-              <div style="flex:1; min-width:220px">
-                <label for="state-marco">Marco a consultar</label>
-                <p class="field-help">Estado de cumplimiento global de <strong>todos</strong> los hallazgos contra el marco elegido.</p>
-                <select id="state-marco">
-                  <option value="iso_27001_2022">ISO 27001:2022</option>
-                  <option value="ens_2022">ENS 2022</option>
-                  <option value="nis2">NIS2</option>
-                  <option value="dora">DORA</option>
-                  <option value="rgpd">RGPD</option>
-                  <option value="nist_csf_2">NIST CSF 2.0</option>
-                  <option value="pci_dss_4">PCI-DSS 4.0</option>
-                </select>
-              </div>
-              <button class="btn" onclick="doComplianceState()" style="align-self:flex-end">Consultar</button>
+            <label>Marco a consultar</label>
+            <p class="field-help">Selecciona un marco regulatorio, o consulta el estado <strong>agregado de todos</strong> a la vez.</p>
+            <div class="marco-picker" id="marco-picker" role="group" aria-label="Marco a consultar">
+              <button type="button" class="marco-chip marco-chip--all active" data-marco="all" onclick="selectMarco(this)">
+                <span class="marco-chip-dot" aria-hidden="true"></span>Todos los marcos
+              </button>
+              <button type="button" class="marco-chip" data-marco="iso_27001_2022" onclick="selectMarco(this)">ISO 27001:2022</button>
+              <button type="button" class="marco-chip" data-marco="ens_2022" onclick="selectMarco(this)">ENS 2022</button>
+              <button type="button" class="marco-chip" data-marco="nis2" onclick="selectMarco(this)">NIS2</button>
+              <button type="button" class="marco-chip" data-marco="dora" onclick="selectMarco(this)">DORA</button>
+              <button type="button" class="marco-chip" data-marco="rgpd" onclick="selectMarco(this)">RGPD</button>
+              <button type="button" class="marco-chip" data-marco="nist_csf_2" onclick="selectMarco(this)">NIST CSF 2.0</button>
+              <button type="button" class="marco-chip" data-marco="pci_dss_4" onclick="selectMarco(this)">PCI-DSS 4.0</button>
             </div>
-            <div id="state-result" class="mt-5"></div>
+            <div id="state-result" class="mt-5">
+              <div class="empty">Elige un marco para ver su estado de cumplimiento.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -2215,15 +2258,102 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       setMsg('translate-result', html);
     }
 
-    async function doComplianceState() {
-      const marco = document.getElementById('state-marco').value;
+    const COMPLIANCE_MARCOS = [
+      ['iso_27001_2022', 'ISO 27001:2022'], ['ens_2022', 'ENS 2022'],
+      ['nis2', 'NIS2'], ['dora', 'DORA'], ['rgpd', 'RGPD'],
+      ['nist_csf_2', 'NIST CSF 2.0'], ['pci_dss_4', 'PCI-DSS 4.0'],
+    ];
+
+    function selectMarco(el) {
+      document.querySelectorAll('#marco-picker .marco-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      if (el.dataset.marco === 'all') doComplianceAll();
+      else doComplianceState(el.dataset.marco);
+    }
+
+    async function fetchComplianceState(marco) {
+      const r = await authedFetch(API + '/compliance/state/' + marco);
+      const d = await r.json();
+      if (!r.ok) throw new Error((d && d.detail) || ('HTTP ' + r.status));
+      return d;
+    }
+
+    async function doComplianceState(marco) {
       setMsg('state-result', '<div class="empty">Consultando…</div>');
       try {
-        const r = await authedFetch(API + '/compliance/state/' + marco);
-        const d = await r.json();
-        if (!r.ok) { setMsg('state-result', '<div class="msg-error">Error ' + r.status + ': ' + esc(d.detail || JSON.stringify(d)) + '</div>'); return; }
-        renderComplianceState(d);
-      } catch (e) { setMsg('state-result', '<div class="msg-error">Error de red: ' + esc(e.message) + '</div>'); }
+        renderComplianceState(await fetchComplianceState(marco));
+      } catch (e) {
+        setMsg('state-result', '<div class="msg-error">Error: ' + esc(e.message) + '</div>');
+      }
+    }
+
+    async function doComplianceAll() {
+      setMsg('state-result', '<div class="empty">Consultando los ' + COMPLIANCE_MARCOS.length + ' marcos…</div>');
+      const results = await Promise.all(COMPLIANCE_MARCOS.map(async ([id, label]) => {
+        try { return { id: id, label: label, data: await fetchComplianceState(id) }; }
+        catch (e) { return { id: id, label: label, error: e.message }; }
+      }));
+      renderComplianceAll(results);
+    }
+
+    function complianceErrsHtml(errs) {
+      return '<div class="msg-error" style="margin-top:var(--s-4)">Sin respuesta de ' +
+        errs.length + ' marco(s): ' + errs.map(e => esc(e.label)).join(', ') + '</div>';
+    }
+
+    function renderComplianceAll(results) {
+      const ok = results.filter(r => r.data);
+      const errs = results.filter(r => r.error);
+      const sevOrder = ['critica', 'alta', 'media', 'baja', 'informativa'];
+
+      const totalSum = ok.reduce((a, r) => a + (r.data.total_hallazgos || 0), 0);
+      const sevAgg = {};
+      ok.forEach(r => {
+        const s = r.data.severidad_distribution || {};
+        Object.keys(s).forEach(k => { sevAgg[k] = (sevAgg[k] || 0) + s[k]; });
+      });
+      const criticos = (sevAgg.critica || 0) + (sevAgg.alta || 0);
+      const conHallazgos = ok.filter(r => (r.data.total_hallazgos || 0) > 0).length;
+
+      if (!totalSum) {
+        let empty = '<div class="empty mt-3">Sin hallazgos registrados en ningún marco. Traduce alguno para empezar.</div>';
+        if (errs.length) empty += complianceErrsHtml(errs);
+        setMsg('state-result', empty);
+        return;
+      }
+
+      let html = '<div class="kpi-strip mt-3">' +
+        '<div class="kpi kpi--accent"><div class="kpi-label">Marcos con hallazgos</div><div class="kpi-value">' + conHallazgos +
+          '<span style="font-size:14px;color:var(--fg-4)"> / ' + COMPLIANCE_MARCOS.length + '</span></div></div>' +
+        '<div class="kpi kpi--accent"><div class="kpi-label">Hallazgos por marco (suma)</div><div class="kpi-value">' + totalSum + '</div></div>' +
+        '<div class="kpi kpi--sky"><div class="kpi-label">Crítica + alta</div><div class="kpi-value">' + criticos + '</div></div>' +
+      '</div>';
+
+      const maxTotal = Math.max.apply(null, ok.map(r => r.data.total_hallazgos || 0).concat([1]));
+      const sorted = ok.slice().sort((a, b) => (b.data.total_hallazgos || 0) - (a.data.total_hallazgos || 0));
+      html += '<div class="mt-5"><label>Hallazgos por marco</label>';
+      sorted.forEach(r => {
+        const t = r.data.total_hallazgos || 0;
+        html += '<div class="bar-row"><span class="k">' + esc(r.label) + '</span>' +
+          '<div class="bar-track"><div class="bar-fill" style="transform:scaleX(' + (t / maxTotal) + ')"></div></div>' +
+          '<span class="n">' + t + '</span></div>';
+      });
+      html += '</div>';
+
+      const sevTotal = Object.values(sevAgg).reduce((a, b) => a + b, 0) || 1;
+      if (Object.keys(sevAgg).length) {
+        html += '<div class="mt-5"><label>Severidad agregada</label><div class="sev-stack">';
+        sevOrder.forEach(s => {
+          if (sevAgg[s]) html += '<div class="s-' + s + '" style="width:' + ((sevAgg[s] / sevTotal) * 100) + '%"></div>';
+        });
+        html += '</div><div class="sev-legend">';
+        sevOrder.forEach(s => { if (sevAgg[s]) html += '<span class="l-' + s + '">' + s + ' · ' + sevAgg[s] + '</span>'; });
+        html += '</div></div>';
+      }
+
+      html += '<p class="field-help">Un hallazgo puede aplicar a varios marcos; la suma por marco puede superar el número de hallazgos únicos.</p>';
+      if (errs.length) html += complianceErrsHtml(errs);
+      setMsg('state-result', html);
     }
 
     function renderComplianceState(d) {
