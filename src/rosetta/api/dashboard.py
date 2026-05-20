@@ -443,7 +443,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     }
     label small { font-size: 10px; color: var(--fg-4); text-transform: none; letter-spacing: 0; font-weight: 400; }
 
-    textarea, select, input[type="text"], input[type="file"] {
+    textarea, select, input[type="text"], input[type="password"], input[type="file"] {
       width: 100%;
       background: var(--surface-1);
       border: 1px solid var(--line-2);
@@ -730,6 +730,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       font-size: 11.5px; line-height: 1.45;
     }
     .login-alert svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+    .login-alert[hidden] { display: none; }
     .login-submit { width: 100%; justify-content: center; margin-top: var(--s-1); }
     .login-submit[aria-busy="true"] { opacity: .85; }
     .login-foot {
