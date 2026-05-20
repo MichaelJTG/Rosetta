@@ -648,6 +648,97 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     }
     .modal-foot #translate-msg { margin: 0 auto 0 0; }
 
+    /* LOGIN SCREEN */
+    .login-overlay {
+      background: var(--bg-0);
+      align-items: center;
+      padding: var(--s-4);
+    }
+    .login-overlay::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(880px 420px at 50% -10%, rgba(184, 127, 68, .15), transparent 70%),
+        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 58%);
+      pointer-events: none;
+    }
+    .login-panel {
+      position: relative;
+      width: 100%; max-width: 392px;
+      background: var(--surface-1);
+      border: 1px solid var(--line-2);
+      border-radius: var(--r-3);
+      box-shadow: 0 1px 0 rgba(255, 253, 248, .7) inset,
+                  0 28px 64px -28px rgba(26, 25, 12, .34);
+      padding: var(--s-6) var(--s-6) var(--s-5);
+      animation: loginIn 340ms var(--ease);
+    }
+    @keyframes loginIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .login-brand {
+      display: flex; align-items: center; gap: var(--s-3);
+      padding-bottom: var(--s-4);
+      margin-bottom: var(--s-5);
+      border-bottom: 1px solid var(--line-1);
+    }
+    .login-brand .brand-mark { width: 32px; height: 32px; flex-shrink: 0; }
+    .login-brand-name {
+      font-size: 13px; font-weight: 600; color: var(--fg-1);
+      letter-spacing: .16em;
+    }
+    .login-brand-tag {
+      font-family: var(--font-mono); font-size: 9.5px;
+      color: var(--fg-4); margin-top: 3px;
+    }
+    .login-title {
+      font-size: 19px; font-weight: 600; color: var(--fg-1);
+      letter-spacing: -.01em;
+    }
+    .login-sub { font-size: 12.5px; color: var(--fg-3); margin-top: var(--s-1); }
+    .login-form {
+      margin-top: var(--s-5);
+      display: flex; flex-direction: column; gap: var(--s-4);
+    }
+    .login-field { display: flex; flex-direction: column; gap: 5px; }
+    .login-field label { margin-bottom: 0; }
+    .login-pass-wrap { position: relative; }
+    .login-pass-wrap input { padding-right: 40px; }
+    .login-pass-toggle {
+      position: absolute; right: 1px; top: 1px; bottom: 1px;
+      width: 38px; padding: 0 !important;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: transparent !important; border: 0 !important;
+      box-shadow: none !important; color: var(--fg-4) !important;
+      cursor: pointer;
+    }
+    .login-pass-toggle:hover { background: transparent !important; color: var(--fg-2) !important; }
+    .login-pass-toggle.on { color: var(--accent) !important; }
+    .login-pass-toggle svg { width: 15px; height: 15px; }
+    .login-caps {
+      font-family: var(--font-mono); font-size: 10px;
+      color: var(--sev-alta);
+    }
+    .login-alert {
+      display: flex; align-items: flex-start; gap: var(--s-2);
+      padding: var(--s-2) var(--s-3);
+      background: var(--sev-critica-bg);
+      border: 1px solid rgba(168, 49, 42, .26);
+      border-radius: var(--r-1);
+      color: var(--sev-critica);
+      font-size: 11.5px; line-height: 1.45;
+    }
+    .login-alert svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+    .login-submit { width: 100%; justify-content: center; margin-top: var(--s-1); }
+    .login-submit[aria-busy="true"] { opacity: .85; }
+    .login-foot {
+      margin-top: var(--s-5); padding-top: var(--s-4);
+      border-top: 1px solid var(--line-1);
+      font-family: var(--font-mono); font-size: 9.5px;
+      color: var(--fg-4); text-align: center; letter-spacing: .04em;
+    }
+
     /* BUTTONS */
     .btn, button.btn {
       display: inline-flex; align-items: center; gap: var(--s-2);
@@ -1696,23 +1787,48 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
 
   <!-- LOGIN OVERLAY (mostrado cuando no hay token o JWT expirado sin refresh) -->
   <div class="modal-overlay login-overlay" id="login-overlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="login-title" style="max-width:380px">
-      <div class="modal-head">
-        <h2 id="login-title">Acceso a ROSETTA</h2>
-      </div>
-      <form class="modal-body" onsubmit="submitLogin(event)">
-        <p class="field-help" style="margin-top:0">
-          Introduce las credenciales del panel para acceder a la API.
-        </p>
-        <label class="mt-3" for="login-user">Usuario</label>
-        <input type="text" id="login-user" autocomplete="username" required>
-        <label class="mt-3" for="login-pass">Contraseña</label>
-        <input type="password" id="login-pass" autocomplete="current-password" required>
-        <div id="login-msg" style="margin-top: var(--s-3); color: var(--sev-critica); font-family: var(--font-mono); font-size: 11.5px; min-height: 18px"></div>
-        <div class="btn-row mt-4">
-          <button type="submit" class="btn" id="login-btn" style="width:100%; justify-content:center">Entrar</button>
+    <div class="login-panel" role="dialog" aria-modal="true" aria-labelledby="login-title">
+      <div class="login-brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>
+          <div class="login-brand-name">ROSETTA</div>
+          <div class="login-brand-tag">Orquestador de cumplimiento continuo</div>
         </div>
+      </div>
+      <h2 id="login-title" class="login-title">Acceso al panel</h2>
+      <p class="login-sub">Autentícate para operar la API de auditoría.</p>
+      <form class="login-form" onsubmit="submitLogin(event)" novalidate>
+        <div class="login-field">
+          <label for="login-user">Usuario</label>
+          <input type="text" id="login-user" autocomplete="username" autocapitalize="none"
+                 spellcheck="false" required>
+        </div>
+        <div class="login-field">
+          <label for="login-pass">Contraseña</label>
+          <div class="login-pass-wrap">
+            <input type="password" id="login-pass" autocomplete="current-password" required>
+            <button type="button" class="login-pass-toggle" id="login-pass-toggle"
+                    aria-label="Mostrar contraseña" onclick="toggleLoginPass()">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M1 8s2.6-4.5 7-4.5S15 8 15 8s-2.6 4.5-7 4.5S1 8 1 8Z"/>
+                <circle cx="8" cy="8" r="2"/>
+              </svg>
+            </button>
+          </div>
+          <span class="login-caps" id="login-caps" hidden>Bloq Mayús activado</span>
+        </div>
+        <div id="login-msg" class="login-alert" role="alert" hidden>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M8 1.5 15 14H1L8 1.5Z"/><line x1="8" y1="6.5" x2="8" y2="9.5"/>
+            <circle cx="8" cy="11.6" r=".5" fill="currentColor"/>
+          </svg>
+          <span id="login-msg-text"></span>
+        </div>
+        <button type="submit" class="btn login-submit" id="login-btn">Entrar</button>
       </form>
+      <div class="login-foot">API protegida con JWT · rosetta.aegiscores.com</div>
     </div>
   </div>
 
@@ -1804,20 +1920,50 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
 
     function showLoginOverlay() {
       const o = document.getElementById('login-overlay');
-      if (o) o.classList.add('open');
+      if (!o) return;
+      o.classList.add('open');
+      o.setAttribute('aria-hidden', 'false');
+      setTimeout(() => { const u = document.getElementById('login-user'); if (u) u.focus(); }, 60);
     }
     function hideLoginOverlay() {
       const o = document.getElementById('login-overlay');
-      if (o) o.classList.remove('open');
+      if (!o) return;
+      o.classList.remove('open');
+      o.setAttribute('aria-hidden', 'true');
     }
+    function loginError(text) {
+      const box = document.getElementById('login-msg');
+      const span = document.getElementById('login-msg-text');
+      if (span) span.textContent = text;
+      if (box) box.hidden = !text;
+    }
+    function toggleLoginPass() {
+      const inp = document.getElementById('login-pass');
+      const btn = document.getElementById('login-pass-toggle');
+      if (!inp || !btn) return;
+      const show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      btn.classList.toggle('on', show);
+      btn.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    }
+    function loginCapsCheck(ev) {
+      const hint = document.getElementById('login-caps');
+      if (hint && ev.getModifierState) hint.hidden = !ev.getModifierState('CapsLock');
+    }
+    (function bindLoginCaps() {
+      const p = document.getElementById('login-pass');
+      if (p) { p.addEventListener('keyup', loginCapsCheck); p.addEventListener('keydown', loginCapsCheck); }
+    })();
     async function submitLogin(ev) {
       ev.preventDefault();
       const u = document.getElementById('login-user').value.trim();
       const p = document.getElementById('login-pass').value;
-      const msg = document.getElementById('login-msg');
       const btn = document.getElementById('login-btn');
-      msg.textContent = '';
+      loginError('');
+      if (!u || !p) { loginError('Introduce usuario y contraseña.'); return; }
       btn.disabled = true;
+      btn.setAttribute('aria-busy', 'true');
+      btn.textContent = 'Verificando…';
       try {
         await doLogin(u, p);
         hideLoginOverlay();
@@ -1825,9 +1971,11 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         try { updateFindingsCount(); } catch (_) {}
         try { loadInicio(); } catch (_) {}
       } catch (e) {
-        msg.textContent = e.message || 'Error de inicio de sesión';
+        loginError(e.message || 'Error de inicio de sesión.');
       } finally {
         btn.disabled = false;
+        btn.removeAttribute('aria-busy');
+        btn.textContent = 'Entrar';
       }
     }
     function doLogout() { clearTokens(); showLoginOverlay(); }
