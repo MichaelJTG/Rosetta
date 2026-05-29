@@ -101,15 +101,46 @@ def decode_token(token: str, expected_type: str) -> dict[str, Any] | None:
     return payload
 
 
+def _all_credentials() -> list[tuple[str, str]]:
+    """Lista de pares (usuario, contraseña) admitidos.
+
+    Combina la credencial principal (``ROSETTA_USER`` / ``ROSETTA_PASSWORD``)
+    con cero o más credenciales adicionales declaradas en
+    ``ROSETTA_USERS_EXTRA`` con formato ``user1:pass1,user2:pass2``.
+    """
+    creds: list[tuple[str, str]] = []
+    main_u = os.getenv("ROSETTA_USER", "")
+    main_p = os.getenv("ROSETTA_PASSWORD", "")
+    if main_u:
+        creds.append((main_u, main_p))
+    extra = os.getenv("ROSETTA_USERS_EXTRA", "")
+    for raw in extra.split(","):
+        pair = raw.strip()
+        if not pair or ":" not in pair:
+            continue
+        u, _, p = pair.partition(":")
+        u, p = u.strip(), p.strip()
+        if u:
+            creds.append((u, p))
+    return creds
+
+
 def verify_credentials(username: str, password: str) -> bool:
-    """Verifica usuario/password contra las variables de entorno (timing-safe)."""
-    expected_user = os.getenv("ROSETTA_USER", "")
-    expected_pass = os.getenv("ROSETTA_PASSWORD", "")
-    if not expected_user:
+    """Verifica usuario/password contra el conjunto de credenciales (timing-safe).
+
+    Recorre todas las credenciales sin atajos para evitar fugas de timing por
+    salida temprana cuando el username coincide con alguna entrada.
+    """
+    creds = _all_credentials()
+    if not creds:
         return False
-    ok_u = secrets.compare_digest(username.encode(), expected_user.encode())
-    ok_p = secrets.compare_digest(password.encode(), expected_pass.encode())
-    return ok_u and ok_p
+    matched = False
+    for expected_user, expected_pass in creds:
+        ok_u = secrets.compare_digest(username.encode(), expected_user.encode())
+        ok_p = secrets.compare_digest(password.encode(), expected_pass.encode())
+        if ok_u and ok_p:
+            matched = True
+    return matched
 
 
 def access_ttl_seconds() -> int:
