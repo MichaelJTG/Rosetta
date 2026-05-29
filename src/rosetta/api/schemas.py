@@ -414,3 +414,216 @@ class DriftResponse(BaseModel):
     severidad: str = Field(
         ..., description="Severidad del drift: informativa/baja/media/alta/critica."
     )
+
+
+# ---------------------------------------------------------------------------
+# Controls Catalog — GET/PATCH /controls/{marco}/...
+# ---------------------------------------------------------------------------
+
+
+class ControlStatusItem(BaseModel):
+    """Estado de un control normativo individual."""
+
+    control_id: str = Field(..., description="Identificador del control (p.ej. 'A.8.16').")
+    marco: str = Field(..., description="Marco normativo (p.ej. 'iso_27001_2022').")
+    titulo: str = Field(..., description="Título corto del control.")
+    descripcion: str = Field(..., description="Descripción completa del control.")
+    estado: str = Field(
+        default="no_aplica",
+        description="cumple | parcial | no_cumple | no_aplica",
+    )
+    responsable: str = Field(default="", description="Persona o rol responsable.")
+    comentarios: str = Field(default="", description="Notas del auditor.")
+    evidencias_vinculadas: list[str] = Field(
+        default_factory=list,
+        description="IDs de hallazgos que sirven de evidencia para este control.",
+    )
+    updated_at: str = Field(default="", description="ISO-8601 de última actualización.")
+
+
+class ControlUpdate(BaseModel):
+    """Cuerpo de PATCH /controls/{marco}/{control_id}."""
+
+    estado: str | None = Field(
+        default=None,
+        description="cumple | parcial | no_cumple | no_aplica",
+        pattern="^(cumple|parcial|no_cumple|no_aplica)$",
+    )
+    responsable: str | None = Field(default=None)
+    comentarios: str | None = Field(default=None)
+
+
+class ControlsListResponse(BaseModel):
+    """Respuesta de GET /controls/{marco}."""
+
+    marco: str
+    total: int
+    controles: list[ControlStatusItem]
+
+
+# ---------------------------------------------------------------------------
+# Vuln Roadmap — GET /vuln-roadmap · PATCH /findings/{id}/timeline
+# ---------------------------------------------------------------------------
+
+
+class VulnRoadmapItem(BaseModel):
+    """Entrada del roadmap de gestión de vulnerabilidades."""
+
+    id_hallazgo: str
+    nombre: str = Field(..., description="Descripción corta (activo + origen).")
+    criticidad: str = Field(..., description="informativa | baja | media | alta | critica")
+    estado: str = Field(..., description="activo | en_progreso | solucionado")
+    fecha_deteccion: datetime
+    fecha_limite: str | None = Field(None, description="ISO-8601 fecha objetivo de resolución.")
+    propietario: str = Field(default="")
+    dias_restantes: int | None = Field(
+        None,
+        description="Días hasta fecha límite. Negativo = vencido. None si no hay fecha.",
+    )
+    marcos: list[str] = Field(default_factory=list)
+    controles: list[str] = Field(default_factory=list)
+
+
+class VulnRoadmapResponse(BaseModel):
+    """Respuesta de GET /vuln-roadmap."""
+
+    total: int
+    items: list[VulnRoadmapItem]
+
+
+class TimelineUpdate(BaseModel):
+    """Cuerpo de PATCH /findings/{id}/timeline."""
+
+    fecha_limite: str | None = Field(
+        default=None,
+        description="ISO-8601 fecha objetivo de resolución. None para borrar.",
+    )
+    propietario: str = Field(default="")
+
+
+# ---------------------------------------------------------------------------
+# Evidence Panel — GET /evidence-panel
+# ---------------------------------------------------------------------------
+
+
+class EvidencePanelCard(BaseModel):
+    """Card de evidencia por control en el panel de evidencias."""
+
+    control_id: str
+    titulo: str
+    fuentes_activas: list[str] = Field(default_factory=list)
+    total_evidencias: int = Field(default=0)
+    ultimo_evento: str | None = Field(None)
+    cobertura: str = Field(
+        default="sin_datos",
+        description="verde (≥2 fuentes) | amarillo (1 fuente) | rojo (0 fuentes) | sin_datos",
+    )
+
+
+class EvidencePanelResponse(BaseModel):
+    """Respuesta de GET /evidence-panel."""
+
+    total_controles: int
+    cards: list[EvidencePanelCard]
+
+
+# ---------------------------------------------------------------------------
+# Gap Analysis — POST /gap-analysis/{marco}
+# ---------------------------------------------------------------------------
+
+
+class GapControlResult(BaseModel):
+    """Resultado de gap para un control individual."""
+
+    control_id: str
+    titulo: str
+    respuesta: str = Field(..., description="cumple | parcial | no_cumple | sin_datos")
+    confianza: float = Field(..., ge=0.0, le=1.0)
+    justificacion: str
+    evidencia_base: list[str] = Field(default_factory=list)
+
+
+class GapAnalysisResponse(BaseModel):
+    """Respuesta de POST /gap-analysis/{marco}."""
+
+    marco: str
+    total_controles: int
+    cumple: int
+    parcial: int
+    no_cumple: int
+    sin_datos: int
+    porcentaje_cumplimiento: float
+    controles: list[GapControlResult]
+
+
+# ---------------------------------------------------------------------------
+# Plan Director — POST /plan-director/{marco}
+# ---------------------------------------------------------------------------
+
+
+class AccionPlan(BaseModel):
+    """Acción individual del plan director de seguridad."""
+
+    titulo: str
+    descripcion: str
+    categoria: str = Field(..., description="tecnico | organizativo | documental")
+    prioridad: str = Field(..., description="critica | alta | media | baja")
+    personas_dia: float = Field(..., ge=0)
+    coste_estimado_eur: float = Field(..., ge=0)
+    controles_relacionados: list[str] = Field(default_factory=list)
+    cubierto_por_herramienta: str | None = Field(None)
+    estado: str = Field(default="pendiente")
+
+
+class PlanDirectorResponse(BaseModel):
+    """Respuesta de POST /plan-director/{marco}."""
+
+    marco: str
+    total_acciones: int
+    total_personas_dia: float
+    total_coste_eur: float
+    tarifa_dia_eur: float = Field(default=450.0)
+    acciones: list[AccionPlan]
+    resumen_ejecutivo: str
+
+
+# ---------------------------------------------------------------------------
+# Risk Analysis — GET /assets · POST /risk-analysis
+# ---------------------------------------------------------------------------
+
+
+class AssetItem(BaseModel):
+    """Activo detectado en el sistema."""
+
+    nombre: str
+    hallazgos_count: int = Field(default=0)
+    criticidad_max: str | None = Field(None)
+    controles_afectados: list[str] = Field(default_factory=list)
+
+
+class AssetsResponse(BaseModel):
+    """Respuesta de GET /assets."""
+
+    total: int
+    activos: list[AssetItem]
+
+
+class RiskEntry(BaseModel):
+    """Entrada de riesgo para un activo."""
+
+    activo: str
+    amenazas: list[str]
+    probabilidad: int = Field(..., ge=1, le=5)
+    impacto: int = Field(..., ge=1, le=5)
+    riesgo: int = Field(..., ge=1, le=25, description="probabilidad × impacto")
+    nivel: str = Field(..., description="bajo (1-4) | medio (5-9) | alto (10-16) | critico (17-25)")
+    tratamiento: str
+    controles_relacionados: list[str] = Field(default_factory=list)
+
+
+class RiskAnalysisResponse(BaseModel):
+    """Respuesta de POST /risk-analysis."""
+
+    total_activos: int
+    riesgo_promedio: float
+    entradas: list[RiskEntry]

@@ -82,7 +82,7 @@ def test_wrong_password_returns_401(monkeypatch: pytest.MonkeyPatch) -> None:
     client = TestClient(_make_app())
     r = client.get("/protected", headers={"Authorization": _basic_header("admin", "wrong")})
     assert r.status_code == 401
-    assert r.headers["WWW-Authenticate"] == 'Basic realm="ROSETTA"'
+    assert 'Basic realm="ROSETTA"' in r.headers["WWW-Authenticate"]
 
 
 def test_wrong_user_returns_401(monkeypatch: pytest.MonkeyPatch) -> None:

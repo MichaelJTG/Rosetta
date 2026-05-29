@@ -1380,6 +1380,14 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       Hallazgos <span class="nav-key">9</span>
     </button>
 
+    <div class="nav-section">Gestión</div>
+    <button onclick="switchTab('controles',this)">Catálogo de Controles</button>
+    <button onclick="switchTab('roadmap',this)">Roadmap Vuln.</button>
+    <button onclick="switchTab('evidencias',this)">Panel de Evidencias</button>
+    <button onclick="switchTab('gap',this)">Pre-Gap Análisis</button>
+    <button onclick="switchTab('plan',this)">Plan Director</button>
+    <button onclick="switchTab('riesgos',this)">Análisis de Riesgos</button>
+
     <div class="nav-footer">
       <div class="nav-footer-row"><span>marco</span><span class="v">iso_27001_2022</span></div>
       <div class="nav-footer-row"><span>llm</span><span class="v" id="footer-llm">claude</span></div>
@@ -1882,6 +1890,9 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       'inicio':'Inicio','traductor':'Traducir','cumplimiento':'Cumplimiento','auditoria':'Modo Auditoría',
       'pdf':'Ingesta PDF','blue':'Blue Team','grafo':'Grafo','drift':'Procedure Drift',
       'copilot':'Copilot','hallazgos':'Hallazgos',
+      'controles':'Catálogo de Controles','roadmap':'Roadmap de Vulnerabilidades',
+      'evidencias':'Panel de Evidencias','gap':'Pre-Gap Análisis',
+      'plan':'Plan Director de Seguridad','riesgos':'Análisis de Riesgos',
     };
     let _graphNetwork = null;
     let _graphNodes   = null;
@@ -3271,15 +3282,532 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     try {
       const saved = sessionStorage.getItem('rosetta:tab');
       if (saved && saved !== 'inicio') {
-        const map = { 'inicio':0,'traductor':1,'pdf':2,'auditoria':3,'drift':4,'cumplimiento':5,'blue':6,'grafo':7,'copilot':8,'hallazgos':9 };
-        const idx = map[saved];
-        if (idx != null) {
-          const btns = document.querySelectorAll('nav button');
-          if (btns[idx]) btns[idx].click();
-        }
+        const allBtns = document.querySelectorAll('nav button');
+        allBtns.forEach(b => { if (b.textContent.trim().toLowerCase().startsWith(saved) || b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+saved+"'")) b.click(); });
       }
     } catch (_) {}
+
+    /* ═══════════════════════════════════════════════════════════════════
+       CONTROLES — Catálogo de controles normativos con estado
+       ═══════════════════════════════════════════════════════════════════ */
+    let _controlesMarco = 'iso_27001_2022';
+    let _controlesData  = [];
+
+    function loadControles(marco) {
+      _controlesMarco = marco || _controlesMarco;
+      const el = document.getElementById('controles-body');
+      if (el) el.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--fg-4)">Cargando…</td></tr>';
+      authedFetch('/controls/' + _controlesMarco)
+        .then(r => r.json())
+        .then(data => {
+          _controlesData = data.controles || [];
+          renderControlesTable(_controlesData);
+        })
+        .catch(e => { if (el) el.innerHTML = '<tr><td colspan="5" style="color:var(--sev-critica)">Error: ' + e.message + '</td></tr>'; });
+    }
+
+    function renderControlesTable(items) {
+      const el = document.getElementById('controles-body');
+      if (!el) return;
+      const ESTADO_BADGE = {
+        'cumple':    ['var(--sev-baja)',    'var(--sev-baja-bg)',    'Cumple'],
+        'parcial':   ['var(--sev-media)',   'var(--sev-media-bg)',   'Parcial'],
+        'no_cumple': ['var(--sev-critica)', 'var(--sev-critica-bg)','No cumple'],
+        'no_aplica': ['var(--fg-3)',        'var(--surface-3)',      'No aplica'],
+      };
+      if (!items.length) { el.innerHTML = '<tr><td colspan="5" style="padding:24px;color:var(--fg-4)">Sin controles disponibles.</td></tr>'; return; }
+      el.innerHTML = items.map(c => {
+        const [col, bg, lbl] = ESTADO_BADGE[c.estado] || ESTADO_BADGE['no_aplica'];
+        const evCount = (c.evidencias_vinculadas || []).length;
+        return `<tr style="cursor:pointer" onclick="openControlModal(${JSON.stringify(c).replace(/"/g,'&quot;')})">
+          <td style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">${c.control_id}</td>
+          <td>${c.titulo}</td>
+          <td><span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--r-pill);font-size:11px;font-weight:500;color:${col};background:${bg}">${lbl}</span></td>
+          <td style="color:var(--fg-3);font-size:12px">${c.responsable || '—'}</td>
+          <td style="text-align:center"><span style="font-family:var(--font-mono);font-size:11px;color:${evCount>0?'var(--accent)':'var(--fg-4)'}">${evCount}</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function openControlModal(ctrl) {
+      document.getElementById('ctrl-modal-id').textContent    = ctrl.control_id;
+      document.getElementById('ctrl-modal-title').textContent = ctrl.titulo;
+      document.getElementById('ctrl-modal-desc').textContent  = ctrl.descripcion;
+      document.getElementById('ctrl-modal-estado').value      = ctrl.estado;
+      document.getElementById('ctrl-modal-resp').value        = ctrl.responsable || '';
+      document.getElementById('ctrl-modal-comments').value    = ctrl.comentarios || '';
+      const evList = document.getElementById('ctrl-modal-ev');
+      evList.innerHTML = (ctrl.evidencias_vinculadas||[]).map(id=>`<li style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">${id}</li>`).join('') || '<li style="color:var(--fg-4)">Sin evidencias vinculadas</li>';
+      document.getElementById('ctrl-modal').dataset.controlId = ctrl.control_id;
+      document.getElementById('ctrl-modal').classList.add('open');
+      document.getElementById('ctrl-modal').removeAttribute('aria-hidden');
+    }
+
+    function closeControlModal() {
+      document.getElementById('ctrl-modal').classList.remove('open');
+      document.getElementById('ctrl-modal').setAttribute('aria-hidden','true');
+    }
+
+    async function saveControl() {
+      const ctrl_id = document.getElementById('ctrl-modal').dataset.controlId;
+      const body = {
+        estado:      document.getElementById('ctrl-modal-estado').value,
+        responsable: document.getElementById('ctrl-modal-resp').value,
+        comentarios: document.getElementById('ctrl-modal-comments').value,
+      };
+      try {
+        await authedFetch('/controls/' + _controlesMarco + '/' + encodeURIComponent(ctrl_id), { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        closeControlModal();
+        loadControles(_controlesMarco);
+      } catch(e) { alert('Error guardando: ' + e.message); }
+    }
+
+    async function downloadTemplate() {
+      const ctrl_id = document.getElementById('ctrl-modal').dataset.controlId;
+      try {
+        const r = await authedFetch('/controls/' + _controlesMarco + '/' + encodeURIComponent(ctrl_id) + '/template');
+        const d = await r.json();
+        const blob = new Blob([d.plantilla], {type:'text/markdown'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = ctrl_id.replace(/[^a-z0-9]/gi,'_') + '_plantilla.md';
+        a.click();
+      } catch(e) { alert('Error descargando plantilla: ' + e.message); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       ROADMAP — Gestión de vulnerabilidades con fechas límite
+       ═══════════════════════════════════════════════════════════════════ */
+    function loadRoadmap() {
+      const el = document.getElementById('roadmap-body');
+      if (el) el.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--fg-4)">Cargando…</td></tr>';
+      authedFetch('/vuln-roadmap?estado=all')
+        .then(r => r.json())
+        .then(data => renderRoadmap(data.items || []))
+        .catch(e => { if (el) el.innerHTML = '<tr><td colspan="7" style="color:var(--sev-critica)">Error: ' + e.message + '</td></tr>'; });
+    }
+
+    function renderRoadmap(items) {
+      const el = document.getElementById('roadmap-body');
+      if (!el) return;
+      const SEV = {'critica':['var(--sev-critica)','var(--sev-critica-bg)'],'alta':['var(--sev-alta)','var(--sev-alta-bg)'],'media':['var(--sev-media)','var(--sev-media-bg)'],'baja':['var(--sev-baja)','var(--sev-baja-bg)'],'informativa':['var(--sev-info)','var(--sev-info-bg)']};
+      const EST = {'activo':'🔴 Activo','en_progreso':'🟡 En progreso','solucionado':'✅ Resuelto'};
+      if (!items.length) { el.innerHTML = '<tr><td colspan="7" style="padding:24px;color:var(--fg-4)">Sin vulnerabilidades registradas.</td></tr>'; return; }
+      el.innerHTML = items.map(v => {
+        const [col,bg] = SEV[v.criticidad] || SEV['media'];
+        const dias = v.dias_restantes;
+        let diasTxt = '—', diasColor = 'var(--fg-3)';
+        if (dias !== null && dias !== undefined) {
+          diasTxt = dias < 0 ? `Vencido (${Math.abs(dias)}d)` : `${dias}d`;
+          diasColor = dias < 0 ? 'var(--sev-critica)' : (dias < 7 ? 'var(--sev-alta)' : 'var(--sev-baja)');
+        }
+        const fl = v.fecha_limite ? v.fecha_limite.slice(0,10) : '—';
+        return `<tr>
+          <td style="font-family:var(--font-mono);font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${v.nombre}">${v.nombre}</td>
+          <td><span style="padding:2px 8px;border-radius:var(--r-pill);font-size:11px;font-weight:500;color:${col};background:${bg}">${v.criticidad}</span></td>
+          <td style="font-size:12px">${EST[v.estado]||v.estado}</td>
+          <td style="font-family:var(--font-mono);font-size:11px;color:var(--fg-3)">${v.fecha_deteccion?v.fecha_deteccion.slice(0,10):'—'}</td>
+          <td><input type="date" value="${v.fecha_limite?v.fecha_limite.slice(0,10):''}" style="font-family:var(--font-mono);font-size:11px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:2px 6px;background:var(--surface-1);color:var(--fg-1)" onchange="updateTimeline('${v.id_hallazgo}',this.value,document.getElementById('prop-${v.id_hallazgo}')?document.getElementById('prop-${v.id_hallazgo}').value:'')"></td>
+          <td><input id="prop-${v.id_hallazgo}" type="text" value="${v.propietario||''}" placeholder="Responsable" style="font-size:11px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:2px 6px;background:var(--surface-1);color:var(--fg-1);width:100px" onblur="updateTimeline('${v.id_hallazgo}',document.querySelector('[onchange*=${JSON.stringify(v.id_hallazgo)}]')?.value||'',this.value)"></td>
+          <td style="font-family:var(--font-mono);font-size:11px;font-weight:500;color:${diasColor}">${diasTxt}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function updateTimeline(id, fecha, propietario) {
+      authedFetch('/findings/' + id + '/timeline', {
+        method:'PATCH', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ fecha_limite: fecha || null, propietario: propietario || '' })
+      }).then(() => loadRoadmap()).catch(e => console.error('timeline error', e));
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       EVIDENCIAS — Panel de evidencias por control
+       ═══════════════════════════════════════════════════════════════════ */
+    function loadEvidencias() {
+      const el = document.getElementById('evidencias-grid');
+      if (el) el.innerHTML = '<p style="color:var(--fg-4);padding:24px">Cargando…</p>';
+      authedFetch('/evidence-panel')
+        .then(r => r.json())
+        .then(data => renderEvidencias(data.cards || []))
+        .catch(e => { if (el) el.innerHTML = '<p style="color:var(--sev-critica)">Error: ' + e.message + '</p>'; });
+    }
+
+    function renderEvidencias(cards) {
+      const el = document.getElementById('evidencias-grid');
+      if (!el) return;
+      const COV = {'verde':'var(--sev-baja)','amarillo':'var(--sev-alta)','rojo':'var(--sev-critica)','sin_datos':'var(--fg-4)'};
+      const COV_BG = {'verde':'var(--sev-baja-bg)','amarillo':'var(--sev-alta-bg)','rojo':'var(--sev-critica-bg)','sin_datos':'var(--surface-3)'};
+      if (!cards.length) { el.innerHTML = '<p style="color:var(--fg-4);padding:24px">Sin evidencias registradas. Ingesta hallazgos primero.</p>'; return; }
+      el.innerHTML = cards.filter(c=>c.cobertura!=='sin_datos'||c.total_evidencias>0).map(c => `
+        <div style="background:var(--surface-1);border:1px solid var(--line-1);border-radius:var(--r-3);padding:var(--s-4)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--s-2)">
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">${c.control_id}</span>
+            <span style="width:10px;height:10px;border-radius:50%;background:${COV[c.cobertura]||COV['sin_datos']};flex-shrink:0;margin-top:2px"></span>
+          </div>
+          <div style="font-size:12px;font-weight:500;color:var(--fg-1);margin-bottom:var(--s-2);line-height:1.3">${c.titulo}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:var(--s-2)">
+            ${(c.fuentes_activas||[]).map(f=>`<span style="font-family:var(--font-mono);font-size:10px;padding:1px 6px;border-radius:var(--r-pill);background:${COV_BG[c.cobertura]||'var(--surface-3)'};color:${COV[c.cobertura]||'var(--fg-3)'}">${f}</span>`).join('')||'<span style="font-size:11px;color:var(--fg-4)">Sin evidencias</span>'}
+          </div>
+          <div style="font-size:11px;color:var(--fg-4)">${c.total_evidencias} evento${c.total_evidencias!==1?'s':''} · ${c.ultimo_evento?c.ultimo_evento.slice(0,10):'—'}</div>
+        </div>
+      `).join('');
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       GAP — Pre-gap análisis automatizado
+       ═══════════════════════════════════════════════════════════════════ */
+    let _gapMarco = 'iso_27001_2022';
+
+    async function runGapAnalysis() {
+      const btn = document.getElementById('btn-gap');
+      if (btn) { btn.disabled = true; btn.textContent = 'Analizando…'; }
+      const el = document.getElementById('gap-body');
+      if (el) el.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--fg-4)">Analizando controles con LLM…</td></tr>';
+      try {
+        const r = await authedFetch('/gap-analysis/' + _gapMarco, { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
+        const data = await r.json();
+        renderGap(data);
+        document.getElementById('gap-summary').innerHTML =
+          `<span style="color:var(--sev-baja)">✅ Cumple: ${data.cumple}</span> &nbsp;
+           <span style="color:var(--sev-media)">⚠ Parcial: ${data.parcial}</span> &nbsp;
+           <span style="color:var(--sev-critica)">✗ No cumple: ${data.no_cumple}</span> &nbsp;
+           <span style="color:var(--fg-4)">? Sin datos: ${data.sin_datos}</span> &nbsp;
+           <strong style="color:var(--accent)">${data.porcentaje_cumplimiento}% cumplimiento</strong>`;
+      } catch(e) {
+        if (el) el.innerHTML = '<tr><td colspan="5" style="color:var(--sev-critica)">Error: ' + e.message + '</td></tr>';
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Analizar con mis datos'; }
+      }
+    }
+
+    function renderGap(data) {
+      const el = document.getElementById('gap-body');
+      if (!el) return;
+      const RESP = {
+        'cumple':    ['var(--sev-baja)',    'var(--sev-baja-bg)',    '✅ Cumple'],
+        'parcial':   ['var(--sev-media)',   'var(--sev-media-bg)',   '⚠ Parcial'],
+        'no_cumple': ['var(--sev-critica)', 'var(--sev-critica-bg)','✗ No cumple'],
+        'sin_datos': ['var(--fg-3)',        'var(--surface-3)',      '? Sin datos'],
+      };
+      el.innerHTML = (data.controles||[]).map(c => {
+        const [col,bg,lbl] = RESP[c.respuesta] || RESP['sin_datos'];
+        const conf = Math.round((c.confianza||0)*100);
+        return `<tr>
+          <td style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">${c.control_id}</td>
+          <td style="font-size:12px">${c.titulo}</td>
+          <td><span style="padding:2px 8px;border-radius:var(--r-pill);font-size:11px;font-weight:500;color:${col};background:${bg}">${lbl}</span></td>
+          <td style="font-size:11px;color:var(--fg-3)">${conf}%</td>
+          <td style="font-size:11px;color:var(--fg-3);max-width:200px">${c.justificacion}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       PLAN DIRECTOR
+       ═══════════════════════════════════════════════════════════════════ */
+    let _planMarco = 'iso_27001_2022';
+
+    async function runPlanDirector() {
+      const btn = document.getElementById('btn-plan');
+      if (btn) { btn.disabled = true; btn.textContent = 'Generando…'; }
+      const el = document.getElementById('plan-body');
+      if (el) el.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--fg-4)">Generando plan con LLM…</td></tr>';
+      const tarifa = parseFloat(document.getElementById('plan-tarifa')?.value || '450');
+      try {
+        const r = await authedFetch('/plan-director/' + _planMarco + '?tarifa_dia=' + tarifa, { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
+        const data = await r.json();
+        renderPlan(data);
+        document.getElementById('plan-summary').innerHTML =
+          `<strong>${data.total_acciones}</strong> acciones ·
+           <strong>${data.total_personas_dia}</strong> personas-día ·
+           <strong>€${data.total_coste_eur.toLocaleString()}</strong> estimado`;
+        document.getElementById('plan-resumen').textContent = data.resumen_ejecutivo || '';
+      } catch(e) {
+        if (el) el.innerHTML = '<tr><td colspan="6" style="color:var(--sev-critica)">Error: ' + e.message + '</td></tr>';
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Generar Plan Director'; }
+      }
+    }
+
+    function renderPlan(data) {
+      const el = document.getElementById('plan-body');
+      if (!el) return;
+      const PRIO = {'critica':['var(--sev-critica)','var(--sev-critica-bg)'],'alta':['var(--sev-alta)','var(--sev-alta-bg)'],'media':['var(--sev-media)','var(--sev-media-bg)'],'baja':['var(--sev-baja)','var(--sev-baja-bg)']};
+      el.innerHTML = (data.acciones||[]).map(a => {
+        const [col,bg] = PRIO[a.prioridad] || PRIO['media'];
+        const cubierto = a.cubierto_por_herramienta ? `<span style="font-size:10px;color:var(--sev-baja);background:var(--sev-baja-bg);padding:1px 5px;border-radius:var(--r-pill)">✅ ${a.cubierto_por_herramienta}</span>` : '';
+        return `<tr>
+          <td style="font-size:12px;font-weight:500">${a.titulo} ${cubierto}</td>
+          <td style="font-size:11px;color:var(--fg-3)">${a.categoria}</td>
+          <td><span style="padding:2px 8px;border-radius:var(--r-pill);font-size:11px;font-weight:500;color:${col};background:${bg}">${a.prioridad}</span></td>
+          <td style="font-family:var(--font-mono);font-size:11px;text-align:right">${a.personas_dia}d</td>
+          <td style="font-family:var(--font-mono);font-size:11px;text-align:right;color:var(--accent)">€${a.coste_estimado_eur.toLocaleString()}</td>
+          <td style="font-size:11px;color:var(--fg-3)">${(a.controles_relacionados||[]).join(', ')}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       RIESGOS — Análisis de riesgos por activo
+       ═══════════════════════════════════════════════════════════════════ */
+    async function runRiskAnalysis() {
+      const btn = document.getElementById('btn-risk');
+      if (btn) { btn.disabled = true; btn.textContent = 'Analizando…'; }
+      const el = document.getElementById('risk-body');
+      if (el) el.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--fg-4)">Analizando riesgos con LLM…</td></tr>';
+      try {
+        const r = await authedFetch('/risk-analysis', { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
+        const data = await r.json();
+        renderRisk(data);
+        document.getElementById('risk-summary').textContent =
+          data.total_activos + ' activos · riesgo promedio: ' + data.riesgo_promedio + '/25';
+      } catch(e) {
+        if (el) el.innerHTML = '<tr><td colspan="6" style="color:var(--sev-critica)">Error: ' + e.message + '</td></tr>';
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Generar análisis'; }
+      }
+    }
+
+    async function loadAssets() {
+      const el = document.getElementById('assets-list');
+      if (!el) return;
+      el.innerHTML = '<span style="color:var(--fg-4)">Cargando activos…</span>';
+      try {
+        const r = await authedFetch('/assets');
+        const d = await r.json();
+        el.innerHTML = (d.activos||[]).map(a=>`<span style="font-family:var(--font-mono);font-size:11px;padding:2px 8px;border-radius:var(--r-pill);background:var(--surface-3);color:var(--fg-2)">${a.nombre} <span style="color:var(--fg-4)">(${a.hallazgos_count})</span></span>`).join(' ');
+      } catch(e) { el.innerHTML = '<span style="color:var(--sev-critica)">Error cargando activos</span>'; }
+    }
+
+    function renderRisk(data) {
+      const el = document.getElementById('risk-body');
+      if (!el) return;
+      function riskColor(r) {
+        if (r >= 17) return ['var(--sev-critica)','var(--sev-critica-bg)'];
+        if (r >= 10) return ['var(--sev-alta)',   'var(--sev-alta-bg)'];
+        if (r >= 5)  return ['var(--sev-media)',  'var(--sev-media-bg)'];
+        return              ['var(--sev-baja)',   'var(--sev-baja-bg)'];
+      }
+      el.innerHTML = (data.entradas||[]).map(e => {
+        const [col,bg] = riskColor(e.riesgo);
+        return `<tr>
+          <td style="font-family:var(--font-mono);font-size:11px">${e.activo}</td>
+          <td style="font-size:11px;color:var(--fg-3)">${(e.amenazas||[]).join(', ')}</td>
+          <td style="text-align:center;font-family:var(--font-mono)">${e.probabilidad}</td>
+          <td style="text-align:center;font-family:var(--font-mono)">${e.impacto}</td>
+          <td><span style="padding:3px 10px;border-radius:var(--r-pill);font-size:12px;font-weight:600;color:${col};background:${bg}">${e.riesgo}</span></td>
+          <td style="font-size:11px;color:var(--fg-3)">${e.tratamiento}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    /* ── switchTab extension for new tabs ── */
+    const _origSwitchTab = switchTab;
+    switchTab = function(name, btn) {
+      _origSwitchTab(name, btn);
+      if (name === 'controles')  loadControles(_controlesMarco);
+      if (name === 'roadmap')    loadRoadmap();
+      if (name === 'evidencias') loadEvidencias();
+      if (name === 'riesgos')    loadAssets();
+    };
   </script>
+
+  <!-- ═══════════════ TAB PANELS: nuevas secciones gestión ══════════════ -->
+
+  <!-- CONTROLES -->
+  <div id="tab-controles" class="tab-panel" style="display:none">
+    <div class="page-intro">
+      <h1>Catálogo de Controles</h1>
+      <p class="lead">Visualiza, asigna responsables y gestiona el estado de cada control normativo.</p>
+    </div>
+    <div class="content">
+      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-4);flex-wrap:wrap">
+        <select id="ctrl-marco-sel" onchange="_controlesMarco=this.value;loadControles(this.value)" style="font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 10px;background:var(--surface-1);color:var(--fg-1)">
+          <option value="iso_27001_2022">ISO 27001:2022</option>
+          <option value="ens_2022">ENS 2022</option>
+        </select>
+        <button class="btn" onclick="loadControles(_controlesMarco)">↺ Actualizar</button>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Control</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Título</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:110px">Estado</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:130px">Responsable</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:80px;text-align:center">Evidencias</th>
+        </tr></thead>
+        <tbody id="controles-body" style="font-size:13px"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODAL CONTROL -->
+  <div id="ctrl-modal" class="modal-overlay" aria-hidden="true" onclick="if(event.target===this)closeControlModal()">
+    <div class="modal-box" style="max-width:560px" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--s-4)">
+        <div>
+          <span id="ctrl-modal-id" style="font-family:var(--font-mono);font-size:11px;color:var(--accent);display:block;margin-bottom:4px"></span>
+          <h2 id="ctrl-modal-title" style="font-size:15px;font-weight:600;color:var(--fg-1)"></h2>
+        </div>
+        <button class="modal-close" onclick="closeControlModal()" aria-label="Cerrar">&times;</button>
+      </div>
+      <p id="ctrl-modal-desc" style="font-size:12px;color:var(--fg-3);margin-bottom:var(--s-4);line-height:1.5"></p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3);margin-bottom:var(--s-3)">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--fg-3);display:block;margin-bottom:4px">Estado</label>
+          <select id="ctrl-modal-estado" style="width:100%;font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:6px 8px;background:var(--surface-1);color:var(--fg-1)">
+            <option value="no_aplica">No aplica</option>
+            <option value="no_cumple">No cumple</option>
+            <option value="parcial">Parcial</option>
+            <option value="cumple">Cumple</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--fg-3);display:block;margin-bottom:4px">Responsable</label>
+          <input id="ctrl-modal-resp" type="text" placeholder="Nombre o rol" style="width:100%;font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:6px 8px;background:var(--surface-1);color:var(--fg-1)">
+        </div>
+      </div>
+      <div style="margin-bottom:var(--s-3)">
+        <label style="font-size:11px;font-weight:600;color:var(--fg-3);display:block;margin-bottom:4px">Comentarios</label>
+        <textarea id="ctrl-modal-comments" rows="3" style="width:100%;font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:6px 8px;background:var(--surface-1);color:var(--fg-1);resize:vertical"></textarea>
+      </div>
+      <div style="margin-bottom:var(--s-4)">
+        <div style="font-size:11px;font-weight:600;color:var(--fg-3);margin-bottom:6px">Evidencias vinculadas</div>
+        <ul id="ctrl-modal-ev" style="list-style:none;display:flex;flex-wrap:wrap;gap:4px"></ul>
+      </div>
+      <div style="display:flex;gap:var(--s-3)">
+        <button class="btn" onclick="saveControl()">Guardar</button>
+        <button class="btn btn--ghost" onclick="downloadTemplate()">↓ Descargar plantilla</button>
+        <button class="btn btn--ghost" onclick="closeControlModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROADMAP -->
+  <div id="tab-roadmap" class="tab-panel" style="display:none">
+    <div class="page-intro">
+      <h1>Roadmap de Vulnerabilidades</h1>
+      <p class="lead">Cronograma de gestión de vulnerabilidades con fechas límite y propietarios.</p>
+    </div>
+    <div class="content">
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Vulnerabilidad</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Criticidad</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:110px">Estado</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:95px">Detectado</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:130px">Fecha límite</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:120px">Propietario</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:100px">Días restantes</th>
+        </tr></thead>
+        <tbody id="roadmap-body" style="font-size:13px"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EVIDENCIAS -->
+  <div id="tab-evidencias" class="tab-panel" style="display:none">
+    <div class="page-intro">
+      <h1>Panel de Evidencias</h1>
+      <p class="lead">Cada herramienta vinculada a su control normativo. Verde = 2+ fuentes, Amarillo = 1 fuente, Rojo = sin evidencia.</p>
+    </div>
+    <div class="content">
+      <button class="btn" onclick="loadEvidencias()" style="margin-bottom:var(--s-4)">↺ Actualizar panel</button>
+      <div id="evidencias-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--s-3)"></div>
+    </div>
+  </div>
+
+  <!-- GAP -->
+  <div id="tab-gap" class="tab-panel" style="display:none">
+    <div class="page-intro">
+      <h1>Pre-Gap Análisis</h1>
+      <p class="lead">Análisis automático de cumplimiento basado en los hallazgos de la sesión.</p>
+    </div>
+    <div class="content">
+      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-3);flex-wrap:wrap">
+        <select id="gap-marco-sel" onchange="_gapMarco=this.value" style="font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 10px;background:var(--surface-1);color:var(--fg-1)">
+          <option value="iso_27001_2022">ISO 27001:2022</option>
+          <option value="ens_2022">ENS 2022</option>
+        </select>
+        <button id="btn-gap" class="btn" onclick="runGapAnalysis()">Analizar con mis datos</button>
+      </div>
+      <div id="gap-summary" style="font-size:13px;margin-bottom:var(--s-4);color:var(--fg-3)"></div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Control</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Título</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:110px">Respuesta</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:70px">Confianza</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Justificación</th>
+        </tr></thead>
+        <tbody id="gap-body" style="font-size:13px"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PLAN DIRECTOR -->
+  <div id="tab-plan" class="tab-panel" style="display:none">
+    <div class="page-intro">
+      <h1>Plan Director de Seguridad</h1>
+      <p class="lead">Acciones priorizadas con estimación de esfuerzo y presupuesto.</p>
+    </div>
+    <div class="content">
+      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-3);flex-wrap:wrap">
+        <select id="plan-marco-sel" onchange="_planMarco=this.value" style="font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 10px;background:var(--surface-1);color:var(--fg-1)">
+          <option value="iso_27001_2022">ISO 27001:2022</option>
+          <option value="ens_2022">ENS 2022</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:6px">
+          <label style="font-size:11px;color:var(--fg-3)">€/día</label>
+          <input id="plan-tarifa" type="number" value="450" min="1" style="width:70px;font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 8px;background:var(--surface-1);color:var(--fg-1)">
+        </div>
+        <button id="btn-plan" class="btn" onclick="runPlanDirector()">Generar Plan Director</button>
+      </div>
+      <div id="plan-summary" style="font-size:13px;font-weight:500;color:var(--accent);margin-bottom:var(--s-2)"></div>
+      <p id="plan-resumen" style="font-size:12px;color:var(--fg-3);margin-bottom:var(--s-4);font-style:italic"></p>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Acción</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Categoría</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:80px">Prioridad</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:80px;text-align:right">Pers.-día</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px;text-align:right">Coste</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Controles</th>
+        </tr></thead>
+        <tbody id="plan-body" style="font-size:13px"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RIESGOS -->
+  <div id="tab-riesgos" class="tab-panel" style="display:none">
+    <div class="page-intro">
+      <h1>Análisis de Riesgos</h1>
+      <p class="lead">Activos detectados → amenazas automáticas → riesgo P×I (escala 1-25).</p>
+    </div>
+    <div class="content">
+      <div style="margin-bottom:var(--s-3)">
+        <div style="font-size:11px;font-weight:600;color:var(--fg-3);margin-bottom:6px">Activos en sesión</div>
+        <div id="assets-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:var(--s-4)"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-3)">
+        <button id="btn-risk" class="btn" onclick="runRiskAnalysis()">Generar análisis</button>
+        <span id="risk-summary" style="font-size:12px;color:var(--fg-3)"></span>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Activo</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Amenazas</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:50px;text-align:center">P</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:50px;text-align:center">I</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:70px">Riesgo</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Tratamiento</th>
+        </tr></thead>
+        <tbody id="risk-body" style="font-size:13px"></tbody>
+      </table>
+    </div>
+  </div>
 
 </body>
 </html>"""

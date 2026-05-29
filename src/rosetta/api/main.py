@@ -9,7 +9,7 @@ import tempfile
 import uuid
 from collections.abc import AsyncIterator, Iterable, MutableSequence
 from contextlib import asynccontextmanager
-from typing import Annotated, Any
+from typing import Annotated, Any, cast
 
 import structlog
 from dotenv import load_dotenv
@@ -38,16 +38,22 @@ from rosetta.api.auth import (
     verify_credentials,
 )
 from rosetta.api.dashboard import HTML_DASHBOARD
-from rosetta.api.deps import DiffAnalyzerDep, FindingsDep, GrafoDep, TraductorDep
+from rosetta.api.deps import ControlStoreDep, DiffAnalyzerDep, FindingsDep, GrafoDep, TraductorDep
 from rosetta.api.schemas import (
+    AccionPlan,
     AlertaBlueItem,
+    AssetItem,
+    AssetsResponse,
     AuditStartRequest,
     AuditStartResponse,
     AuditStatusResponse,
     BlueIngestRequest,
     BlueIngestResponse,
     ComplianceStateResponse,
+    ControlsListResponse,
+    ControlStatusItem,
     ControlSummary,
+    ControlUpdate,
     CopilotApiResponse,
     CopilotRequest,
     DiffAnalysisRequest,
@@ -55,17 +61,27 @@ from rosetta.api.schemas import (
     DiffViolationItem,
     DriftRequest,
     DriftResponse,
+    EvidencePanelCard,
+    EvidencePanelResponse,
     FindingEstadoUpdate,
     FindingItem,
     FindingsResponse,
+    GapAnalysisResponse,
+    GapControlResult,
     IngestPdfResponse,
     LoginRequest,
+    PlanDirectorResponse,
     RefreshRequest,
     ReportGenerateRequest,
     ReportGenerateResponse,
+    RiskAnalysisResponse,
+    RiskEntry,
     StatsResponse,
+    TimelineUpdate,
     TokenResponse,
     TranslateRequest,
+    VulnRoadmapItem,
+    VulnRoadmapResponse,
 )
 from rosetta.core.diff_analyzer import DiffAnalysisResult, DiffViolation
 from rosetta.core.models import (
@@ -109,6 +125,12 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
     db_path = os.getenv("ROSETTA_SESSION_DB", ".rosetta_sessions.db")
     _app.state.session_findings = SessionStore(db_path=db_path)
+
+    from rosetta.core.control_store import ControlStore
+
+    ctrl_db_path = os.getenv("ROSETTA_CONTROLS_DB", ".rosetta_controls.db")
+    _app.state.control_store = ControlStore(db_path=ctrl_db_path)
+
     _app.state.audits = {}  # dict[str, ResultadoAuditoria]
     _app.state.audit_queues = {}  # dict[str, asyncio.Queue[ProgresoAuditoria | None]]
     _app.state.audit_events = {}  # dict[str, list[dict[str, Any]]]
@@ -136,6 +158,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     if _app.state.grafo is not None:
         _app.state.grafo.cerrar()
     _app.state.session_findings.close()
+    _app.state.control_store.close()
     logger.info("rosetta_api_stopping")
 
 
@@ -329,18 +352,16 @@ async def list_findings(
     all_items: list[HallazgoMaestro] = list(findings)
 
     # Date filter
+    import contextlib
+
     if desde:
-        try:
+        with contextlib.suppress(ValueError):
             d_from = datetime.fromisoformat(desde)
             all_items = [m for m in all_items if m.timestamp >= d_from]
-        except ValueError:
-            pass
     if hasta:
-        try:
+        with contextlib.suppress(ValueError):
             d_to = datetime.fromisoformat(hasta)
             all_items = [m for m in all_items if m.timestamp <= d_to]
-        except ValueError:
-            pass
 
     # Estado filter (default: excluye solucionados)
     estado_filter = estado or "active_or_progress"
@@ -1275,3 +1296,839 @@ async def graph_data(
             }
 
     return {"nodes": nodes, "edges": edges}
+
+
+# ---------------------------------------------------------------------------
+# Controls Catalog — P1
+# ---------------------------------------------------------------------------
+
+
+@app.get("/controls/{marco}", response_model=ControlsListResponse, tags=["controls"])
+async def list_controls(
+    marco: str,
+    ctrl_store: ControlStoreDep,
+    findings: FindingsDep,
+) -> ControlsListResponse:
+    """Lista todos los controles del marco con su estado de cumplimiento actual.
+
+    Cruza el catálogo estático con los estados guardados en ControlStore y con
+    los hallazgos de la sesión para calcular evidencias vinculadas.
+    """
+    from rosetta.core.tool_control_map import get_controls_catalog
+
+    catalog = get_controls_catalog(marco)
+    if not catalog:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Marco {marco!r} no disponible. Catálogos: iso_27001_2022, ens_2022.",
+        )
+
+    estados_map = ctrl_store.get_all_estados(marco)
+
+    # Calcular evidencias vinculadas: hallazgos con ese control incumplido
+    ctrl_evidencias: dict[str, list[str]] = {}
+    for m in findings:
+        if m.compliance_data:
+            for ctrl_id in m.compliance_data.controles_incumplidos:
+                ctrl_evidencias.setdefault(ctrl_id, []).append(m.id_hallazgo)
+
+    controles: list[ControlStatusItem] = []
+    for c in catalog:
+        ctrl_id = c["id"]
+        estado_data = estados_map.get(ctrl_id, {})
+        controles.append(
+            ControlStatusItem(
+                control_id=ctrl_id,
+                marco=marco,
+                titulo=c["titulo"],
+                descripcion=c["descripcion"],
+                estado=estado_data.get("estado", "no_aplica"),
+                responsable=estado_data.get("responsable", ""),
+                comentarios=estado_data.get("comentarios", ""),
+                evidencias_vinculadas=ctrl_evidencias.get(ctrl_id, []),
+                updated_at=estado_data.get("updated_at", ""),
+            )
+        )
+
+    return ControlsListResponse(marco=marco, total=len(controles), controles=controles)
+
+
+@app.get(
+    "/controls/{marco}/{control_id}",
+    response_model=ControlStatusItem,
+    tags=["controls"],
+)
+async def get_control(
+    marco: str,
+    control_id: str,
+    ctrl_store: ControlStoreDep,
+    findings: FindingsDep,
+) -> ControlStatusItem:
+    """Devuelve el detalle completo de un control con evidencias vinculadas."""
+    from rosetta.core.tool_control_map import get_controls_catalog
+
+    catalog = get_controls_catalog(marco)
+    ctrl_meta = next((c for c in catalog if c["id"] == control_id), None)
+    if not ctrl_meta:
+        raise HTTPException(
+            status_code=404, detail=f"Control {control_id!r} no encontrado en {marco!r}."
+        )
+
+    estado_data = ctrl_store.get_estado(marco, control_id)
+
+    evidencias = [
+        m.id_hallazgo
+        for m in findings
+        if m.compliance_data and control_id in m.compliance_data.controles_incumplidos
+    ]
+
+    return ControlStatusItem(
+        control_id=control_id,
+        marco=marco,
+        titulo=ctrl_meta["titulo"],
+        descripcion=ctrl_meta["descripcion"],
+        estado=estado_data["estado"],
+        responsable=estado_data["responsable"],
+        comentarios=estado_data["comentarios"],
+        evidencias_vinculadas=evidencias,
+        updated_at=estado_data["updated_at"],
+    )
+
+
+@app.patch(
+    "/controls/{marco}/{control_id}",
+    response_model=ControlStatusItem,
+    tags=["controls"],
+)
+async def update_control(
+    marco: str,
+    control_id: str,
+    body: ControlUpdate,
+    ctrl_store: ControlStoreDep,
+    findings: FindingsDep,
+) -> ControlStatusItem:
+    """Actualiza estado, responsable o comentarios de un control normativo."""
+    from rosetta.core.tool_control_map import get_controls_catalog
+
+    catalog = get_controls_catalog(marco)
+    ctrl_meta = next((c for c in catalog if c["id"] == control_id), None)
+    if not ctrl_meta:
+        raise HTTPException(
+            status_code=404, detail=f"Control {control_id!r} no encontrado en {marco!r}."
+        )
+
+    current = ctrl_store.get_estado(marco, control_id)
+    new_estado = body.estado if body.estado is not None else current["estado"]
+    new_responsable = body.responsable if body.responsable is not None else current["responsable"]
+    new_comentarios = body.comentarios if body.comentarios is not None else current["comentarios"]
+
+    try:
+        ctrl_store.set_estado(marco, control_id, new_estado, new_responsable, new_comentarios)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    evidencias = [
+        m.id_hallazgo
+        for m in findings
+        if m.compliance_data and control_id in m.compliance_data.controles_incumplidos
+    ]
+    updated = ctrl_store.get_estado(marco, control_id)
+
+    return ControlStatusItem(
+        control_id=control_id,
+        marco=marco,
+        titulo=ctrl_meta["titulo"],
+        descripcion=ctrl_meta["descripcion"],
+        estado=updated["estado"],
+        responsable=updated["responsable"],
+        comentarios=updated["comentarios"],
+        evidencias_vinculadas=evidencias,
+        updated_at=updated["updated_at"],
+    )
+
+
+@app.get(
+    "/controls/{marco}/{control_id}/template",
+    tags=["controls"],
+)
+async def get_control_template(
+    marco: str,
+    control_id: str,
+    ctrl_store: ControlStoreDep,
+    traductor: TraductorDep,
+) -> dict[str, str]:
+    """Devuelve una plantilla de procedimiento para cumplir el control.
+
+    Si no está en caché, la genera vía LLM y la cachea para peticiones futuras.
+    """
+    from rosetta.core.tool_control_map import get_controls_catalog
+
+    catalog = get_controls_catalog(marco)
+    ctrl_meta = next((c for c in catalog if c["id"] == control_id), None)
+    titulo = ctrl_meta["titulo"] if ctrl_meta else control_id
+    descripcion = ctrl_meta["descripcion"] if ctrl_meta else ""
+
+    cached = ctrl_store.get_plantilla(marco, control_id)
+    if cached:
+        return {"control_id": control_id, "marco": marco, "plantilla": cached}
+
+    # Generar con LLM
+    prompt = (
+        f"Genera una plantilla de procedimiento de seguridad en español para cumplir con el "
+        f"control normativo '{control_id} — {titulo}' del marco {marco}.\n\n"
+        f"Descripción del control: {descripcion}\n\n"
+        f"La plantilla debe incluir: Objetivo, Alcance, Responsables, Procedimiento paso a paso, "
+        f"Registros requeridos, y Criterios de cumplimiento. "
+        f"Formato Markdown. Máximo 600 palabras."
+    )
+    try:
+        from rosetta.llm.base import Message as _LLMMsg
+
+        result = await traductor.llm.completar(
+            system="Eres un experto en normativa de ciberseguridad. Redacta plantillas de procedimientos claros y concisos.",
+            messages=[_LLMMsg(role="user", content=prompt)],
+        )
+        plantilla = result.content or ""
+        if not plantilla:
+            raise ValueError("LLM devolvio contenido vacio")
+    except Exception as exc:
+        logger.error("template_generation_error", error=str(exc))
+        plantilla = (
+            f"# Plantilla: {control_id} — {titulo}\n\n"
+            f"> Generación automática no disponible. Descripción: {descripcion}\n\n"
+            "## Objetivo\n\n## Alcance\n\n## Responsables\n\n"
+            "## Procedimiento\n\n## Registros\n\n## Criterios de cumplimiento\n"
+        )
+
+    ctrl_store.set_plantilla(marco, control_id, plantilla)
+    return {"control_id": control_id, "marco": marco, "plantilla": plantilla}
+
+
+# ---------------------------------------------------------------------------
+# Vuln Roadmap — P2
+# ---------------------------------------------------------------------------
+
+
+@app.get("/vuln-roadmap", response_model=VulnRoadmapResponse, tags=["roadmap"])
+async def vuln_roadmap(
+    findings: FindingsDep,
+    ctrl_store: ControlStoreDep,
+    estado: str | None = Query(
+        None, description="Filtra por estado: activo|en_progreso|solucionado"
+    ),
+    criticidad: str | None = Query(
+        None, description="Filtra por criticidad: baja|media|alta|critica"
+    ),
+) -> VulnRoadmapResponse:
+    """Roadmap de gestión de vulnerabilidades con fechas límite y propietarios."""
+    from datetime import datetime as dt
+
+    estados_map = _get_estados_map(findings)
+    timelines = ctrl_store.get_all_timelines()
+    hoy = dt.utcnow()
+
+    items: list[VulnRoadmapItem] = []
+    for m in findings:
+        estado_hallazgo = estados_map.get(m.id_hallazgo, "activo")
+        if estado and estado_hallazgo != estado:
+            continue
+
+        compliance = m.compliance_data
+        criticidad_val = compliance.impacto_legal.value if compliance else "media"
+        if criticidad and criticidad_val != criticidad:
+            continue
+
+        tl = timelines.get(m.id_hallazgo, {})
+        fecha_limite = tl.get("fecha_limite")
+        propietario = tl.get("propietario", "") or ""
+
+        dias_restantes: int | None = None
+        if fecha_limite:
+            import contextlib
+
+            with contextlib.suppress(ValueError):
+                fl_dt = dt.fromisoformat(fecha_limite)
+                dias_restantes = (fl_dt - hoy).days
+
+        nombre = f"{m.red_team_data.activo_detectado} — {m.red_team_data.origen.value}"
+        marcos = [mm.value for mm in compliance.marcos_aplicables] if compliance else []
+        controles = list(compliance.controles_incumplidos) if compliance else []
+
+        items.append(
+            VulnRoadmapItem(
+                id_hallazgo=m.id_hallazgo,
+                nombre=nombre,
+                criticidad=criticidad_val,
+                estado=estado_hallazgo,
+                fecha_deteccion=m.timestamp,
+                fecha_limite=fecha_limite,
+                propietario=propietario,
+                dias_restantes=dias_restantes,
+                marcos=marcos,
+                controles=controles,
+            )
+        )
+
+    # Ordenar: primero vencidos, luego por criticidad desc
+    sev_order = {"critica": 4, "alta": 3, "media": 2, "baja": 1, "informativa": 0}
+    items.sort(
+        key=lambda x: (
+            x.dias_restantes if x.dias_restantes is not None else 9999,
+            -sev_order.get(x.criticidad, 0),
+        )
+    )
+
+    return VulnRoadmapResponse(total=len(items), items=items)
+
+
+@app.patch("/findings/{id_hallazgo}/timeline", response_model=VulnRoadmapItem, tags=["roadmap"])
+async def update_finding_timeline(
+    id_hallazgo: str,
+    body: TimelineUpdate,
+    findings: FindingsDep,
+    ctrl_store: ControlStoreDep,
+) -> VulnRoadmapItem:
+    """Actualiza la fecha límite de resolución y propietario de un hallazgo."""
+    from datetime import datetime as dt
+
+    maestro: HallazgoMaestro | None = None
+    for m in findings:
+        if m.id_hallazgo == id_hallazgo:
+            maestro = m
+            break
+    if maestro is None:
+        raise HTTPException(status_code=404, detail=f"Hallazgo {id_hallazgo!r} no encontrado.")
+
+    ctrl_store.set_timeline(id_hallazgo, body.fecha_limite, body.propietario)
+
+    estados_map = _get_estados_map(findings)
+    compliance = maestro.compliance_data
+    criticidad_val = compliance.impacto_legal.value if compliance else "media"
+    tl = ctrl_store.get_timeline(id_hallazgo)
+    fecha_limite = tl.get("fecha_limite")
+    hoy = dt.utcnow()
+    dias_restantes: int | None = None
+    if fecha_limite:
+        import contextlib
+
+        with contextlib.suppress(ValueError):
+            dias_restantes = (dt.fromisoformat(fecha_limite) - hoy).days
+
+    return VulnRoadmapItem(
+        id_hallazgo=id_hallazgo,
+        nombre=f"{maestro.red_team_data.activo_detectado} — {maestro.red_team_data.origen.value}",
+        criticidad=criticidad_val,
+        estado=estados_map.get(id_hallazgo, "activo"),
+        fecha_deteccion=maestro.timestamp,
+        fecha_limite=fecha_limite,
+        propietario=tl.get("propietario", "") or "",
+        dias_restantes=dias_restantes,
+        marcos=[mm.value for mm in compliance.marcos_aplicables] if compliance else [],
+        controles=list(compliance.controles_incumplidos) if compliance else [],
+    )
+
+
+# ---------------------------------------------------------------------------
+# Evidence Panel — P3
+# ---------------------------------------------------------------------------
+
+
+@app.get("/evidence-panel", response_model=EvidencePanelResponse, tags=["evidence"])
+async def evidence_panel(findings: FindingsDep) -> EvidencePanelResponse:
+    """Panel de evidencias: muestra qué controles están cubiertos por qué herramientas."""
+    from rosetta.core.tool_control_map import get_all_covered_controls, get_control_title
+
+    all_findings = list(findings)
+    covered = get_all_covered_controls()  # control_id → [fuentes]
+
+    # Construir mapa control → fuentes activas en la sesión + timestamps
+    ctrl_fuentes: dict[str, set[str]] = {}
+    ctrl_timestamps: dict[str, list[str]] = {}
+    ctrl_counts: dict[str, int] = {}
+
+    for m in all_findings:
+        fuente = m.red_team_data.origen.value.upper()
+        ts = m.timestamp.isoformat()
+        for ctrl_id, _ in __import__(
+            "rosetta.core.tool_control_map", fromlist=["get_controls_for_tool"]
+        ).get_controls_for_tool(fuente):
+            ctrl_fuentes.setdefault(ctrl_id, set()).add(fuente)
+            ctrl_timestamps.setdefault(ctrl_id, []).append(ts)
+            ctrl_counts[ctrl_id] = ctrl_counts.get(ctrl_id, 0) + 1
+
+    # También incluir controles incumplidos de los hallazgos traducidos
+    for m in all_findings:
+        if m.compliance_data:
+            fuente = m.red_team_data.origen.value.upper()
+            for ctrl_id in m.compliance_data.controles_incumplidos:
+                ctrl_fuentes.setdefault(ctrl_id, set()).add(fuente)
+                ctrl_timestamps.setdefault(ctrl_id, []).append(m.timestamp.isoformat())
+                ctrl_counts[ctrl_id] = ctrl_counts.get(ctrl_id, 0) + 1
+
+    # Unión: controles cubiertos por el mapa estático + controles detectados en hallazgos
+    all_ctrl_ids = set(covered.keys()) | set(ctrl_fuentes.keys())
+
+    cards: list[EvidencePanelCard] = []
+    for ctrl_id in sorted(all_ctrl_ids):
+        fuentes = sorted(ctrl_fuentes.get(ctrl_id, set()))
+        timestamps = sorted(ctrl_timestamps.get(ctrl_id, []), reverse=True)
+        ultimo = timestamps[0] if timestamps else None
+        n_fuentes = len(fuentes)
+        cobertura = "verde" if n_fuentes >= 2 else ("amarillo" if n_fuentes == 1 else "rojo")
+        if not fuentes and ctrl_id not in ctrl_fuentes:
+            cobertura = "sin_datos"
+
+        cards.append(
+            EvidencePanelCard(
+                control_id=ctrl_id,
+                titulo=get_control_title(ctrl_id),
+                fuentes_activas=fuentes,
+                total_evidencias=ctrl_counts.get(ctrl_id, 0),
+                ultimo_evento=ultimo,
+                cobertura=cobertura,
+            )
+        )
+
+    return EvidencePanelResponse(total_controles=len(cards), cards=cards)
+
+
+# ---------------------------------------------------------------------------
+# Gap Analysis — P4
+# ---------------------------------------------------------------------------
+
+
+@app.post("/gap-analysis/{marco}", response_model=GapAnalysisResponse, tags=["gap"])
+@limiter.limit("10/minute")
+async def gap_analysis(
+    request: Request,  # noqa: ARG001
+    marco: str,
+    findings: FindingsDep,
+    traductor: TraductorDep,
+) -> GapAnalysisResponse:
+    """Análisis de gap automatizado: infiere cumplimiento de controles desde hallazgos de sesión.
+
+    Para cada control del catálogo usa LLM para decidir cumple/parcial/no_cumple/sin_datos
+    basándose en los hallazgos traducidos existentes en la sesión.
+    """
+    import json as _json
+
+    from rosetta.core.tool_control_map import get_controls_catalog
+
+    catalog = get_controls_catalog(marco)
+    if not catalog:
+        raise HTTPException(status_code=404, detail=f"Marco {marco!r} no disponible.")
+
+    # Preparar resumen de hallazgos para el LLM
+    hallazgos_resumen = []
+    for m in findings:
+        if m.compliance_data:
+            hallazgos_resumen.append(
+                {
+                    "activo": m.red_team_data.activo_detectado,
+                    "origen": m.red_team_data.origen.value,
+                    "controles_incumplidos": list(m.compliance_data.controles_incumplidos),
+                    "marcos": [mm.value for mm in m.compliance_data.marcos_aplicables],
+                    "severidad": m.compliance_data.impacto_legal.value,
+                    "justificacion": m.compliance_data.justificacion[:200],
+                }
+            )
+
+    controles_json = _json.dumps(
+        [{"id": c["id"], "titulo": c["titulo"]} for c in catalog], ensure_ascii=False
+    )
+    hallazgos_json = _json.dumps(hallazgos_resumen[:30], ensure_ascii=False)  # límite de contexto
+
+    prompt = (
+        f"Eres un auditor de seguridad experto en {marco}. "
+        f"Tienes los siguientes hallazgos de seguridad detectados:\n\n{hallazgos_json}\n\n"
+        f"Analiza el cumplimiento de estos controles del marco {marco}:\n\n{controles_json}\n\n"
+        f"Para cada control, responde con un JSON array con objetos que tengan:\n"
+        f'- "control_id": string\n'
+        f'- "respuesta": "cumple" | "parcial" | "no_cumple" | "sin_datos"\n'
+        f'- "confianza": float 0.0-1.0\n'
+        f'- "justificacion": string (máx 150 chars)\n'
+        f'- "evidencia_base": array de control_ids de hallazgos relacionados\n\n'
+        f"Responde SOLO con el JSON array, sin texto adicional."
+    )
+
+    resultados: list[GapControlResult] = []
+    try:
+        from rosetta.llm.base import Message as _LLMMsg
+
+        _gap_result = await traductor.llm.completar(
+            system="Eres un auditor de seguridad experto. Responde solo con JSON valido.",
+            messages=[_LLMMsg(role="user", content=prompt)],
+        )
+        raw = (_gap_result.content or "").strip()
+        # Extraer JSON si viene envuelto en ```json ... ```
+        if "```" in raw:
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        data = _json.loads(raw)
+        ctrl_lookup = {c["id"]: c for c in catalog}
+        for item in data:
+            ctrl_id = item.get("control_id", "")
+            ctrl_meta = ctrl_lookup.get(ctrl_id, {})
+            resultados.append(
+                GapControlResult(
+                    control_id=ctrl_id,
+                    titulo=ctrl_meta.get("titulo", ctrl_id),
+                    respuesta=item.get("respuesta", "sin_datos"),
+                    confianza=float(item.get("confianza", 0.5)),
+                    justificacion=str(item.get("justificacion", "")),
+                    evidencia_base=list(item.get("evidencia_base", [])),
+                )
+            )
+    except Exception as exc:
+        logger.warning("gap_analysis_llm_error", error=str(exc))
+        # Fallback: marcar todo como sin_datos
+        for c in catalog:
+            resultados.append(
+                GapControlResult(
+                    control_id=c["id"],
+                    titulo=c["titulo"],
+                    respuesta="sin_datos",
+                    confianza=0.0,
+                    justificacion="Análisis automático no disponible.",
+                    evidencia_base=[],
+                )
+            )
+
+    cumple = sum(1 for r in resultados if r.respuesta == "cumple")
+    parcial = sum(1 for r in resultados if r.respuesta == "parcial")
+    no_cumple = sum(1 for r in resultados if r.respuesta == "no_cumple")
+    sin_datos = sum(1 for r in resultados if r.respuesta == "sin_datos")
+    total = len(resultados)
+    pct = round((cumple + parcial * 0.5) / total * 100, 1) if total else 0.0
+
+    return GapAnalysisResponse(
+        marco=marco,
+        total_controles=total,
+        cumple=cumple,
+        parcial=parcial,
+        no_cumple=no_cumple,
+        sin_datos=sin_datos,
+        porcentaje_cumplimiento=pct,
+        controles=resultados,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Plan Director — P5
+# ---------------------------------------------------------------------------
+
+
+@app.post("/plan-director/{marco}", response_model=PlanDirectorResponse, tags=["plan"])
+@limiter.limit("5/minute")
+async def plan_director(
+    request: Request,  # noqa: ARG001
+    marco: str,
+    findings: FindingsDep,
+    ctrl_store: ControlStoreDep,
+    traductor: TraductorDep,
+    tarifa_dia: float = Query(
+        default=450.0, ge=1, description="€ por persona-día para estimación."
+    ),
+) -> PlanDirectorResponse:
+    """Genera un Plan Director de Seguridad con acciones priorizadas y estimación de esfuerzo."""
+    import json as _json
+
+    from rosetta.core.tool_control_map import get_controls_catalog
+
+    catalog = get_controls_catalog(marco)
+    if not catalog:
+        raise HTTPException(status_code=404, detail=f"Marco {marco!r} no disponible.")
+
+    # Recopilar controles con estado no_cumple o parcial
+    estados_map = ctrl_store.get_all_estados(marco)
+    controles_pendientes = [
+        c
+        for c in catalog
+        if estados_map.get(c["id"], {}).get("estado", "no_aplica")
+        in ("no_cumple", "parcial", "no_aplica")
+    ]
+
+    # Enriquecer con info de hallazgos
+    ctrl_hallazgos: dict[str, list[str]] = {}
+    for m in findings:
+        if m.compliance_data:
+            for ctrl_id in m.compliance_data.controles_incumplidos:
+                ctrl_hallazgos.setdefault(ctrl_id, []).append(m.compliance_data.impacto_legal.value)
+
+    # Detectar herramientas activas en la sesión
+    fuentes_activas = {m.red_team_data.origen.value.upper() for m in findings}
+    tiene_wazuh = "WAZUH" in fuentes_activas
+
+    controles_para_llm = [
+        {
+            "id": c["id"],
+            "titulo": c["titulo"],
+            "hallazgos": ctrl_hallazgos.get(c["id"], []),
+        }
+        for c in controles_pendientes[:20]  # límite de contexto
+    ]
+
+    prompt = (
+        f"Eres un consultor experto en {marco}. "
+        f"Genera un Plan Director de Seguridad para remediar los siguientes controles pendientes:\n\n"
+        f"{_json.dumps(controles_para_llm, ensure_ascii=False)}\n\n"
+        f"{'El cliente tiene Wazuh activo como SIEM/SOC.' if tiene_wazuh else ''}\n\n"
+        f"Para cada control, crea una acción con este JSON:\n"
+        f'- "titulo": string\n'
+        f'- "descripcion": string (máx 200 chars)\n'
+        f'- "categoria": "tecnico" | "organizativo" | "documental"\n'
+        f'- "prioridad": "critica" | "alta" | "media" | "baja"\n'
+        f'- "personas_dia": float (esfuerzo estimado)\n'
+        f'- "controles_relacionados": array de IDs\n'
+        f'- "cubierto_por_herramienta": string o null '
+        f'(si Wazuh u otra herramienta ya lo cubre, indicar cuál)\n\n'
+        f"Además incluye un campo 'resumen_ejecutivo' con 2-3 frases.\n"
+        f"Responde SOLO con JSON: {{\"acciones\": [...], \"resumen_ejecutivo\": \"...\"}}"
+    )
+
+    acciones: list[AccionPlan] = []
+    resumen = "Plan director generado automaticamente por ROSETTA."
+    try:
+        from rosetta.llm.base import Message as _LLMMsg
+
+        _plan_result = await traductor.llm.completar(
+            system="Eres un consultor experto en seguridad. Responde solo con JSON valido.",
+            messages=[_LLMMsg(role="user", content=prompt)],
+        )
+        raw = (_plan_result.content or "").strip()
+        if "```" in raw:
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        data = _json.loads(raw)
+        resumen = data.get("resumen_ejecutivo", resumen)
+        for a in data.get("acciones", []):
+            pd_val = float(a.get("personas_dia", 1.0))
+            acciones.append(
+                AccionPlan(
+                    titulo=str(a.get("titulo", "")),
+                    descripcion=str(a.get("descripcion", "")),
+                    categoria=str(a.get("categoria", "tecnico")),
+                    prioridad=str(a.get("prioridad", "media")),
+                    personas_dia=pd_val,
+                    coste_estimado_eur=round(pd_val * tarifa_dia, 2),
+                    controles_relacionados=list(a.get("controles_relacionados", [])),
+                    cubierto_por_herramienta=a.get("cubierto_por_herramienta"),
+                    estado="pendiente",
+                )
+            )
+    except Exception as exc:
+        logger.warning("plan_director_llm_error", error=str(exc))
+        for c in controles_pendientes[:10]:
+            acciones.append(
+                AccionPlan(
+                    titulo=f"Implementar {c['id']}",
+                    descripcion=c["titulo"],
+                    categoria="tecnico",
+                    prioridad="media",
+                    personas_dia=2.0,
+                    coste_estimado_eur=round(2.0 * tarifa_dia, 2),
+                    controles_relacionados=[c["id"]],
+                    cubierto_por_herramienta=None,
+                    estado="pendiente",
+                )
+            )
+
+    total_pd = round(sum(a.personas_dia for a in acciones), 1)
+    total_eur = round(sum(a.coste_estimado_eur for a in acciones), 2)
+
+    return PlanDirectorResponse(
+        marco=marco,
+        total_acciones=len(acciones),
+        total_personas_dia=total_pd,
+        total_coste_eur=total_eur,
+        tarifa_dia_eur=tarifa_dia,
+        acciones=acciones,
+        resumen_ejecutivo=resumen,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Risk Analysis — P6
+# ---------------------------------------------------------------------------
+
+
+@app.get("/assets", response_model=AssetsResponse, tags=["risk"])
+async def list_assets(findings: FindingsDep, grafo: GrafoDep) -> AssetsResponse:
+    """Devuelve inventario de activos detectados (Neo4j o sesión en memoria)."""
+    activos_map: dict[str, dict[str, Any]] = {}
+
+    # Intentar desde Neo4j si disponible
+    if grafo is not None:
+        try:
+            from rosetta.core.graph import GrafoCorrelacion as _Grafo
+
+            _grafo_typed = cast(_Grafo, grafo)
+            for marco_enum in MarcoNormativo:
+                for h in _grafo_typed.hallazgos_por_marco(marco_enum.value):
+                    nombre = str(h.get("activo") or "desconocido")
+                    ctrl = str(h.get("control_id") or "")
+                    sev = str(h.get("severidad") or "media")
+                    entry = activos_map.setdefault(
+                        nombre, {"count": 0, "sev_list": [], "ctrls": set()}
+                    )
+                    entry["count"] += 1
+                    entry["sev_list"].append(sev)
+                    if ctrl:
+                        entry["ctrls"].add(ctrl)
+        except Exception as exc:
+            logger.warning("assets_neo4j_error", error=str(exc))
+
+    # Complementar / fallback desde sesión en memoria
+    for m in findings:
+        nombre = m.red_team_data.activo_detectado
+        entry = activos_map.setdefault(nombre, {"count": 0, "sev_list": [], "ctrls": set()})
+        entry["count"] += 1
+        if m.compliance_data:
+            entry["sev_list"].append(m.compliance_data.impacto_legal.value)
+            entry["ctrls"].update(m.compliance_data.controles_incumplidos)
+
+    sev_order = {"critica": 4, "alta": 3, "media": 2, "baja": 1, "informativa": 0}
+    activos_list: list[AssetItem] = []
+    for nombre, data in activos_map.items():
+        sev_max = max(data["sev_list"], key=lambda s: sev_order.get(s, 0), default=None)
+        activos_list.append(
+            AssetItem(
+                nombre=nombre,
+                hallazgos_count=data["count"],
+                criticidad_max=sev_max,
+                controles_afectados=sorted(data["ctrls"]),
+            )
+        )
+
+    activos_list.sort(
+        key=lambda a: sev_order.get(a.criticidad_max or "informativa", 0), reverse=True
+    )
+    return AssetsResponse(total=len(activos_list), activos=activos_list)
+
+
+@app.post("/risk-analysis", response_model=RiskAnalysisResponse, tags=["risk"])
+@limiter.limit("5/minute")
+async def risk_analysis(
+    request: Request,  # noqa: ARG001
+    findings: FindingsDep,
+    grafo: GrafoDep,  # noqa: ARG001
+    traductor: TraductorDep,
+) -> RiskAnalysisResponse:
+    """Analisis de riesgos automatizado: activos → amenazas LLM → riesgo = P×I."""
+    import json as _json
+
+    # Reutilizar lógica de list_assets para construir mapa de activos
+    activos_map: dict[str, dict[str, Any]] = {}
+    for m in findings:
+        nombre = m.red_team_data.activo_detectado
+        entry = activos_map.setdefault(nombre, {"hallazgos": [], "ctrls": set()})
+        entry["hallazgos"].append(
+            {
+                "severidad": m.compliance_data.impacto_legal.value
+                if m.compliance_data
+                else "media",
+                "origen": m.red_team_data.origen.value,
+                "vector": m.red_team_data.vector_ataque,
+            }
+        )
+        if m.compliance_data:
+            entry["ctrls"].update(m.compliance_data.controles_incumplidos)
+
+    if not activos_map:
+        return RiskAnalysisResponse(total_activos=0, riesgo_promedio=0.0, entradas=[])
+
+    activos_json = _json.dumps(
+        [
+            {
+                "activo": nombre,
+                "hallazgos": data["hallazgos"][:5],
+                "controles_afectados": sorted(data["ctrls"])[:5],
+            }
+            for nombre, data in list(activos_map.items())[:15]  # límite de contexto
+        ],
+        ensure_ascii=False,
+    )
+
+    prompt = (
+        f"Eres un analista de riesgos de seguridad. Para cada activo de la lista, "
+        f"genera un análisis de riesgos basado en los hallazgos detectados.\n\n"
+        f"Activos:\n{activos_json}\n\n"
+        f"Para cada activo devuelve un JSON con:\n"
+        f'- "activo": string\n'
+        f'- "amenazas": array de strings (2-4 amenazas principales)\n'
+        f'- "probabilidad": int 1-5 (1=muy baja, 5=muy alta)\n'
+        f'- "impacto": int 1-5 (1=muy bajo, 5=muy alto)\n'
+        f'- "tratamiento": string (acción recomendada, máx 120 chars)\n'
+        f'- "controles_relacionados": array de IDs de controles\n\n'
+        f"Responde SOLO con un JSON array."
+    )
+
+    entradas: list[RiskEntry] = []
+    try:
+        from rosetta.llm.base import Message as _LLMMsg
+
+        _risk_result = await traductor.llm.completar(
+            system="Eres un analista de riesgos de seguridad. Responde solo con JSON valido.",
+            messages=[_LLMMsg(role="user", content=prompt)],
+        )
+        raw = (_risk_result.content or "").strip()
+        if "```" in raw:
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        data = _json.loads(raw)
+        for item in data:
+            prob = max(1, min(5, int(item.get("probabilidad", 3))))
+            imp = max(1, min(5, int(item.get("impacto", 3))))
+            riesgo = prob * imp
+            nivel = (
+                "critico"
+                if riesgo >= 17
+                else "alto"
+                if riesgo >= 10
+                else "medio"
+                if riesgo >= 5
+                else "bajo"
+            )
+            entradas.append(
+                RiskEntry(
+                    activo=str(item.get("activo", "")),
+                    amenazas=list(item.get("amenazas", [])),
+                    probabilidad=prob,
+                    impacto=imp,
+                    riesgo=riesgo,
+                    nivel=nivel,
+                    tratamiento=str(item.get("tratamiento", "")),
+                    controles_relacionados=list(item.get("controles_relacionados", [])),
+                )
+            )
+    except Exception as exc:
+        logger.warning("risk_analysis_llm_error", error=str(exc))
+        for nombre, data in activos_map.items():
+            n_hallazgos = len(data["hallazgos"])
+            prob = min(5, max(1, n_hallazgos))
+            imp = 3
+            riesgo = prob * imp
+            entradas.append(
+                RiskEntry(
+                    activo=nombre,
+                    amenazas=["Análisis automático no disponible"],
+                    probabilidad=prob,
+                    impacto=imp,
+                    riesgo=riesgo,
+                    nivel="medio",
+                    tratamiento="Revisar hallazgos manualmente.",
+                    controles_relacionados=sorted(data["ctrls"])[:3],
+                )
+            )
+
+    entradas.sort(key=lambda e: e.riesgo, reverse=True)
+    promedio = round(sum(e.riesgo for e in entradas) / len(entradas), 1) if entradas else 0.0
+
+    return RiskAnalysisResponse(
+        total_activos=len(entradas),
+        riesgo_promedio=promedio,
+        entradas=entradas,
+    )
