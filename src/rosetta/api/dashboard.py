@@ -3602,10 +3602,10 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       }).join('');
     }
 
-    /* ── switchTab extension for new tabs ── */
-    const _origSwitchTab = switchTab;
+    /* ── switchTab extension for new tabs (chained over earlier hook) ── */
+    const _origSwitchTab2 = switchTab;
     switchTab = function(name, btn) {
-      _origSwitchTab(name, btn);
+      _origSwitchTab2(name, btn);
       if (name === 'controles')  loadControles(_controlesMarco);
       if (name === 'roadmap')    loadRoadmap();
       if (name === 'evidencias') loadEvidencias();
