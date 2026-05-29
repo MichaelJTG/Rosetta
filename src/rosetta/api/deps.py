@@ -10,6 +10,7 @@ from typing import Annotated, cast
 
 from fastapi import Depends, Request
 
+from rosetta.core.control_store import ControlStore
 from rosetta.core.diff_analyzer import DiffAnalyzer
 from rosetta.core.session_store import SessionStore
 from rosetta.core.traductor import TraductorSimbiotico
@@ -36,7 +37,13 @@ def get_diff_analyzer(request: Request) -> DiffAnalyzer:
     return DiffAnalyzer(llm=traductor.llm, rag=traductor.rag)
 
 
+def get_control_store(request: Request) -> ControlStore:
+    """Devuelve el ControlStore (SQLite) de estados de controles."""
+    return cast(ControlStore, request.app.state.control_store)
+
+
 TraductorDep = Annotated[TraductorSimbiotico, Depends(get_traductor)]
 GrafoDep = Annotated[object | None, Depends(get_grafo)]
 FindingsDep = Annotated[SessionStore, Depends(get_session_findings)]
 DiffAnalyzerDep = Annotated[DiffAnalyzer, Depends(get_diff_analyzer)]
+ControlStoreDep = Annotated[ControlStore, Depends(get_control_store)]
