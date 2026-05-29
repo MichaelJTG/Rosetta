@@ -1835,6 +1835,202 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       </div>
     </div>
 
+  <!-- ═══════════════ TAB PANELS: nuevas secciones gestión ══════════════ -->
+
+  <!-- CONTROLES -->
+  <div id="tab-controles" class="tab-panel">
+    <div class="page-intro">
+      <h1>Catálogo de Controles</h1>
+      <p class="lead">Visualiza, asigna responsables y gestiona el estado de cada control normativo.</p>
+    </div>
+    <div class="content">
+      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-4);flex-wrap:wrap">
+        <select id="ctrl-marco-sel" onchange="_controlesMarco=this.value;loadControles(this.value)" style="font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 10px;background:var(--surface-1);color:var(--fg-1)">
+          <option value="iso_27001_2022">ISO 27001:2022</option>
+          <option value="ens_2022">ENS 2022</option>
+        </select>
+        <button class="btn" onclick="loadControles(_controlesMarco)">↺ Actualizar</button>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Control</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Título</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:110px">Estado</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:130px">Responsable</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:80px;text-align:center">Evidencias</th>
+        </tr></thead>
+        <tbody id="controles-body" style="font-size:13px"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODAL CONTROL -->
+  <div id="ctrl-modal" class="modal-overlay" aria-hidden="true" onclick="if(event.target===this)closeControlModal()">
+    <div class="modal-box" style="max-width:560px" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--s-4)">
+        <div>
+          <span id="ctrl-modal-id" style="font-family:var(--font-mono);font-size:11px;color:var(--accent);display:block;margin-bottom:4px"></span>
+          <h2 id="ctrl-modal-title" style="font-size:15px;font-weight:600;color:var(--fg-1)"></h2>
+        </div>
+        <button class="modal-close" onclick="closeControlModal()" aria-label="Cerrar">&times;</button>
+      </div>
+      <p id="ctrl-modal-desc" style="font-size:12px;color:var(--fg-3);margin-bottom:var(--s-4);line-height:1.5"></p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3);margin-bottom:var(--s-3)">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--fg-3);display:block;margin-bottom:4px">Estado</label>
+          <select id="ctrl-modal-estado" style="width:100%;font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:6px 8px;background:var(--surface-1);color:var(--fg-1)">
+            <option value="no_aplica">No aplica</option>
+            <option value="no_cumple">No cumple</option>
+            <option value="parcial">Parcial</option>
+            <option value="cumple">Cumple</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--fg-3);display:block;margin-bottom:4px">Responsable</label>
+          <input id="ctrl-modal-resp" type="text" placeholder="Nombre o rol" style="width:100%;font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:6px 8px;background:var(--surface-1);color:var(--fg-1)">
+        </div>
+      </div>
+      <div style="margin-bottom:var(--s-3)">
+        <label style="font-size:11px;font-weight:600;color:var(--fg-3);display:block;margin-bottom:4px">Comentarios</label>
+        <textarea id="ctrl-modal-comments" rows="3" style="width:100%;font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:6px 8px;background:var(--surface-1);color:var(--fg-1);resize:vertical"></textarea>
+      </div>
+      <div style="margin-bottom:var(--s-4)">
+        <div style="font-size:11px;font-weight:600;color:var(--fg-3);margin-bottom:6px">Evidencias vinculadas</div>
+        <ul id="ctrl-modal-ev" style="list-style:none;display:flex;flex-wrap:wrap;gap:4px"></ul>
+      </div>
+      <div style="display:flex;gap:var(--s-3)">
+        <button class="btn" onclick="saveControl()">Guardar</button>
+        <button class="btn btn--ghost" onclick="downloadTemplate()">↓ Descargar plantilla</button>
+        <button class="btn btn--ghost" onclick="closeControlModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROADMAP -->
+  <div id="tab-roadmap" class="tab-panel">
+    <div class="page-intro">
+      <h1>Roadmap de Vulnerabilidades</h1>
+      <p class="lead">Cronograma de gestión de vulnerabilidades con fechas límite y propietarios.</p>
+    </div>
+    <div class="content">
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Vulnerabilidad</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Criticidad</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:110px">Estado</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:95px">Detectado</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:130px">Fecha límite</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:120px">Propietario</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:100px">Días restantes</th>
+        </tr></thead>
+        <tbody id="roadmap-body" style="font-size:13px"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EVIDENCIAS -->
+  <div id="tab-evidencias" class="tab-panel">
+    <div class="page-intro">
+      <h1>Panel de Evidencias</h1>
+      <p class="lead">Cada herramienta vinculada a su control normativo. Verde = 2+ fuentes, Amarillo = 1 fuente, Rojo = sin evidencia.</p>
+    </div>
+    <div class="content">
+      <button class="btn" onclick="loadEvidencias()" style="margin-bottom:var(--s-4)">↺ Actualizar panel</button>
+      <div id="evidencias-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--s-3)"></div>
+    </div>
+  </div>
+
+  <!-- GAP -->
+  <div id="tab-gap" class="tab-panel">
+    <div class="page-intro">
+      <h1>Pre-Gap Análisis</h1>
+      <p class="lead">Análisis automático de cumplimiento basado en los hallazgos de la sesión.</p>
+    </div>
+    <div class="content">
+      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-3);flex-wrap:wrap">
+        <select id="gap-marco-sel" onchange="_gapMarco=this.value" style="font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 10px;background:var(--surface-1);color:var(--fg-1)">
+          <option value="iso_27001_2022">ISO 27001:2022</option>
+          <option value="ens_2022">ENS 2022</option>
+        </select>
+        <button id="btn-gap" class="btn" onclick="runGapAnalysis()">Analizar con mis datos</button>
+      </div>
+      <div id="gap-summary" style="font-size:13px;margin-bottom:var(--s-4);color:var(--fg-3)"></div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Control</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Título</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:110px">Respuesta</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:70px">Confianza</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Justificación</th>
+        </tr></thead>
+        <tbody id="gap-body" style="font-size:13px"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PLAN DIRECTOR -->
+  <div id="tab-plan" class="tab-panel">
+    <div class="page-intro">
+      <h1>Plan Director de Seguridad</h1>
+      <p class="lead">Acciones priorizadas con estimación de esfuerzo y presupuesto.</p>
+    </div>
+    <div class="content">
+      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-3);flex-wrap:wrap">
+        <select id="plan-marco-sel" onchange="_planMarco=this.value" style="font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 10px;background:var(--surface-1);color:var(--fg-1)">
+          <option value="iso_27001_2022">ISO 27001:2022</option>
+          <option value="ens_2022">ENS 2022</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:6px">
+          <label style="font-size:11px;color:var(--fg-3)">€/día</label>
+          <input id="plan-tarifa" type="number" value="450" min="1" style="width:70px;font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 8px;background:var(--surface-1);color:var(--fg-1)">
+        </div>
+        <button id="btn-plan" class="btn" onclick="runPlanDirector()">Generar Plan Director</button>
+      </div>
+      <div id="plan-summary" style="font-size:13px;font-weight:500;color:var(--accent);margin-bottom:var(--s-2)"></div>
+      <p id="plan-resumen" style="font-size:12px;color:var(--fg-3);margin-bottom:var(--s-4);font-style:italic"></p>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Acción</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Categoría</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:80px">Prioridad</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:80px;text-align:right">Pers.-día</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px;text-align:right">Coste</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Controles</th>
+        </tr></thead>
+        <tbody id="plan-body" style="font-size:13px"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RIESGOS -->
+  <div id="tab-riesgos" class="tab-panel">
+    <div class="page-intro">
+      <h1>Análisis de Riesgos</h1>
+      <p class="lead">Activos detectados → amenazas automáticas → riesgo P×I (escala 1-25).</p>
+    </div>
+    <div class="content">
+      <div style="margin-bottom:var(--s-3)">
+        <div style="font-size:11px;font-weight:600;color:var(--fg-3);margin-bottom:6px">Activos en sesión</div>
+        <div id="assets-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:var(--s-4)"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-3)">
+        <button id="btn-risk" class="btn" onclick="runRiskAnalysis()">Generar análisis</button>
+        <span id="risk-summary" style="font-size:12px;color:var(--fg-3)"></span>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Activo</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Amenazas</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:50px;text-align:center">P</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:50px;text-align:center">I</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:70px">Riesgo</th>
+          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Tratamiento</th>
+        </tr></thead>
+        <tbody id="risk-body" style="font-size:13px"></tbody>
+      </table>
+    </div>
+  </div>
+
   </div><!-- /.main -->
 
   <!-- LOGIN OVERLAY (mostrado cuando no hay token o JWT expirado sin refresh) -->
@@ -3612,202 +3808,6 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       if (name === 'riesgos')    loadAssets();
     };
   </script>
-
-  <!-- ═══════════════ TAB PANELS: nuevas secciones gestión ══════════════ -->
-
-  <!-- CONTROLES -->
-  <div id="tab-controles" class="tab-panel" style="display:none">
-    <div class="page-intro">
-      <h1>Catálogo de Controles</h1>
-      <p class="lead">Visualiza, asigna responsables y gestiona el estado de cada control normativo.</p>
-    </div>
-    <div class="content">
-      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-4);flex-wrap:wrap">
-        <select id="ctrl-marco-sel" onchange="_controlesMarco=this.value;loadControles(this.value)" style="font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 10px;background:var(--surface-1);color:var(--fg-1)">
-          <option value="iso_27001_2022">ISO 27001:2022</option>
-          <option value="ens_2022">ENS 2022</option>
-        </select>
-        <button class="btn" onclick="loadControles(_controlesMarco)">↺ Actualizar</button>
-      </div>
-      <table style="width:100%;border-collapse:collapse">
-        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Control</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Título</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:110px">Estado</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:130px">Responsable</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:80px;text-align:center">Evidencias</th>
-        </tr></thead>
-        <tbody id="controles-body" style="font-size:13px"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- MODAL CONTROL -->
-  <div id="ctrl-modal" class="modal-overlay" aria-hidden="true" onclick="if(event.target===this)closeControlModal()">
-    <div class="modal-box" style="max-width:560px" onclick="event.stopPropagation()">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--s-4)">
-        <div>
-          <span id="ctrl-modal-id" style="font-family:var(--font-mono);font-size:11px;color:var(--accent);display:block;margin-bottom:4px"></span>
-          <h2 id="ctrl-modal-title" style="font-size:15px;font-weight:600;color:var(--fg-1)"></h2>
-        </div>
-        <button class="modal-close" onclick="closeControlModal()" aria-label="Cerrar">&times;</button>
-      </div>
-      <p id="ctrl-modal-desc" style="font-size:12px;color:var(--fg-3);margin-bottom:var(--s-4);line-height:1.5"></p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3);margin-bottom:var(--s-3)">
-        <div>
-          <label style="font-size:11px;font-weight:600;color:var(--fg-3);display:block;margin-bottom:4px">Estado</label>
-          <select id="ctrl-modal-estado" style="width:100%;font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:6px 8px;background:var(--surface-1);color:var(--fg-1)">
-            <option value="no_aplica">No aplica</option>
-            <option value="no_cumple">No cumple</option>
-            <option value="parcial">Parcial</option>
-            <option value="cumple">Cumple</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px;font-weight:600;color:var(--fg-3);display:block;margin-bottom:4px">Responsable</label>
-          <input id="ctrl-modal-resp" type="text" placeholder="Nombre o rol" style="width:100%;font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:6px 8px;background:var(--surface-1);color:var(--fg-1)">
-        </div>
-      </div>
-      <div style="margin-bottom:var(--s-3)">
-        <label style="font-size:11px;font-weight:600;color:var(--fg-3);display:block;margin-bottom:4px">Comentarios</label>
-        <textarea id="ctrl-modal-comments" rows="3" style="width:100%;font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:6px 8px;background:var(--surface-1);color:var(--fg-1);resize:vertical"></textarea>
-      </div>
-      <div style="margin-bottom:var(--s-4)">
-        <div style="font-size:11px;font-weight:600;color:var(--fg-3);margin-bottom:6px">Evidencias vinculadas</div>
-        <ul id="ctrl-modal-ev" style="list-style:none;display:flex;flex-wrap:wrap;gap:4px"></ul>
-      </div>
-      <div style="display:flex;gap:var(--s-3)">
-        <button class="btn" onclick="saveControl()">Guardar</button>
-        <button class="btn btn--ghost" onclick="downloadTemplate()">↓ Descargar plantilla</button>
-        <button class="btn btn--ghost" onclick="closeControlModal()">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ROADMAP -->
-  <div id="tab-roadmap" class="tab-panel" style="display:none">
-    <div class="page-intro">
-      <h1>Roadmap de Vulnerabilidades</h1>
-      <p class="lead">Cronograma de gestión de vulnerabilidades con fechas límite y propietarios.</p>
-    </div>
-    <div class="content">
-      <table style="width:100%;border-collapse:collapse">
-        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Vulnerabilidad</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Criticidad</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:110px">Estado</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:95px">Detectado</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:130px">Fecha límite</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:120px">Propietario</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:100px">Días restantes</th>
-        </tr></thead>
-        <tbody id="roadmap-body" style="font-size:13px"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- EVIDENCIAS -->
-  <div id="tab-evidencias" class="tab-panel" style="display:none">
-    <div class="page-intro">
-      <h1>Panel de Evidencias</h1>
-      <p class="lead">Cada herramienta vinculada a su control normativo. Verde = 2+ fuentes, Amarillo = 1 fuente, Rojo = sin evidencia.</p>
-    </div>
-    <div class="content">
-      <button class="btn" onclick="loadEvidencias()" style="margin-bottom:var(--s-4)">↺ Actualizar panel</button>
-      <div id="evidencias-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--s-3)"></div>
-    </div>
-  </div>
-
-  <!-- GAP -->
-  <div id="tab-gap" class="tab-panel" style="display:none">
-    <div class="page-intro">
-      <h1>Pre-Gap Análisis</h1>
-      <p class="lead">Análisis automático de cumplimiento basado en los hallazgos de la sesión.</p>
-    </div>
-    <div class="content">
-      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-3);flex-wrap:wrap">
-        <select id="gap-marco-sel" onchange="_gapMarco=this.value" style="font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 10px;background:var(--surface-1);color:var(--fg-1)">
-          <option value="iso_27001_2022">ISO 27001:2022</option>
-          <option value="ens_2022">ENS 2022</option>
-        </select>
-        <button id="btn-gap" class="btn" onclick="runGapAnalysis()">Analizar con mis datos</button>
-      </div>
-      <div id="gap-summary" style="font-size:13px;margin-bottom:var(--s-4);color:var(--fg-3)"></div>
-      <table style="width:100%;border-collapse:collapse">
-        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Control</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Título</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:110px">Respuesta</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:70px">Confianza</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Justificación</th>
-        </tr></thead>
-        <tbody id="gap-body" style="font-size:13px"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- PLAN DIRECTOR -->
-  <div id="tab-plan" class="tab-panel" style="display:none">
-    <div class="page-intro">
-      <h1>Plan Director de Seguridad</h1>
-      <p class="lead">Acciones priorizadas con estimación de esfuerzo y presupuesto.</p>
-    </div>
-    <div class="content">
-      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-3);flex-wrap:wrap">
-        <select id="plan-marco-sel" onchange="_planMarco=this.value" style="font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 10px;background:var(--surface-1);color:var(--fg-1)">
-          <option value="iso_27001_2022">ISO 27001:2022</option>
-          <option value="ens_2022">ENS 2022</option>
-        </select>
-        <div style="display:flex;align-items:center;gap:6px">
-          <label style="font-size:11px;color:var(--fg-3)">€/día</label>
-          <input id="plan-tarifa" type="number" value="450" min="1" style="width:70px;font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-2);border-radius:var(--r-1);padding:5px 8px;background:var(--surface-1);color:var(--fg-1)">
-        </div>
-        <button id="btn-plan" class="btn" onclick="runPlanDirector()">Generar Plan Director</button>
-      </div>
-      <div id="plan-summary" style="font-size:13px;font-weight:500;color:var(--accent);margin-bottom:var(--s-2)"></div>
-      <p id="plan-resumen" style="font-size:12px;color:var(--fg-3);margin-bottom:var(--s-4);font-style:italic"></p>
-      <table style="width:100%;border-collapse:collapse">
-        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Acción</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px">Categoría</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:80px">Prioridad</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:80px;text-align:right">Pers.-día</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:90px;text-align:right">Coste</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Controles</th>
-        </tr></thead>
-        <tbody id="plan-body" style="font-size:13px"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- RIESGOS -->
-  <div id="tab-riesgos" class="tab-panel" style="display:none">
-    <div class="page-intro">
-      <h1>Análisis de Riesgos</h1>
-      <p class="lead">Activos detectados → amenazas automáticas → riesgo P×I (escala 1-25).</p>
-    </div>
-    <div class="content">
-      <div style="margin-bottom:var(--s-3)">
-        <div style="font-size:11px;font-weight:600;color:var(--fg-3);margin-bottom:6px">Activos en sesión</div>
-        <div id="assets-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:var(--s-4)"></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-3)">
-        <button id="btn-risk" class="btn" onclick="runRiskAnalysis()">Generar análisis</button>
-        <span id="risk-summary" style="font-size:12px;color:var(--fg-3)"></span>
-      </div>
-      <table style="width:100%;border-collapse:collapse">
-        <thead><tr style="border-bottom:2px solid var(--line-2);text-align:left">
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Activo</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Amenazas</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:50px;text-align:center">P</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:50px;text-align:center">I</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3);width:70px">Riesgo</th>
-          <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--fg-3)">Tratamiento</th>
-        </tr></thead>
-        <tbody id="risk-body" style="font-size:13px"></tbody>
-      </table>
-    </div>
-  </div>
 
 </body>
 </html>"""
