@@ -141,3 +141,50 @@ def test_all_public_paths_bypass_auth(monkeypatch: pytest.MonkeyPatch, path: str
     r = client.get(path)
     # No debe devolver 401
     assert r.status_code != 401
+
+
+# ---------------------------------------------------------------------------
+# Credenciales adicionales vía ROSETTA_USERS_EXTRA
+# ---------------------------------------------------------------------------
+
+
+def test_extra_user_accepted(monkeypatch: pytest.MonkeyPatch) -> None:
+    """ROSETTA_USERS_EXTRA permite cuentas adicionales (formato user:pass,user:pass)."""
+    monkeypatch.setenv("ROSETTA_USER", "admin")
+    monkeypatch.setenv("ROSETTA_PASSWORD", "main-pass")
+    monkeypatch.setenv("ROSETTA_USERS_EXTRA", "profesor:Rosetta-Profesor-2026!,otro:abc123")
+    client = TestClient(_make_app())
+
+    # Cuenta principal sigue funcionando
+    r = client.get("/protected", headers={"Authorization": _basic_header("admin", "main-pass")})
+    assert r.status_code == 200
+
+    # Cuentas extra funcionan
+    r = client.get(
+        "/protected",
+        headers={"Authorization": _basic_header("profesor", "Rosetta-Profesor-2026!")},
+    )
+    assert r.status_code == 200
+
+    r = client.get("/protected", headers={"Authorization": _basic_header("otro", "abc123")})
+    assert r.status_code == 200
+
+
+def test_extra_user_wrong_password_returns_401(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("ROSETTA_USER", "admin")
+    monkeypatch.setenv("ROSETTA_PASSWORD", "main-pass")
+    monkeypatch.setenv("ROSETTA_USERS_EXTRA", "profesor:correct")
+    client = TestClient(_make_app())
+    r = client.get("/protected", headers={"Authorization": _basic_header("profesor", "wrong")})
+    assert r.status_code == 401
+
+
+def test_extra_user_malformed_entry_ignored(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Entradas sin ':' o vacías en USERS_EXTRA se ignoran sin romper auth."""
+    monkeypatch.setenv("ROSETTA_USER", "admin")
+    monkeypatch.setenv("ROSETTA_PASSWORD", "main-pass")
+    monkeypatch.setenv("ROSETTA_USERS_EXTRA", ",sin_dos_puntos, , profesor:ok ")
+    client = TestClient(_make_app())
+    # La cuenta válida sigue funcionando (con espacios trimados)
+    r = client.get("/protected", headers={"Authorization": _basic_header("profesor", "ok")})
+    assert r.status_code == 200
