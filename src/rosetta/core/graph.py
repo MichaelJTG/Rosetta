@@ -73,6 +73,10 @@ ORDER BY h.timestamp DESC
 """
 
 
+# Segundos máximos para conectar o tomar una conexión del pool de Neo4j.
+_TIMEOUT_NEO4J_S = 5.0
+
+
 class GrafoCorrelacion:
     """Cliente Neo4j para el grafo de correlación de ROSETTA.
 
@@ -86,10 +90,29 @@ class GrafoCorrelacion:
 
     @classmethod
     def desde_uri(cls, uri: str, user: str, password: str) -> GrafoCorrelacion:
-        """Construye el grafo abriendo un driver Neo4j desde credenciales."""
+        """Construye el grafo abriendo un driver Neo4j y verificando la conexión.
+
+        El driver de Neo4j conecta de forma perezosa: sin la verificación, un
+        Neo4j caído al arrancar no se detectaba y cada petición esperaba los
+        timeouts por defecto (~30 s). Con timeouts cortos y verificación, la API
+        detecta el fallo al arrancar y degrada a modo memoria (RNF-01).
+
+        Raises:
+            Exception: Error del driver si el servidor no es accesible.
+        """
         from neo4j import GraphDatabase
 
-        driver = GraphDatabase.driver(uri, auth=(user, password))
+        driver = GraphDatabase.driver(
+            uri,
+            auth=(user, password),
+            connection_timeout=_TIMEOUT_NEO4J_S,
+            connection_acquisition_timeout=_TIMEOUT_NEO4J_S,
+        )
+        try:
+            driver.verify_connectivity()
+        except Exception:
+            driver.close()
+            raise
         return cls(driver)
 
     def registrar_hallazgo(

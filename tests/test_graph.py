@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
+import pytest
+
 from rosetta.core.graph import GrafoCorrelacion
 
 # ---------------------------------------------------------------------------
@@ -147,3 +149,41 @@ def test_exportar_dossier_llama_ambas_queries() -> None:
 
     session = driver.session.return_value.__enter__.return_value
     assert session.run.call_count >= 2
+
+
+# ---------------------------------------------------------------------------
+# Conexión (RNF-01): timeouts cortos y verificación al construir
+# ---------------------------------------------------------------------------
+
+
+def test_desde_uri_usa_timeouts_cortos_y_verifica_conexion(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """El driver se crea con timeouts de pocos segundos y se verifica la conexión."""
+    driver = _make_driver()
+    kwargs_recibidos: dict[str, object] = {}
+
+    def driver_falso(_uri: str, **kwargs: object) -> MagicMock:
+        kwargs_recibidos.update(kwargs)
+        return driver
+
+    monkeypatch.setattr("neo4j.GraphDatabase.driver", driver_falso)
+    grafo = GrafoCorrelacion.desde_uri("bolt://neo4j:7687", "neo4j", "clave-ficticia")
+
+    assert grafo._driver is driver
+    driver.verify_connectivity.assert_called_once()
+    assert kwargs_recibidos["connection_timeout"] <= 5  # type: ignore[operator]
+    assert kwargs_recibidos["connection_acquisition_timeout"] <= 5  # type: ignore[operator]
+
+
+def test_desde_uri_cierra_driver_y_propaga_si_neo4j_no_responde(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Si Neo4j no responde, se libera el driver y el error llega al lifespan."""
+    driver = _make_driver()
+    driver.verify_connectivity.side_effect = ConnectionError("Neo4j apagado")
+    monkeypatch.setattr("neo4j.GraphDatabase.driver", lambda *_a, **_k: driver)
+
+    with pytest.raises(ConnectionError):
+        GrafoCorrelacion.desde_uri("bolt://neo4j:7687", "neo4j", "clave-ficticia")
+    driver.close.assert_called_once()
