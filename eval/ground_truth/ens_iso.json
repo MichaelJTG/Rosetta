@@ -1,0 +1,1262 @@
+{
+  "metadata": {
+    "description": "Ground truth ENS-ISO 27001:2022 mapping. Source: SoA_TechServ.xlsx (profesor). NOT AI-generated -- extracted directly from professor's SoA.",
+    "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'",
+    "total_cases": 73,
+    "familias": [
+      "Continuidad del servicio",
+      "Control de acceso",
+      "Explotación",
+      "Gestión del personal",
+      "Marco organizativo",
+      "Monitorización del sistema",
+      "Planificación",
+      "Protección de la información",
+      "Protección de las aplicaciones informáticas",
+      "Protección de las comunicaciones",
+      "Protección de las instalaciones e infraestructuras",
+      "Protección de los equipos",
+      "Protección de los servicios",
+      "Protección de los soportes de información",
+      "Recursos externos",
+      "Servicios en la nube"
+    ]
+  },
+  "cases": [
+    {
+      "ens_code": "org.2",
+      "ens_name": "Normativa de seguridad",
+      "familia": "Marco organizativo",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.1",
+        "5.10",
+        "5.36",
+        "6.7",
+        "7.7",
+        "8.1"
+      ],
+      "iso_27001_2022_raw": "5.1 Políticas; 5.10 Uso aceptable; 5.36 Cumplimiento de políticas; 6.7 Trabajo remoto; 7.7 Escritorio y pantalla despejados; 8.1 Dispositivos de usuario",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "org.3",
+      "ens_name": "Procedimientos de seguridad",
+      "familia": "Marco organizativo",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.37",
+        "5.5",
+        "5.14",
+        "5.24"
+      ],
+      "iso_27001_2022_raw": "5.37 Procedimientos operativos documentados; 5.5 Contacto con autoridades; 5.14 Transferencia de información; 5.24 Planificación de la gestión de incidentes",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "org.4",
+      "ens_name": "Proceso de autorización",
+      "familia": "Marco organizativo",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.2",
+        "8.19",
+        "8.20",
+        "8.32",
+        "5.10"
+      ],
+      "iso_27001_2022_raw": "5.2 Roles y responsabilidades; 8.19 Instalación de software; 8.20 Seguridad de redes; 8.32 Gestión de cambios; 5.10 Uso aceptable",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.pl.3",
+      "ens_name": "Adquisición de nuevos componentes",
+      "familia": "Planificación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.8",
+        "5.19",
+        "8.29"
+      ],
+      "iso_27001_2022_raw": "5.8 Seguridad en la gestión de proyectos; 5.19/5.20 Seguridad en las relaciones con proveedores; 8.29 Pruebas de seguridad en desarrollo y aceptación",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.acc.3",
+      "ens_name": "Segregación de funciones y tareas",
+      "familia": "Control de acceso",
+      "dimensiones": [
+        "ICAT"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.3",
+        "8.2"
+      ],
+      "iso_27001_2022_raw": "5.3 Segregación de funciones; 8.2 Derechos de acceso privilegiado",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.acc.4",
+      "ens_name": "Proceso de gestión de derechos de acceso",
+      "familia": "Control de acceso",
+      "dimensiones": [
+        "ICAT"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.18",
+        "8.2",
+        "5.15"
+      ],
+      "iso_27001_2022_raw": "5.18 Derechos de acceso; 8.2 Derechos de acceso privilegiado; 5.15 Control de acceso",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.exp.1",
+      "ens_name": "Inventario de activos",
+      "familia": "Explotación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.9",
+        "5.12"
+      ],
+      "iso_27001_2022_raw": "5.9 Inventario de información y otros activos; 5.12 Clasificación",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.exp.2",
+      "ens_name": "Configuración de seguridad",
+      "familia": "Explotación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.9",
+        "8.19",
+        "8.12"
+      ],
+      "iso_27001_2022_raw": "8.9 Gestión de la configuración; 8.19 Instalación de software; 8.12 Prevención de fuga de datos",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.exp.5",
+      "ens_name": "Gestión de cambios",
+      "familia": "Explotación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.32",
+        "8.29",
+        "8.31"
+      ],
+      "iso_27001_2022_raw": "8.32 Gestión de cambios; 8.29 Pruebas de seguridad; 8.31 Separación de entornos",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.exp.9",
+      "ens_name": "Registro de la gestión de incidentes",
+      "familia": "Explotación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.26",
+        "5.27",
+        "5.28"
+      ],
+      "iso_27001_2022_raw": "5.26 Respuesta a incidentes; 5.27 Aprender de incidentes; 5.28 Recogida de evidencias",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.ext.1",
+      "ens_name": "Contratación y acuerdos de nivel de servicio",
+      "familia": "Recursos externos",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.19",
+        "5.20",
+        "6.6",
+        "5.14"
+      ],
+      "iso_27001_2022_raw": "5.19 Seguridad en relaciones con proveedores; 5.20 Seguridad en acuerdos con proveedores; 6.6 Acuerdos de confidencialidad; 5.14 Transferencia de información",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.ext.2",
+      "ens_name": "Gestión diaria",
+      "familia": "Recursos externos",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.22"
+      ],
+      "iso_27001_2022_raw": "5.22 Seguimiento, revisión y gestión de cambios de servicios de proveedores",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.cont.2",
+      "ens_name": "Plan de continuidad",
+      "familia": "Continuidad del servicio",
+      "dimensiones": [
+        "D"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.29",
+        "5.30"
+      ],
+      "iso_27001_2022_raw": "5.29 Seguridad durante la disrupción; 5.30 Preparación TIC continuidad",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.cont.3",
+      "ens_name": "Pruebas periódicas",
+      "familia": "Continuidad del servicio",
+      "dimensiones": [
+        "D"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.30",
+        "8.14"
+      ],
+      "iso_27001_2022_raw": "5.30 Preparación TIC continuidad (pruebas); 8.14 Redundancia",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.cont.4",
+      "ens_name": "Medios alternativos",
+      "familia": "Continuidad del servicio",
+      "dimensiones": [
+        "D"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.14",
+        "5.30"
+      ],
+      "iso_27001_2022_raw": "8.14 Redundancia de instalaciones de tratamiento; 5.30 Preparación TIC continuidad",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.if.1",
+      "ens_name": "Áreas separadas y con control de acceso",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "7.1",
+        "7.2",
+        "7.3",
+        "7.4",
+        "7.6"
+      ],
+      "iso_27001_2022_raw": "7.1 Perímetros de seguridad física; 7.2 Entradas físicas; 7.3 Oficinas, salas e instalaciones; 7.4 Vigilancia física; 7.6 Trabajo en áreas seguras",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.if.2",
+      "ens_name": "Identificación de las personas",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "7.2",
+        "7.4"
+      ],
+      "iso_27001_2022_raw": "7.2 Controles físicos de entrada; 7.4 Vigilancia de la seguridad física",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.if.3",
+      "ens_name": "Acondicionamiento de los locales",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "7.5",
+        "7.8",
+        "7.12"
+      ],
+      "iso_27001_2022_raw": "7.5 Protección contra amenazas físicas y ambientales; 7.8 Ubicación y protección de equipos; 7.12 Seguridad del cableado",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.if.5",
+      "ens_name": "Protección frente a incendios",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "dimensiones": [
+        "D"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "7.5"
+      ],
+      "iso_27001_2022_raw": "7.5 Protección contra amenazas físicas y ambientales",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.if.7",
+      "ens_name": "Registro de entrada y salida de equipamiento",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "7.2",
+        "7.9",
+        "7.10"
+      ],
+      "iso_27001_2022_raw": "7.2 Controles físicos de entrada; 7.9 Seguridad de activos fuera de las instalaciones; 7.10 Soportes de almacenamiento",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.per.1",
+      "ens_name": "Caracterización del puesto de trabajo",
+      "familia": "Gestión del personal",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "6.1",
+        "6.2",
+        "5.2"
+      ],
+      "iso_27001_2022_raw": "6.1 Selección (cribado); 6.2 Términos y condiciones de empleo; 5.2 Roles y responsabilidades",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.per.3",
+      "ens_name": "Concienciación",
+      "familia": "Gestión del personal",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "6.3"
+      ],
+      "iso_27001_2022_raw": "6.3 Concienciación, educación y formación en seguridad",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.per.4",
+      "ens_name": "Formación",
+      "familia": "Gestión del personal",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "6.3"
+      ],
+      "iso_27001_2022_raw": "6.3 Concienciación, educación y formación; Cl. 7.2 Competencia",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.com.1",
+      "ens_name": "Perímetro seguro",
+      "familia": "Protección de las comunicaciones",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.20",
+        "8.21",
+        "8.22"
+      ],
+      "iso_27001_2022_raw": "8.20 Seguridad de redes; 8.21 Seguridad de servicios de red; 8.22 Segregación de redes",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.si.3",
+      "ens_name": "Custodia",
+      "familia": "Protección de los soportes de información",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "7.10",
+        "5.9",
+        "5.10"
+      ],
+      "iso_27001_2022_raw": "7.10 Soportes de almacenamiento; 5.9 Inventario; 5.10 Uso aceptable",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.si.4",
+      "ens_name": "Transporte",
+      "familia": "Protección de los soportes de información",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "7.10",
+        "7.9",
+        "5.14"
+      ],
+      "iso_27001_2022_raw": "7.10 Soportes de almacenamiento; 7.9 Activos fuera de las instalaciones; 5.14 Transferencia",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.info.1",
+      "ens_name": "Datos personales",
+      "familia": "Protección de la información",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.34",
+        "5.31",
+        "8.11"
+      ],
+      "iso_27001_2022_raw": "5.34 Privacidad y protección de la PII; 5.31 Requisitos legales; 8.11 Enmascaramiento",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.s.1",
+      "ens_name": "Protección del correo electrónico",
+      "familia": "Protección de los servicios",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.14",
+        "8.7",
+        "8.24",
+        "8.23"
+      ],
+      "iso_27001_2022_raw": "5.14 Transferencia de información; 8.7 Malware; 8.24 Criptografía; 8.23 Filtrado web",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.acc.5",
+      "ens_name": "Mecanismo de autenticación (usuarios externos)",
+      "familia": "Control de acceso",
+      "dimensiones": [
+        "ICAT"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.17",
+        "8.5",
+        "5.16"
+      ],
+      "iso_27001_2022_raw": "5.17 Información de autenticación; 8.5 Autenticación segura; 5.16 Gestión de identidades",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.com.4",
+      "ens_name": "Separación de flujos de información en la red",
+      "familia": "Protección de las comunicaciones",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.22",
+        "8.20"
+      ],
+      "iso_27001_2022_raw": "8.22 Segregación de redes; 8.20 Seguridad de redes",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.acc.6",
+      "ens_name": "Mecanismo de autenticación (usuarios de la organización)",
+      "familia": "Control de acceso",
+      "dimensiones": [
+        "ICAT"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.5",
+        "5.17",
+        "6.7",
+        "8.1"
+      ],
+      "iso_27001_2022_raw": "8.5 Autenticación segura; 5.17 Información de autenticación; 6.7 Trabajo remoto; 8.1 Dispositivos de usuario",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.ext.3",
+      "ens_name": "Protección de la cadena de suministro",
+      "familia": "Recursos externos",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.21",
+        "5.29",
+        "5.30"
+      ],
+      "iso_27001_2022_raw": "5.21 Seguridad en la cadena de suministro TIC; 5.29 Seguridad durante la disrupción; 5.30 Preparación de las TIC para la continuidad",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.eq.2",
+      "ens_name": "Bloqueo de puesto de trabajo",
+      "familia": "Protección de los equipos",
+      "dimensiones": [
+        "A"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "7.7",
+        "8.1"
+      ],
+      "iso_27001_2022_raw": "7.7 Escritorio y pantalla despejados; 8.1 Dispositivos de usuario",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.si.1",
+      "ens_name": "Marcado de soportes",
+      "familia": "Protección de los soportes de información",
+      "dimensiones": [
+        "C"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.13",
+        "7.10"
+      ],
+      "iso_27001_2022_raw": "5.13 Etiquetado de la información; 7.10 Soportes de almacenamiento",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.info.2",
+      "ens_name": "Calificación de la información",
+      "familia": "Protección de la información",
+      "dimensiones": [
+        "C"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.12",
+        "5.13"
+      ],
+      "iso_27001_2022_raw": "5.12 Clasificación de la información; 5.13 Etiquetado",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.info.5",
+      "ens_name": "Limpieza de documentos",
+      "familia": "Protección de la información",
+      "dimensiones": [
+        "C"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.14",
+        "8.10"
+      ],
+      "iso_27001_2022_raw": "5.14 Transferencia de información; 8.10 Borrado de información (sin equivalente directo)",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.eq.4",
+      "ens_name": "Otros dispositivos conectados a la red",
+      "familia": "Protección de los equipos",
+      "dimensiones": [
+        "C"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.1",
+        "8.20",
+        "5.9"
+      ],
+      "iso_27001_2022_raw": "8.1 Dispositivos de usuario; 8.20 Seguridad de redes; 5.9 Inventario",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.si.5",
+      "ens_name": "Borrado y destrucción",
+      "familia": "Protección de los soportes de información",
+      "dimensiones": [
+        "C"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "7.10",
+        "7.14",
+        "8.10"
+      ],
+      "iso_27001_2022_raw": "7.10 Soportes; 7.14 Eliminación segura o reutilización de equipos; 8.10 Borrado de información",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.cont.1",
+      "ens_name": "Análisis de impacto",
+      "familia": "Continuidad del servicio",
+      "dimensiones": [
+        "D"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.29",
+        "5.30"
+      ],
+      "iso_27001_2022_raw": "5.29 Seguridad durante la disrupción; 5.30 Preparación de las TIC para la continuidad (BIA – ISO 22301)",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.pl.4",
+      "ens_name": "Dimensionamiento/gestión de la capacidad",
+      "familia": "Planificación",
+      "dimensiones": [
+        "D"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.6",
+        "8.14"
+      ],
+      "iso_27001_2022_raw": "8.6 Gestión de la capacidad; 8.14 Redundancia de instalaciones",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.if.4",
+      "ens_name": "Energía eléctrica",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "dimensiones": [
+        "D"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "7.11",
+        "7.5"
+      ],
+      "iso_27001_2022_raw": "7.11 Servicios de suministro; 7.5 Amenazas físicas y ambientales",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.s.4",
+      "ens_name": "Protección frente a denegación de servicio",
+      "familia": "Protección de los servicios",
+      "dimensiones": [
+        "D"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.6",
+        "8.16",
+        "8.14",
+        "5.30"
+      ],
+      "iso_27001_2022_raw": "8.6 Gestión de la capacidad; 8.16 Monitorización; 8.14 Redundancia; 5.30 Continuidad TIC",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.info.6",
+      "ens_name": "Copias de seguridad",
+      "familia": "Protección de la información",
+      "dimensiones": [
+        "D"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.13",
+        "8.14"
+      ],
+      "iso_27001_2022_raw": "8.13 Copias de seguridad de la información; 8.14 Redundancia",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.exp.8",
+      "ens_name": "Registro de la actividad",
+      "familia": "Explotación",
+      "dimensiones": [
+        "T"
+      ],
+      "nivel_exigido": "MEDIO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.15",
+        "8.17",
+        "8.16"
+      ],
+      "iso_27001_2022_raw": "8.15 Registro de eventos; 8.17 Sincronización de relojes; 8.16 Monitorización",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.info.3",
+      "ens_name": "Firma electrónica",
+      "familia": "Protección de la información",
+      "dimensiones": [
+        "IA"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.24",
+        "8.26",
+        "5.31"
+      ],
+      "iso_27001_2022_raw": "8.24 Uso de criptografía; 8.26 Requisitos de seguridad de aplicaciones; 5.31 Requisitos legales (Reglamento eIDAS)",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.acc.1",
+      "ens_name": "Identificación",
+      "familia": "Control de acceso",
+      "dimensiones": [
+        "AT"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.16",
+        "5.17",
+        "8.15"
+      ],
+      "iso_27001_2022_raw": "5.16 Gestión de identidades; 5.17 Información de autenticación; 8.15 Registro de eventos",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.info.4",
+      "ens_name": "Sellos de tiempo",
+      "familia": "Protección de la información",
+      "dimensiones": [
+        "T"
+      ],
+      "nivel_exigido": "MEDIO",
+      "aplica": "NO",
+      "iso_27001_2022_control_ids": [
+        "8.24",
+        "8.17",
+        "8.26"
+      ],
+      "iso_27001_2022_raw": "8.24 Uso de criptografía; 8.17 Sincronización de relojes; 8.26 Requisitos de aplicaciones",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.exp.10",
+      "ens_name": "Protección de claves criptográficas",
+      "familia": "Explotación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.24",
+        "5.17"
+      ],
+      "iso_27001_2022_raw": "8.24 Uso de criptografía; 5.17 Información de autenticación",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.ext.4",
+      "ens_name": "Interconexión de sistemas",
+      "familia": "Recursos externos",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.20",
+        "8.21",
+        "8.22",
+        "5.14"
+      ],
+      "iso_27001_2022_raw": "8.20 Seguridad de redes; 8.21 Seguridad de servicios de red; 8.22 Segregación de redes; 5.14 Transferencia de información",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.per.2",
+      "ens_name": "Deberes y obligaciones",
+      "familia": "Gestión del personal",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "6.2",
+        "6.4",
+        "6.5",
+        "6.6",
+        "5.11"
+      ],
+      "iso_27001_2022_raw": "6.2 Términos y condiciones; 6.4 Proceso disciplinario; 6.5 Responsabilidades tras la finalización; 6.6 Acuerdos de confidencialidad; 5.11 Devolución de activos",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.eq.1",
+      "ens_name": "Puesto de trabajo despejado",
+      "familia": "Protección de los equipos",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "7.7"
+      ],
+      "iso_27001_2022_raw": "7.7 Escritorio y pantalla despejados",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.sw.2",
+      "ens_name": "Aceptación y puesta en servicio",
+      "familia": "Protección de las aplicaciones informáticas",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.29",
+        "8.31",
+        "8.33",
+        "8.11"
+      ],
+      "iso_27001_2022_raw": "8.29 Pruebas de seguridad en desarrollo y aceptación; 8.31 Separación de entornos; 8.33 Información de pruebas; 8.11 Enmascaramiento de datos",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.s.3",
+      "ens_name": "Protección de la navegación web",
+      "familia": "Protección de los servicios",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.23",
+        "8.7",
+        "8.16"
+      ],
+      "iso_27001_2022_raw": "8.23 Filtrado web; 8.7 Malware; 8.16 Monitorización",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.acc.2",
+      "ens_name": "Requisitos de acceso",
+      "familia": "Control de acceso",
+      "dimensiones": [
+        "ICAT"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.15",
+        "8.3",
+        "8.18",
+        "8.4"
+      ],
+      "iso_27001_2022_raw": "5.15 Control de acceso; 8.3 Restricción de acceso a la información; 8.18 Programas de utilidad privilegiados; 8.4 Acceso al código fuente",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.si.2",
+      "ens_name": "Criptografía",
+      "familia": "Protección de los soportes de información",
+      "dimensiones": [
+        "IC"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ (compensada)",
+      "iso_27001_2022_control_ids": [
+        "8.24",
+        "7.10",
+        "8.12"
+      ],
+      "iso_27001_2022_raw": "8.24 Uso de criptografía; 7.10 Soportes de almacenamiento; 8.12 Prevención de fuga de datos",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.exp.4",
+      "ens_name": "Mantenimiento y actualizaciones de seguridad",
+      "familia": "Explotación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.8",
+        "7.13",
+        "8.31"
+      ],
+      "iso_27001_2022_raw": "8.8 Gestión de vulnerabilidades técnicas; 7.13 Mantenimiento de equipos; 8.31 Separación de entornos",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.nub.1",
+      "ens_name": "Protección de servicios en la nube",
+      "familia": "Servicios en la nube",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.23",
+        "5.19"
+      ],
+      "iso_27001_2022_raw": "5.23 Seguridad para el uso de servicios en la nube; 5.19/5.20 Proveedores",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.mon.1",
+      "ens_name": "Detección de intrusión",
+      "familia": "Monitorización del sistema",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.16",
+        "8.20",
+        "8.15"
+      ],
+      "iso_27001_2022_raw": "8.16 Actividades de monitorización; 8.20 Seguridad de redes; 8.15 Registro",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.mon.2",
+      "ens_name": "Sistema de métricas",
+      "familia": "Monitorización del sistema",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.36"
+      ],
+      "iso_27001_2022_raw": "Cl. 9.1 Seguimiento, medición, análisis y evaluación; 5.36 Cumplimiento de políticas",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.eq.3",
+      "ens_name": "Protección de dispositivos portátiles",
+      "familia": "Protección de los equipos",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.1",
+        "7.9",
+        "6.7",
+        "8.24"
+      ],
+      "iso_27001_2022_raw": "8.1 Dispositivos de usuario; 7.9 Activos fuera de las instalaciones; 6.7 Trabajo remoto; 8.24 Criptografía",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.exp.3",
+      "ens_name": "Gestión de la configuración de seguridad",
+      "familia": "Explotación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.9",
+        "8.32",
+        "8.13"
+      ],
+      "iso_27001_2022_raw": "8.9 Gestión de la configuración; 8.32 Gestión de cambios; 8.13 Copias de seguridad",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.exp.7",
+      "ens_name": "Gestión de incidentes",
+      "familia": "Explotación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.24",
+        "5.25",
+        "5.26",
+        "5.27",
+        "5.28",
+        "6.8"
+      ],
+      "iso_27001_2022_raw": "5.24 Planificación gestión incidentes; 5.25 Evaluación de eventos; 5.26 Respuesta; 5.27 Aprender de incidentes; 5.28 Recogida de evidencias; 6.8 Notificación de eventos",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.com.2",
+      "ens_name": "Protección de la confidencialidad",
+      "familia": "Protección de las comunicaciones",
+      "dimensiones": [
+        "C"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.24",
+        "8.20",
+        "5.14"
+      ],
+      "iso_27001_2022_raw": "8.24 Uso de criptografía; 8.20/8.21 Redes; 5.14 Transferencia de información",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.pl.2",
+      "ens_name": "Arquitectura de Seguridad",
+      "familia": "Planificación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.9",
+        "8.20",
+        "8.22",
+        "8.27",
+        "8.26"
+      ],
+      "iso_27001_2022_raw": "5.9 Inventario de activos; 8.20 Seguridad de redes; 8.22 Segregación de redes; 8.27 Arquitectura y principios de ingeniería segura; 8.26 Requisitos de seguridad de aplicaciones",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.exp.6",
+      "ens_name": "Protección frente a código dañino",
+      "familia": "Explotación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.7",
+        "8.19",
+        "8.16"
+      ],
+      "iso_27001_2022_raw": "8.7 Protección contra malware; 8.19 Instalación de software; 8.16 Monitorización",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.sw.1",
+      "ens_name": "Desarrollo de aplicaciones",
+      "familia": "Protección de las aplicaciones informáticas",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.25",
+        "8.26",
+        "8.27",
+        "8.28",
+        "8.30",
+        "8.4"
+      ],
+      "iso_27001_2022_raw": "8.25 Ciclo de vida de desarrollo seguro; 8.26 Requisitos de seguridad de aplicaciones; 8.27 Arquitectura segura; 8.28 Codificación segura; 8.30 Desarrollo externalizado; 8.4 Código fuente",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.pl.1",
+      "ens_name": "Análisis de riesgos",
+      "familia": "Planificación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.7"
+      ],
+      "iso_27001_2022_raw": "Cl. 6.1.2 Evaluación de riesgos; Cl. 6.1.3 Tratamiento de riesgos; Cl. 8.2/8.3; 5.7 Inteligencia de amenazas",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.s.2",
+      "ens_name": "Protección de servicios y aplicaciones web",
+      "familia": "Protección de los servicios",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "8.26",
+        "8.29",
+        "8.8",
+        "8.25"
+      ],
+      "iso_27001_2022_raw": "8.26 Requisitos de seguridad de aplicaciones; 8.29 Pruebas de seguridad; 8.8 Vulnerabilidades técnicas; 8.25 SDLC",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.com.3",
+      "ens_name": "Protección de la integridad y de la autenticidad",
+      "familia": "Protección de las comunicaciones",
+      "dimensiones": [
+        "IA"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ (compensada)",
+      "iso_27001_2022_control_ids": [
+        "8.24",
+        "8.20",
+        "6.7"
+      ],
+      "iso_27001_2022_raw": "8.24 Uso de criptografía; 8.20/8.21 Redes; 6.7 Trabajo remoto (VPN)",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.mon.3",
+      "ens_name": "Vigilancia",
+      "familia": "Monitorización del sistema",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.7",
+        "8.16",
+        "8.8"
+      ],
+      "iso_27001_2022_raw": "5.7 Inteligencia de amenazas; 8.16 Actividades de monitorización; 8.8 Vulnerabilidades técnicas",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "org.1",
+      "ens_name": "Política de seguridad",
+      "familia": "Marco organizativo",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ",
+      "iso_27001_2022_control_ids": [
+        "5.1",
+        "5.2",
+        "5.4",
+        "5.31"
+      ],
+      "iso_27001_2022_raw": "5.1 Políticas de seguridad de la información; 5.2 Roles y responsabilidades; 5.4 Responsabilidades de la dirección; 5.31 Requisitos legales y contractuales; Cl. 5.2 Política",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "op.pl.5",
+      "ens_name": "Componentes certificados",
+      "familia": "Planificación",
+      "dimensiones": [
+        "Categoría"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ (compensada)",
+      "iso_27001_2022_control_ids": [
+        "5.21",
+        "8.9"
+      ],
+      "iso_27001_2022_raw": "5.21 Seguridad en la cadena de suministro TIC; 8.9 Gestión de la configuración (sin equivalente directo – CPSTIC)",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    },
+    {
+      "ens_code": "mp.if.6",
+      "ens_name": "Protección frente a inundaciones",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "dimensiones": [
+        "D"
+      ],
+      "nivel_exigido": "ALTO",
+      "aplica": "SÍ (compensada)",
+      "iso_27001_2022_control_ids": [
+        "7.5"
+      ],
+      "iso_27001_2022_raw": "7.5 Protección contra amenazas físicas y ambientales",
+      "fuente": "SoA_TechServ.xlsx · hoja 'SoA ENS' · col 'Control ISO/IEC 27001:2022 equivalente (CCN-STIC 825)'"
+    }
+  ]
+}
