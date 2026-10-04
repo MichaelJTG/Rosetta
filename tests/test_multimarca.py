@@ -240,12 +240,12 @@ async def test_multimarca_canonico(
     resultado = await traductor.traducir(hallazgo)
 
     assert isinstance(resultado, DatosCompliance), descripcion
-    assert (
-        ctrl_iso in resultado.controles_incumplidos
-    ), f"{descripcion}: falta {ctrl_iso} en {resultado.controles_incumplidos}"
-    assert (
-        ctrl_ens in resultado.controles_incumplidos
-    ), f"{descripcion}: falta {ctrl_ens} en {resultado.controles_incumplidos}"
+    assert ctrl_iso in resultado.controles_incumplidos, (
+        f"{descripcion}: falta {ctrl_iso} en {resultado.controles_incumplidos}"
+    )
+    assert ctrl_ens in resultado.controles_incumplidos, (
+        f"{descripcion}: falta {ctrl_ens} en {resultado.controles_incumplidos}"
+    )
     assert MarcoNormativo.ISO_27001_2022 in resultado.marcos_aplicables, descripcion
     assert MarcoNormativo.ENS_2022 in resultado.marcos_aplicables, descripcion
 

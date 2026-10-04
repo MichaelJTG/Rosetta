@@ -481,9 +481,9 @@ async def test_traductor_cinco_hallazgos_canonicos(
     resultado = await traductor.traducir(hallazgo)
 
     assert isinstance(resultado, DatosCompliance)
-    assert (
-        control_esperado in resultado.controles_incumplidos
-    ), f"Control {control_esperado} no encontrado en {resultado.controles_incumplidos}"
+    assert control_esperado in resultado.controles_incumplidos, (
+        f"Control {control_esperado} no encontrado en {resultado.controles_incumplidos}"
+    )
     assert MarcoNormativo.ISO_27001_2022 in resultado.marcos_aplicables
     assert resultado.accion_mitigacion != ""
     assert resultado.justificacion != ""
