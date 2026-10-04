@@ -13,11 +13,14 @@ from __future__ import annotations
 
 import asyncio
 import ipaddress
+import os
+import socket
 import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
+from urllib.parse import urlsplit
 
 import structlog
 
@@ -32,21 +35,58 @@ logger = structlog.get_logger(__name__)
 # Lista negra global — objetivos que NUNCA se deben escanear
 # ---------------------------------------------------------------------------
 
-_RANGOS_PROHIBIDOS: list[str] = [
-    "127.0.0.0/8",
-    "10.0.0.0/8",
-    "172.16.0.0/12",
-    "192.168.0.0/16",
-    "169.254.0.0/16",
-    "::1/128",
-    "fc00::/7",
-]
-
-_REDES_PROHIBIDAS: list[ipaddress.IPv4Network | ipaddress.IPv6Network] = [
-    ipaddress.ip_network(r) for r in _RANGOS_PROHIBIDOS
-]
-
 _HOSTS_PROHIBIDOS: frozenset[str] = frozenset({"localhost", "127.0.0.1", "::1", "0.0.0.0"})
+
+DireccionIP = ipaddress.IPv4Address | ipaddress.IPv6Address
+RedIP = ipaddress.IPv4Network | ipaddress.IPv6Network
+
+
+def _resolver_ips(host: str) -> list[DireccionIP]:
+    """Resuelve un nombre a todas sus direcciones (A y AAAA).
+
+    Raises:
+        socket.gaierror: Si el nombre no resuelve.
+    """
+    infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
+    return [ipaddress.ip_address(str(info[4][0]).split("%")[0]) for info in infos]
+
+
+def _extraer_host(objetivo: str) -> str:
+    """Devuelve el host de un objetivo (URL, host:puerto, IP o IPv6 entre corchetes)."""
+    texto = objetivo.strip().lower()
+    try:
+        return str(ipaddress.ip_address(texto.strip("[]")))
+    except ValueError:
+        pass
+    if "://" not in texto:
+        texto = "//" + texto
+    return urlsplit(texto).hostname or ""
+
+
+def _allowlist_auditoria() -> tuple[frozenset[str], list[RedIP]]:
+    """Objetivos de laboratorio autorizados en el servidor (ROSETTA_AUDIT_ALLOWLIST).
+
+    CSV de nombres de host exactos y/o redes CIDR. Solo la configura quien
+    administra el servidor; nunca llega desde la petición del usuario.
+    """
+    nombres: set[str] = set()
+    redes: list[RedIP] = []
+    for item in os.getenv("ROSETTA_AUDIT_ALLOWLIST", "").split(","):
+        valor = item.strip().lower()
+        if not valor:
+            continue
+        try:
+            redes.append(ipaddress.ip_network(valor, strict=False))
+        except ValueError:
+            nombres.add(valor)
+    return frozenset(nombres), redes
+
+
+def _es_no_publica(addr: DireccionIP) -> bool:
+    """True si la dirección no es enrutable públicamente (privada, loopback, CGNAT...)."""
+    if isinstance(addr, ipaddress.IPv6Address) and addr.ipv4_mapped is not None:
+        addr = addr.ipv4_mapped
+    return not addr.is_global or addr.is_multicast
 
 
 # ---------------------------------------------------------------------------
@@ -340,33 +380,38 @@ class Orchestrator:
             self._validar_no_ip_privada(objetivo_limpio, objetivo)
 
     def _validar_no_ip_privada(self, objetivo_limpio: str, objetivo_original: str) -> None:
-        """Comprueba que el objetivo no sea una dirección IP privada/reservada."""
-        candidato = objetivo_limpio
-        for prefix in ("http://", "https://"):
-            if candidato.startswith(prefix):
-                candidato = candidato[len(prefix) :]
-        candidato = candidato.split("/")[0].split(":")[0]
+        """Comprueba que el objetivo solo alcance direcciones públicas (B-8).
+
+        Los nombres de host se resuelven y se comprueban **todas** sus IP: antes
+        un nombre que resolvía a una IP interna (o el nombre de otro contenedor)
+        esquivaba el bloqueo. Los objetivos de laboratorio se autorizan solo en
+        el servidor con ``ROSETTA_AUDIT_ALLOWLIST``. El mensaje de error no
+        revela la IP resuelta para no servir de oráculo de la red interna.
+
+        Riesgo residual documentado: el escáner vuelve a resolver el nombre al
+        ejecutarse (posible DNS rebinding entre la validación y el escaneo).
+        """
+        host = _extraer_host(objetivo_limpio)
+        nombres_lab, redes_lab = _allowlist_auditoria()
+        if host in nombres_lab:
+            return
 
         try:
-            addr = ipaddress.ip_address(candidato)
+            direcciones: list[DireccionIP] = [ipaddress.ip_address(host)]
         except ValueError:
-            return  # No es una IP — es un hostname, dejarlo pasar
+            try:
+                direcciones = _resolver_ips(host)
+            except OSError as exc:
+                raise ValueError(f"No se pudo resolver el objetivo '{objetivo_original}'.") from exc
 
-        for red in _REDES_PROHIBIDAS:
-            if isinstance(red, ipaddress.IPv4Network) and isinstance(addr, ipaddress.IPv4Address):
-                if addr in red:
-                    raise ValueError(
-                        f"El objetivo '{objetivo_original}' es una dirección IP "
-                        "privada/reservada y no puede ser escaneado."
-                    )
-            elif (
-                isinstance(red, ipaddress.IPv6Network)
-                and isinstance(addr, ipaddress.IPv6Address)
-                and addr in red
-            ):
+        for addr in direcciones:
+            if any(addr.version == red.version and addr in red for red in redes_lab):
+                continue
+            if _es_no_publica(addr):
                 raise ValueError(
-                    f"El objetivo '{objetivo_original}' es una dirección IPv6 "
-                    "privada/reservada y no puede ser escaneado."
+                    f"El objetivo '{objetivo_original}' apunta a una dirección "
+                    "privada/reservada y no puede ser escaneado. Para un laboratorio "
+                    "autorizado, añádelo a ROSETTA_AUDIT_ALLOWLIST en el servidor."
                 )
 
     # ------------------------------------------------------------------

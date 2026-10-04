@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import ipaddress
+import socket
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -117,6 +119,91 @@ class TestValidarAlcance:
         orch = Orchestrator(adaptadores={"nuclei": MagicMock()})
         with pytest.raises(ValueError, match="privada"):
             orch._validar_alcance(_make_alcance(objetivos=["https://172.16.0.1/api"]))
+
+
+# ---------------------------------------------------------------------------
+# B-8 · Resolución DNS y allowlist de laboratorio en servidor
+# ---------------------------------------------------------------------------
+
+# DNS ficticio: ningún test consulta la red. Nombres sin entrada no resuelven.
+_DNS: dict[str, list[str]] = {
+    "ejemplo.com": ["93.184.215.14"],
+    "a.com": ["93.184.215.15"],
+    "b.com": ["93.184.215.16"],
+    "interno.techserv.example": ["10.0.0.5"],
+    "mixto.techserv.example": ["93.184.215.20", "192.168.10.4"],
+    "lab-objetivo": ["172.30.0.5"],
+    "otro-contenedor": ["10.0.0.9"],
+}
+
+
+@pytest.fixture(autouse=True)
+def _dns_ficticio(monkeypatch: pytest.MonkeyPatch) -> None:
+    def resolver(host: str) -> list[ipaddress.IPv4Address | ipaddress.IPv6Address]:
+        if host not in _DNS:
+            raise socket.gaierror(f"{host}: nombre desconocido")
+        return [ipaddress.ip_address(ip) for ip in _DNS[host]]
+
+    monkeypatch.setattr("rosetta.core.orchestrator._resolver_ips", resolver)
+    monkeypatch.delenv("ROSETTA_AUDIT_ALLOWLIST", raising=False)
+
+
+class TestAlcanceDNS:
+    def _orch(self) -> Orchestrator:
+        return Orchestrator(adaptadores={"nuclei": MagicMock()})
+
+    def test_hostname_que_resuelve_a_ip_privada_rechazado(self) -> None:
+        """Antes un nombre que resolvía a IP interna esquivaba el bloqueo."""
+        with pytest.raises(ValueError, match="privada"):
+            self._orch()._validar_alcance(
+                _make_alcance(objetivos=["https://interno.techserv.example/login"])
+            )
+
+    def test_basta_una_ip_privada_entre_varias(self) -> None:
+        with pytest.raises(ValueError, match="privada"):
+            self._orch()._validar_alcance(_make_alcance(objetivos=["mixto.techserv.example"]))
+
+    def test_hostname_publico_aceptado(self) -> None:
+        self._orch()._validar_alcance(_make_alcance(objetivos=["https://ejemplo.com:8443/x"]))
+
+    def test_hostname_no_resoluble_rechazado(self) -> None:
+        with pytest.raises(ValueError, match="resolver"):
+            self._orch()._validar_alcance(_make_alcance(objetivos=["no-existe.example"]))
+
+    def test_ipv6_mapeada_a_ipv4_privada_rechazada(self) -> None:
+        with pytest.raises(ValueError, match="privada"):
+            self._orch()._validar_alcance(_make_alcance(objetivos=["http://[::ffff:10.0.0.1]/"]))
+
+    def test_cgnat_rechazado(self) -> None:
+        with pytest.raises(ValueError, match="privada"):
+            self._orch()._validar_alcance(_make_alcance(objetivos=["100.64.0.1"]))
+
+    def test_mensaje_no_revela_la_ip_resuelta(self) -> None:
+        with pytest.raises(ValueError) as info:
+            self._orch()._validar_alcance(_make_alcance(objetivos=["interno.techserv.example"]))
+        assert "10.0.0.5" not in str(info.value)
+
+    def test_allowlist_por_nombre_permite_el_laboratorio(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("ROSETTA_AUDIT_ALLOWLIST", "lab-objetivo")
+        self._orch()._validar_alcance(_make_alcance(objetivos=["http://lab-objetivo:8080/"]))
+
+    def test_allowlist_no_abre_otros_contenedores(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("ROSETTA_AUDIT_ALLOWLIST", "lab-objetivo")
+        with pytest.raises(ValueError, match="privada"):
+            self._orch()._validar_alcance(_make_alcance(objetivos=["otro-contenedor"]))
+
+    def test_allowlist_por_red_cidr(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("ROSETTA_AUDIT_ALLOWLIST", "172.30.0.0/16")
+        self._orch()._validar_alcance(_make_alcance(objetivos=["lab-objetivo"]))
+        with pytest.raises(ValueError, match="privada"):
+            self._orch()._validar_alcance(_make_alcance(objetivos=["interno.techserv.example"]))
+
+    def test_allowlist_no_salva_localhost(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("ROSETTA_AUDIT_ALLOWLIST", "localhost,127.0.0.0/8")
+        with pytest.raises(ValueError, match="lista negra"):
+            self._orch()._validar_alcance(_make_alcance(objetivos=["http://localhost/"]))
 
 
 # ---------------------------------------------------------------------------
