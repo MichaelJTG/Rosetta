@@ -182,3 +182,16 @@ def test_login_erroneo_devuelve_401_y_correcto_da_token_valido(
     token = bueno.json()["access_token"]
     r = cliente_neo4j_caido.get("/findings", headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 200
+
+
+def test_api_no_arranca_con_autenticacion_mal_configurada(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """B-5: con usuarios definidos y sin ROSETTA_JWT_SECRET la API se niega a arrancar."""
+    monkeypatch.setattr(api_main, "NormativaRAG", _RagFalso)
+    monkeypatch.setenv("ROSETTA_USER", "auditor-demo")
+    monkeypatch.setenv("ROSETTA_PASSWORD", "clave-ficticia-de-prueba")
+    monkeypatch.delenv("ROSETTA_JWT_SECRET")
+
+    with pytest.raises(RuntimeError, match="ROSETTA_JWT_SECRET"), TestClient(app):
+        pass

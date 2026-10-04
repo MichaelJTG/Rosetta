@@ -37,6 +37,7 @@ from rosetta.api.auth import (
     create_access_token,
     create_refresh_token,
     decode_token,
+    validar_configuracion_auth,
     verify_credentials,
 )
 from rosetta.api.dashboard import HTML_DASHBOARD
@@ -113,6 +114,16 @@ logger = structlog.get_logger(__name__)
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     """Inicializa recursos al arrancar y los cierra al parar."""
     logger.info("rosetta_api_starting", version=__version__)
+
+    # B-5: fail-closed. Si la autenticación está mal configurada, no se arranca.
+    modo_auth = validar_configuracion_auth()
+    if modo_auth == "desactivada":
+        logger.warning(
+            "autenticacion_desactivada_modo_desarrollo",
+            aviso="ROSETTA_AUTH_DISABLED=1: la API no exige credenciales. Nunca en producción.",
+        )
+    else:
+        logger.info("autenticacion_activa")
 
     chroma_path = os.getenv("CHROMADB_PATH", ".chroma")
     marcos_raw = os.getenv("ROSETTA_MARCOS", "iso_27001_2022").split(",")

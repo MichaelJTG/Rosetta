@@ -52,6 +52,10 @@ def _entorno_aislado(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Iterato
         monkeypatch.delenv(var, raising=False)
     monkeypatch.setenv("LLM_PROVIDER", "claude")
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key-no-real")
+    # Sin usuarios configurados la API exige modo desarrollo explícito (B-5).
+    # Los tests de autenticación definen sus propias credenciales.
+    monkeypatch.setenv("ROSETTA_AUTH_DISABLED", "1")
+    monkeypatch.setenv("ROSETTA_JWT_SECRET", "secreto-de-prueba-" + "x" * 32)
     monkeypatch.setenv("CHROMADB_PATH", str(tmp_path / "chroma"))
     monkeypatch.setenv("ROSETTA_SESSION_DB", str(tmp_path / "sessions.db"))
     monkeypatch.setenv("ROSETTA_CONTROLS_DB", str(tmp_path / "controls.db"))
