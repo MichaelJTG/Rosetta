@@ -198,7 +198,9 @@ class ReportGenerateRequest(BaseModel):
     )
     nombre_base: str | None = Field(
         default=None,
+        pattern=r"^[A-Za-z0-9][A-Za-z0-9_\-]{0,63}$",
         description="Nombre base para los archivos (sin extensión). "
+        "Solo letras, dígitos, guiones y subrayados (máx. 64 caracteres). "
         "Por defecto: rosetta_report_YYYYMMDD_HHMMSS.",
     )
     hallazgo_ids: list[str] | None = Field(
