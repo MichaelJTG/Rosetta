@@ -119,7 +119,108 @@ ejecutaron la suite completa, ruff y `mypy --strict`. En la pila de embeddings
 
 ---
 
-## 4. Pendientes que requieren al autor
+## 4. Modelo de amenazas STRIDE (B-7)
+
+### Activos
+
+| Activo | Descripción | Confidencialidad | Integridad | Disponibilidad |
+|--------|-------------|-----------------|-----------|----------------|
+| Corpus normativo | Fragmentos indexados de ISO 27001, ENS, NIS2, DORA, RGPD, NIST CSF 2.0, PCI-DSS 4.0 en ChromaDB | Media | Alta | Alta |
+| Historial de hallazgos | SQLite con todos los `HallazgoMaestro` de las sesiones | Alta | Alta | Alta |
+| Credenciales de usuario | Hashes bcrypt en variables de entorno; secreto JWT en `.env` | Crítica | Alta | — |
+| Catálogo de controles | SQLite con estado de cumplimiento por marco | Alta | Alta | Alta |
+| Informes generados | Dosiers MD/PDF en volumen Docker `rosetta_reports` | Alta | Alta | Media |
+| Clave API de Anthropic | Variable de entorno `ANTHROPIC_API_KEY` | Crítica | — | — |
+| Acceso al LLM (Ollama/Claude) | Canal HTTP interno (Ollama) o HTTPS (Claude API) | Media | Alta | Alta |
+
+### Actores
+
+| Actor | Descripción | Nivel de confianza |
+|-------|-------------|-------------------|
+| Auditor autenticado | Usuario con JWT o Basic válido | Confianza total sobre sus propios hallazgos |
+| Atacante externo | Sin credenciales; accede solo a la API pública | Sin confianza |
+| Atacante interno | Sesión activa conseguida por robo de credencial o JWT | Confianza limitada |
+| LLM externo | Claude API (Anthropic); puede devolver contenido generado | Datos no confiables (ver amenazas LLM) |
+| Herramientas de terceros | Nuclei, Nmap, Wazuh; controlados por el servidor | Confianza media (outputs validados) |
+
+### Amenazas por categoría STRIDE
+
+#### S — Spoofing (suplantación)
+
+| ID | Amenaza | Componente afectado | Control existente | Riesgo residual |
+|----|---------|--------------------|--------------------|-----------------|
+| S-1 | Robo de JWT para suplantar sesión | `POST /auth/login` · `src/rosetta/api/auth.py` | Secreto JWT ≥ 32 chars obligatorio (B-5); tokens con expiración configurable | Bajo |
+| S-2 | Fuerza bruta de credenciales | `POST /auth/login` · `POST /auth/basic` | Rate limiting slowapi (120 req/min por IP, con X-Real-IP como clave) | Medio — sin bloqueo permanente por cuenta |
+| S-3 | Inyección de IP para eludir rate limiting via XFF | `_client_ip` en `main.py` | **B-4 corregido**: se usa X-Real-IP (nginx), XFF se descarta | Bajo |
+
+#### T — Tampering (manipulación)
+
+| ID | Amenaza | Componente afectado | Control existente | Riesgo residual |
+|----|---------|--------------------|--------------------|-----------------|
+| T-1 | Modificación de informe en disco antes de descarga | `GET /reports/download/{filename}` | Nombre en lista blanca `[A-Za-z0-9][A-Za-z0-9_-]{0,99}.(md\|pdf)`; ruta restringida al directorio de informes (A-3) | Bajo |
+| T-2 | Path traversal en `nombre_base` de generación | `POST /reports/generate` | **B-1 corregido**: Pydantic v2 `pattern=` rechaza cualquier carácter fuera de `[A-Za-z0-9_-]` (máx. 64 chars) → 422 | Bajo |
+| T-3 | Manipulación del estado de un control por otro usuario | `PATCH /controls/{marco}/{id}` | Autenticación JWT obligatoria; en MVP-6 no hay RBAC multi-usuario (todos los usuarios autenticados comparten el mismo catálogo) | Medio — pendiente RBAC si hay varios auditores |
+| T-4 | Envenenamiento del corpus (corpus poisoning) | `rosetta load-corpus` · ChromaDB | Comando CLI restringido a operadores; corpus cargado desde archivos locales validados | Bajo |
+
+#### R — Repudiation (repudio)
+
+| ID | Amenaza | Componente afectado | Control existente | Riesgo residual |
+|----|---------|--------------------|--------------------|-----------------|
+| R-1 | Un auditor niega haber creado un hallazgo | `POST /translate` · `session_store.py` | Los hallazgos son append-only con timestamp; JWT identifica al emisor en el log de structlog | Medio — no hay firma criptográfica por usuario en cada hallazgo |
+| R-2 | Un auditor niega haber cambiado el estado de un control | `PATCH /controls/{marco}/{id}` | Log de structlog con timestamp e IP real | Medio — no hay audit trail persistido por operación |
+
+#### I — Information Disclosure (divulgación)
+
+| ID | Amenaza | Componente afectado | Control existente | Riesgo residual |
+|----|---------|--------------------|--------------------|-----------------|
+| I-1 | Exposición de detalles internos en errores 500 | API REST | **B-6 corregido**: mensajes genéricos; excepción solo en log structlog interno | Bajo |
+| I-2 | XSS almacenado via datos del LLM o del controlador | Dashboard JS (`dashboard.py`) | **B-2 corregido**: `esc()` en todos los contextos `innerHTML` con datos de usuario/LLM | Bajo |
+| I-3 | Filtración de secretos en el repositorio | Codebase · CI | gitleaks en pre-commit y CI; incidente INC-01 documentado y credenciales rotadas | Bajo (historial antiguo, ya inválido) |
+| I-4 | Acceso a informes sin autenticar | `GET /reports/download/{filename}` | Endpoint autenticado: sin JWT/Basic válido → 401 (A-3) | Bajo |
+| I-5 | Headers HTTP revelan tecnología de implementación | Todas las respuestas | **B-3**: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, CSP añadidos | Bajo |
+
+#### D — Denial of Service (denegación de servicio)
+
+| ID | Amenaza | Componente afectado | Control existente | Riesgo residual |
+|----|---------|--------------------|--------------------|-----------------|
+| D-1 | Abuso de `/translate` para agotar cuota del LLM | `POST /translate` | Rate limiting (120 req/min por IP); autenticación obligatoria | Medio — economic DoS si la clave API se filtra |
+| D-2 | Subida de PDF gigante para agotar memoria | `POST /ingest/pdf` | Pendiente B-9 (sin límite de tamaño ni comprobación de magic bytes aún) | **Alto** — sin mitigar en MVP actual |
+| D-3 | Bucle de agente LLM que no termina | Pipeline RAG + LLM | Timeout del cliente HTTP (aiohttp/httpx) configurado en el SDK | Medio — no hay circuit breaker explícito |
+| D-4 | Escaneo masivo de activos internos via Modo Auditoría | `POST /audit/start` | Validación de alcance con DNS + `is_global` + allowlist de servidor (B-8) | Bajo |
+
+#### E — Elevation of Privilege (elevación de privilegios)
+
+| ID | Amenaza | Componente afectado | Control existente | Riesgo residual |
+|----|---------|--------------------|--------------------|-----------------|
+| E-1 | Proceso app corriendo como root en el contenedor | Dockerfile | uid 10001 (`USER rosetta`), sin `CAP_NET_ADMIN` (A-1) | Bajo |
+| E-2 | Nuclei o Nmap ejecutados con privilegios de red ampliados | `src/rosetta/adapters/red/` | Proceso normal sin NET_RAW; Nmap SYN scan requiere root → modo TCP connect fallback | Bajo |
+| E-3 | Inyección de comandos via parámetros de escaneo | `POST /audit/start` | Parámetros pasados como lista (no como shell string); Pydantic valida tipos | Bajo |
+
+### Amenazas específicas de sistemas LLM
+
+| ID | Amenaza | Descripción | Control existente | Riesgo residual |
+|----|---------|-------------|-------------------|-----------------|
+| LLM-1 | Prompt injection directa | Un hallazgo o consulta al Copilot contiene instrucciones que modifican el comportamiento del LLM | Tool-use forzado con esquema Pydantic — el LLM solo puede rellenar campos predefinidos, no ejecutar texto libre | Medio |
+| LLM-2 | XSS via salida del LLM | El LLM genera `<script>` o atributos `onerror=` en `justificacion`, `cita_normativa` u otros campos de texto renderizados en el dashboard | **B-2 corregido**: todos los campos LLM pasan por `esc()` antes de `innerHTML` | Bajo |
+| LLM-3 | Economic DoS (agotamiento de cuota) | Un atacante autenticado lanza miles de traducciones para agotar la cuota de la API de Anthropic | Rate limiting + autenticación; sin cuota explícita en código | Medio |
+| LLM-4 | Alucinación de controles | El LLM cita un control inexistente o de una versión antigua del estándar | RAG sobre corpus verificado limita el espacio de respuesta; tool-use fuerza IDs reales de controles | Medio — sin verificador automático de IDs en esta versión |
+| LLM-5 | Corpus poisoning via PDF malicioso | Un PDF enviado a `/ingest/pdf` contiene texto que envenena el corpus | El endpoint extrae hallazgos, no modifica el corpus ChromaDB directamente; `load-corpus` es CLI, no API | Bajo |
+
+### Superficie de ataque resumida
+
+```
+Internet → nginx (TLS) → FastAPI (JWT + BasicAuth) → Core (RAG + LLM)
+                                                    → Neo4j (red interna)
+                                                    → ChromaDB (embebido)
+                                                    → SQLite (volumen)
+                                                    → Nuclei/Nmap (CLI, solo con allowlist)
+```
+
+El perímetro externo es nginx. La API nunca está expuesta directamente a Internet. Neo4j, ChromaDB y SQLite no tienen puertos publicados.
+
+---
+
+## 5. Pendientes que requieren al autor
 
 - Revisar tres coincidencias con patrón de clave en el commit antiguo
   `4324141` (`tests/test_api_diff.py`, `tests/test_diff_analyzer.py`,
