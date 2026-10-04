@@ -3530,9 +3530,9 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         const evCount = (c.evidencias_vinculadas || []).length;
         return `<tr style="cursor:pointer" onclick="openControlModal(${JSON.stringify(c).replace(/"/g,'&quot;')})">
           <td style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">${c.control_id}</td>
-          <td>${c.titulo}</td>
+          <td>${esc(c.titulo)}</td>
           <td><span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--r-pill);font-size:11px;font-weight:500;color:${col};background:${bg}">${lbl}</span></td>
-          <td style="color:var(--fg-3);font-size:12px">${c.responsable || '—'}</td>
+          <td style="color:var(--fg-3);font-size:12px">${esc(c.responsable || '—')}</td>
           <td style="text-align:center"><span style="font-family:var(--font-mono);font-size:11px;color:${evCount>0?'var(--accent)':'var(--fg-4)'}">${evCount}</span></td>
         </tr>`;
       }).join('');
@@ -3546,7 +3546,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       document.getElementById('ctrl-modal-resp').value        = ctrl.responsable || '';
       document.getElementById('ctrl-modal-comments').value    = ctrl.comentarios || '';
       const evList = document.getElementById('ctrl-modal-ev');
-      evList.innerHTML = (ctrl.evidencias_vinculadas||[]).map(id=>`<li style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">${id}</li>`).join('') || '<li style="color:var(--fg-4)">Sin evidencias vinculadas</li>';
+      evList.innerHTML = (ctrl.evidencias_vinculadas||[]).map(id=>`<li style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">${esc(id)}</li>`).join('') || '<li style="color:var(--fg-4)">Sin evidencias vinculadas</li>';
       document.getElementById('ctrl-modal').dataset.controlId = ctrl.control_id;
       document.getElementById('ctrl-modal').classList.add('open');
       document.getElementById('ctrl-modal').removeAttribute('aria-hidden');
@@ -3703,9 +3703,9 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
             <span style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">${c.control_id}</span>
             <span style="width:10px;height:10px;border-radius:50%;background:${COV[c.cobertura]||COV['sin_datos']};flex-shrink:0;margin-top:2px"></span>
           </div>
-          <div style="font-size:12px;font-weight:500;color:var(--fg-1);margin-bottom:var(--s-2);line-height:1.3">${c.titulo}</div>
+          <div style="font-size:12px;font-weight:500;color:var(--fg-1);margin-bottom:var(--s-2);line-height:1.3">${esc(c.titulo)}</div>
           <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:var(--s-2)">
-            ${(c.fuentes_activas||[]).map(f=>`<span style="font-family:var(--font-mono);font-size:10px;padding:1px 6px;border-radius:var(--r-pill);background:${COV_BG[c.cobertura]||'var(--surface-3)'};color:${COV[c.cobertura]||'var(--fg-3)'}">${f}</span>`).join('')||'<span style="font-size:11px;color:var(--fg-4)">Sin evidencias</span>'}
+            ${(c.fuentes_activas||[]).map(f=>`<span style="font-family:var(--font-mono);font-size:10px;padding:1px 6px;border-radius:var(--r-pill);background:${COV_BG[c.cobertura]||'var(--surface-3)'};color:${COV[c.cobertura]||'var(--fg-3)'}">${esc(f)}</span>`).join('')||'<span style="font-size:11px;color:var(--fg-4)">Sin evidencias</span>'}
           </div>
           <div style="font-size:11px;color:var(--fg-4)">${c.total_evidencias} evento${c.total_evidencias!==1?'s':''} · ${c.ultimo_evento?c.ultimo_evento.slice(0,10):'—'}</div>
         </div>
@@ -3733,7 +3733,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
            <span style="color:var(--fg-4)">? Sin datos: ${data.sin_datos}</span> &nbsp;
            <strong style="color:var(--accent)">${data.porcentaje_cumplimiento}% cumplimiento</strong>`;
       } catch(e) {
-        if (el) el.innerHTML = '<tr><td colspan="5" style="color:var(--sev-critica)">Error: ' + e.message + '</td></tr>';
+        if (el) el.innerHTML = '<tr><td colspan="5" style="color:var(--sev-critica)">Error: ' + esc(e.message) + '</td></tr>';
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Analizar con mis datos'; }
       }
@@ -3753,10 +3753,10 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         const conf = Math.round((c.confianza||0)*100);
         return `<tr>
           <td style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">${c.control_id}</td>
-          <td style="font-size:12px">${c.titulo}</td>
+          <td style="font-size:12px">${esc(c.titulo)}</td>
           <td><span style="padding:2px 8px;border-radius:var(--r-pill);font-size:11px;font-weight:500;color:${col};background:${bg}">${lbl}</span></td>
           <td style="font-size:11px;color:var(--fg-3)">${conf}%</td>
-          <td style="font-size:11px;color:var(--fg-3);max-width:200px">${c.justificacion}</td>
+          <td style="font-size:11px;color:var(--fg-3);max-width:200px">${esc(c.justificacion)}</td>
         </tr>`;
       }).join('');
     }
@@ -3782,7 +3782,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
            <strong>€${data.total_coste_eur.toLocaleString()}</strong> estimado`;
         document.getElementById('plan-resumen').textContent = data.resumen_ejecutivo || '';
       } catch(e) {
-        if (el) el.innerHTML = '<tr><td colspan="6" style="color:var(--sev-critica)">Error: ' + e.message + '</td></tr>';
+        if (el) el.innerHTML = '<tr><td colspan="6" style="color:var(--sev-critica)">Error: ' + esc(e.message) + '</td></tr>';
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Generar Plan Director'; }
       }
@@ -3794,10 +3794,10 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       const PRIO = {'critica':['var(--sev-critica)','var(--sev-critica-bg)'],'alta':['var(--sev-alta)','var(--sev-alta-bg)'],'media':['var(--sev-media)','var(--sev-media-bg)'],'baja':['var(--sev-baja)','var(--sev-baja-bg)']};
       el.innerHTML = (data.acciones||[]).map(a => {
         const [col,bg] = PRIO[a.prioridad] || PRIO['media'];
-        const cubierto = a.cubierto_por_herramienta ? `<span style="font-size:10px;color:var(--sev-baja);background:var(--sev-baja-bg);padding:1px 5px;border-radius:var(--r-pill)">✅ ${a.cubierto_por_herramienta}</span>` : '';
+        const cubierto = a.cubierto_por_herramienta ? `<span style="font-size:10px;color:var(--sev-baja);background:var(--sev-baja-bg);padding:1px 5px;border-radius:var(--r-pill)">✅ ${esc(a.cubierto_por_herramienta)}</span>` : '';
         return `<tr>
-          <td style="font-size:12px;font-weight:500">${a.titulo} ${cubierto}</td>
-          <td style="font-size:11px;color:var(--fg-3)">${a.categoria}</td>
+          <td style="font-size:12px;font-weight:500">${esc(a.titulo)} ${cubierto}</td>
+          <td style="font-size:11px;color:var(--fg-3)">${esc(a.categoria)}</td>
           <td><span style="padding:2px 8px;border-radius:var(--r-pill);font-size:11px;font-weight:500;color:${col};background:${bg}">${a.prioridad}</span></td>
           <td style="font-family:var(--font-mono);font-size:11px;text-align:right">${a.personas_dia}d</td>
           <td style="font-family:var(--font-mono);font-size:11px;text-align:right;color:var(--accent)">€${a.coste_estimado_eur.toLocaleString()}</td>
