@@ -28,7 +28,7 @@
 | RF-06 | Modo Auditoría Red Team (Nmap, Nuclei) + WebSocket | `f89cb28` | `tests/test_orchestrator.py` | `POST /audit/start` → `WS /audit/ws/{id}`. Nmap 7.95 + Nuclei 3.11.1 en imagen Docker. |
 | RF-07 | Ingesta de alertas Wazuh (JSON/CSV) | `bd0b190` | `tests/test_wazuh.py` | `POST /blue/ingest` → alertas normalizadas a `DatosBlue`. |
 | RF-08 | Correlación Red↔Blue | `bd0b190` | `tests/test_blue_enrichment.py` | `BlueEnrichment.enriquecer()` cruza hallazgos. 96 % cobertura. |
-| RF-09 | Arquitectura multi-agente (Soundwave + Validador) | `bd0b190` | `tests/test_agents.py` | `RosettaOrchestrator` instanciable. Efecto del Validador medido en eval harness (F1 del Traductor). |
+| RF-09 | Arquitectura multi-agente (Soundwave + Validador) | `782a889` | `tests/test_agents.py` · `tests/test_security.py` (RF-09) | `RosettaOrchestrator` + `Validador` implementados. `POST /translate?validar=true` invoca Validador (por defecto `false`). Benchmark: rejection_precision@F1<0.5=1.0 (10 casos piloto). |
 | RF-10 | Copilot normativo con citas y confianza | `bd0b190` | `tests/test_copilot.py` | `POST /copilot/ask` → respuesta con campo `confianza`. 94 % cobertura. |
 | RF-11 | Detección de procedure drift | `bd0b190` | `tests/test_drift.py` | `POST /drift/analyze` → `drift_score`, diferencias detectadas. 95 % cobertura. |
 | RF-12 | Dashboard SPA 16 paneles | `c1e4cde` | `tests/test_security.py` (XSS) | `GET /dashboard` → HTML con los 16 paneles. Todos los `innerHTML` con `esc()`. |
@@ -72,9 +72,10 @@
 | Bloque | Ítems | Commits | Estado |
 |--------|-------|---------|--------|
 | Bloque A (CI, infraestructura, demos) | A-0, A-1, A-3, A-4, A-5, A-6, A-7, A-8, A-9 | `5ea2d2d`…`f89cb28` | ✅ Completo |
-| Bloque B (seguridad) | B-1…B-8, B-10, B-12 | `f916b39`…`1048992` | ✅ Completo |
-| Bloque C (eval + corpus ENS) | C-1, C-2, C-3, C-4 | `4e23e34` | ✅ Completo |
-| Bloque D (cierre P3) | D-1, D-2, D-3, D-5 | este commit | ✅ Completo |
+| Bloque B (seguridad) | B-1…B-8, B-10 (B-9 no hecho; B-11 pendiente) | `f916b39`…`782a889` | 🟡 Parcial (B-9 sin mitigar) |
+| Bloque C (eval + corpus ENS) | C-1, C-2, C-3, C-4 | `4e23e34` · `ce6fe40` | ✅ Completo |
+| Bloque D (cierre P3) | D-1, D-2, D-3, D-4, D-5 | `b270d34` · `ce6fe40` | ✅ Completo |
+| Bloque E (memoria de insumos) | `docs/P3_MEMORIA_INSUMOS.md` · atribución corpus/ground truth | este commit | ✅ Completo |
 
 ---
 

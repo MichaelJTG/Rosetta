@@ -1,9 +1,21 @@
 # Corpus ENS — Esquema Nacional de Seguridad (RD 311/2022)
 
-**Fuente**: Real Decreto 311/2022, de 3 de mayo (BOE-A-2022-7191)
-**Licencia**: Dominio público — legislación española de libre difusión
-**Controles**: 35 medidas de las tres dimensiones (marco organizativo, marco operacional, medidas de protección)
+**Fuente principal**: Real Decreto 311/2022, de 3 de mayo (BOE-A-2022-7191).
+Texto del Anexo II transcrito del Boletín Oficial del Estado — legislación española de libre difusión.
+
+**Fuente de los mapeos ISO 27001:2022**: CCN-STIC 825 «Esquema Nacional de Seguridad — Guía de Adecuación»,
+publicada por el Centro Criptológico Nacional (CCN). Documento público. Los identificadores de control ISO
+que aparecen en la columna `iso_27001_2022` de `ens-2022-anexo-ii.yaml` se derivan de esa guía.
+No se reproduce el texto de la CCN-STIC 825 en este repositorio.
+
+**Fuente de los mapeos en el ground truth de evaluación** (`eval/ground_truth/ens_iso.json`):
+SoA del caso TechServ, facilitado por el equipo docente de la asignatura como material
+del ejercicio práctico. Los controles ISO aparecen como listas de identificadores; el
+texto del SoA no se reproduce. Ver `eval/ground_truth/README.md`.
+
+**Licencia del corpus YAML**: Dominio público — legislación española de libre difusión.
 **Formato**: YAML compatible con `CorpusLoader._cargar_yaml_intuitem`
+**Controles**: 73 medidas del Anexo II (todas las familias ENS)
 
 ## Cobertura
 

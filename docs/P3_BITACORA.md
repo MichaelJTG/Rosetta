@@ -177,6 +177,118 @@ Seis requisitos marcados como ✅ no lo estaban (ver más abajo).
 
 ---
 
+## Bloque B · Hardening de seguridad del producto
+
+### B-1 · Path traversal en `nombre_base` · RNF-07
+
+| | |
+|---|---|
+| **Qué** | Validación Pydantic en `POST /reports/generate`: `nombre_base` solo acepta `[a-zA-Z0-9_-]`, máximo 64 caracteres. Cualquier separador de ruta o punto devuelve 422 antes de tocar el sistema de ficheros. |
+| **Por qué** | Sin validación era posible escribir el informe en rutas arbitrarias del contenedor con un nombre como `../../etc/x`. |
+| **Commit** | `f916b39` |
+| **Tests** | 5 tests en `tests/test_security.py` (traversal con `/`, con `\`, con punto, demasiado largo, espacio; más 1 caso válido). |
+
+### B-2 · XSS en el dashboard · RNF-07
+
+| | |
+|---|---|
+| **Qué** | Función `esc()` en `src/rosetta/api/dashboard.py` que aplica `html.escape()` a cualquier cadena antes de insertarla en el HTML del panel. Reemplaza todos los `innerHTML =` con datos de usuario o de salida del LLM. |
+| **Por qué** | El dashboard construía el HTML concatenando strings crudos. Un hallazgo con `<script>` en el campo `evidencia` o en la justificación del LLM ejecutaba JS en el navegador del auditor. |
+| **Commit** | `c1e4cde` |
+
+### B-3 · Cabeceras de seguridad HTTP · RNF-07
+
+| | |
+|---|---|
+| **Qué** | Middleware `SecurityHeadersMiddleware` en `src/rosetta/api/main.py`: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Content-Security-Policy` con directivas obligatorias y `object-src 'none'`. |
+| **Por qué** | Sin cabeceras, el navegador no aplica ninguna política de origen. Requerimiento explícito de hardening del enunciado. |
+| **Commit** | `4488ae6` |
+| **Tests** | 3 tests en `tests/test_security.py`: cabeceras presentes, CSP con directivas obligatorias, CSP permite unpkg y Google Fonts. |
+
+### B-4 · X-Real-IP con proxies de confianza · RNF-07
+
+| | |
+|---|---|
+| **Qué** | `ROSETTA_TRUSTED_PROXIES` (por defecto `127.0.0.1` y `172.16.0.0/12`). Solo se acepta `X-Real-IP` si el peer TCP está en esa lista. `X-Forwarded-For` nunca se usa para la clave de rate limiting. |
+| **Por qué** | Sin validación del origen, cualquier cliente podía enviar `X-Real-IP: 1.2.3.4` para rotar la clave de rate limit o suplantar una IP. La primera versión usaba `X-Real-IP` incondicionalmente. |
+| **Commits** | `4488ae6` (implementación inicial) · `782a889` (revisión: proxies de confianza estrictos) |
+| **Tests** | 6 tests en `tests/test_security.py`: localhost y red Docker son de confianza; IP pública no lo es; X-Real-IP desde origen no confiable se ignora; desde proxy de confianza se acepta. |
+
+### B-6 · Errores 500 sin detalles internos · RNF-07
+
+| | |
+|---|---|
+| **Qué** | Handler global en FastAPI que captura cualquier excepción no controlada y devuelve `{"detail": "Error interno del servidor"}` sin traza ni mensajes de sistema. `structlog` registra el traceback completo en los logs del contenedor. |
+| **Por qué** | Las excepciones sin capturar exponían rutas internas, nombres de variables y mensajes de librerías en la respuesta JSON. |
+| **Commit** | `4488ae6` |
+| **Tests** | 2 tests en `tests/test_security.py`: excepción en `ReportGenerator` y en `consultar_copilot` no filtran la cadena interna. |
+
+### B-7 · Modelo de amenazas STRIDE · RNF-11
+
+| | |
+|---|---|
+| **Qué** | Sección 4 de `docs/P3_SEGURIDAD.md`: tabla STRIDE completa (Spoofing, Tampering, Repudiation, Information Disclosure, DoS, Elevation of Privilege) sobre los activos de ROSETTA, con referencia a los controles B-1..B-8 que los mitigan. Tabla adicional de amenazas específicas de LLM: prompt injection, XSS vía LLM, economic DoS, alucinaciones, corpus poisoning. Diagrama de superficie de ataque. |
+| **Por qué** | RNF-11 exige modelo de amenazas documentado. El Bloque B implementó controles; este ítem los mapea formalmente. |
+| **Commit** | `1048992` |
+| **Resultado** | RNF-11 pasa de Pendiente a ✅. |
+
+### B-9 · Límite de tamaño y magic bytes en PDF — NO HECHO
+
+B-9 no está implementado. `POST /ingest/pdf` no tiene límite de tamaño ni comprobación de magic bytes. La amenaza D-2 del modelo STRIDE (subida de PDF gigante para agotar memoria) figura como **Alto — sin mitigar** en `docs/P3_SEGURIDAD.md`. Queda fuera del alcance del MVP-1.
+
+### B-10 · Imagen Docker reproducible y sin root · RNF-12
+
+| | |
+|---|---|
+| **Qué** | Dockerfile reescrito: build desde `uv.lock` (reproducible), torch CPU (2,1 GB vs 10,3 GB), Nuclei instalado para amd64 y arm64, proceso como usuario `rosetta` sin privilegios, solo `src/` y `scripts/` copiados. |
+| **Por qué** | La imagen anterior tardaba 10 min, pesaba 10,3 GB, corría como root y no incluía Nuclei. Proceso como root viola el principio de mínimo privilegio. |
+| **Commit** | `6c5485b` |
+
+### B-11 · Secretos fuera del historial — NO HECHO (pendiente decisión)
+
+B-11 (limpieza del historial con `git filter-repo`) no se ejecutó. Decisión documentada en INC-01 (`docs/P3_SEGURIDAD.md`): la contraseña antigua del profesor sigue en el historial de GitHub, pero ya está rotada y verificada como rechazada en producción. La limpieza con force-push la decide el autor antes del jueves 8. No ejecutar sin autorización explícita.
+
+---
+
+## Bloque C · Corpus ENS y harness de evaluación
+
+### C-1 · Corpus ENS enriquecido
+
+| | |
+|---|---|
+| **Qué** | `corpus/ens/ens-2022-anexo-ii.yaml` ampliado: descripciones cortas y completas, referencias cruzadas ISO 27001:2022 y NIS2 por medida, etiquetas de categoría ENS. Fuentes: texto del Anexo II del RD 311/2022 (BOE-A-2022-7191) y mapeo CCN-STIC 825. |
+| **Por qué** | El corpus anterior era un esqueleto sin descripciones. Sin texto real el RAG no produce contexto útil para el Traductor. |
+| **Commit** | `4e23e34` |
+
+### C-2 · Harness de evaluación · `eval/run_eval.py`
+
+| | |
+|---|---|
+| **Qué** | Script de evaluación automatizada con dos modos: `correspondencia` (ENS→ISO, ground truth del SoA del caso TechServ del equipo docente) y `hallazgo` (hallazgo técnico→ISO, ground truth provisional). Métricas por caso y por familia: Precision, Recall, F1, tasa de alucinación (control inventado) y tasa de discrepancia (control real con mapeo diferente). |
+| **Por qué** | Sin métricas objetivas no hay forma de comparar el Traductor solo frente al Traductor + Validador. Requerimiento explícito del plan de cierre. |
+| **Commits** | `4e23e34` (base) · `ce6fe40` (separación alucinación/discrepancia, modo hallazgo, Validador) |
+
+### C-3 · Ground truth ENS↔ISO
+
+| | |
+|---|---|
+| **Qué** | `eval/ground_truth/ens_iso.json`: 73 casos (uno por medida ENS), fuente = SoA del caso TechServ del equipo docente. `eval/ground_truth/ens_hallazgos_tecnicos.json`: 16 casos ficticios (TechServ S.A.), uno por familia ENS, con hallazgos técnicos sintéticos y anotación `revision: pendiente`. **El mapeo no se generó con IA** — sería medir el modelo contra sí mismo. |
+| **Por qué** | La única fuente válida de ground truth es el criterio humano (SoA del docente o revisión manual). Los 16 casos de hallazgo son provisionales hasta revisión. |
+| **Commits** | `4e23e34` (`ens_iso.json`) · `ce6fe40` (`ens_hallazgos_tecnicos.json`) |
+
+### C-4 · Ejecución del eval con Ollama · resultados
+
+| | |
+|---|---|
+| **Qué** | Ejecución de los 73 casos de correspondencia y los 16 de hallazgo con `qwen2.5:14b` vía Ollama. Comparativa Traductor solo vs. Traductor + Validador (10 casos piloto). |
+| **Resultados (correspondencia, 73 casos)** | P=0.408 · R=0.216 · F1=0.265 · alucinación=0.000 · discrepancia=0.625 |
+| **Resultados (hallazgo, 16 casos)** | P=0.313 · R=0.281 · F1=0.281 · alucinación=0.000 · discrepancia=0.757 |
+| **Validador piloto (10 casos)** | aprobados avg F1=0.352 · rechazados avg F1=0.267 · rejection_precision@F1<0.5=1.0 |
+| **Hallazgo clave** | `alucinacion_rate = 0.000` en ambos modos. El modelo nunca inventa controles inexistentes; todas las equivocaciones son controles ISO reales con mapeo diferente al de CCN-STIC 825. El Validador rechazó correctamente el 100 % de los casos con F1 < 0.5. |
+| **Commit** | `ce6fe40` |
+
+---
+
 ## Bloque D · Cierre P3
 
 ### D-1 · Tests del eval harness · C-2
@@ -204,6 +316,24 @@ Seis requisitos marcados como ✅ no lo estaban (ver más abajo).
 | **Qué** | Nuevo fichero `docs/P3_MATRIZ.md`: tabla RF/RNF → commit → tests → evidencia para los 26 RF y 12 RNF. Incluye resumen por bloque y snapshot de tests/cobertura. |
 | **Por qué** | Requerimiento explícito del plan de cierre P3. Permite al evaluador trazar cualquier requisito hasta el código en segundos. |
 | **Commit** | este bloque D |
+
+### D-4 · Incoherencias entre el informe P1 y el estado real · docs/P3_MEMORIA_INSUMOS.md
+
+| | |
+|---|---|
+| **Qué** | Análisis de divergencias entre lo que afirma `docs/informe/informe_rosetta_practica1.html` y lo que implementa el código en la rama `main` tras el Bloque A de P3. |
+
+**Incoherencias detectadas:**
+
+| Afirmación en el informe P1 | Realidad en P3 | Gravedad |
+|-----------------------------|----------------|----------|
+| «FastAPI expone **15 endpoints REST** y un WebSocket» | La API tiene **~30 rutas REST** + 1 WebSocket en `src/rosetta/api/main.py`. | Menor — el número real es mayor, no menor. |
+| «**WeasyPrint**» como generador de PDF (píldora de tecnología y lista de dependencias) | El PDF se genera con **reportlab** (MIT puro Python). `src/rosetta/core/report_generator.py` línea 7: _«WeasyPrint requiere GTK+; reportlab es el backend»_. WeasyPrint no está en `pyproject.toml`. | Media — dependencia incorrecta en el informe. |
+| «**tasa de alucinación**» como métrica ya medida en P1 | La métrica no existía. El harness de evaluación (`eval/run_eval.py`) se creó en el Bloque C de P3. Los datos reales: `alucinacion_rate = 0.000`, `discrepancia_rate = 0.625` (correspondencia, 73 casos). | Media — métrica prometida sin base empírica. |
+| Adaptadores Red Team: **Nuclei, Nmap, Amass** | Amass tiene adapter (`src/rosetta/adapters/red/amass.py`) pero **no está instalado** en la imagen Docker ni aparece en el orquestador de auditoría. El panel de Auditoría solo ofrece Nuclei y Nmap. Amass actúa como valor de `origen` en el formulario del Traductor, no como scanner activo. | Menor — el adapter existe pero no está operativo. |
+| Credenciales del profesor en texto claro | Credencial rotada y reemplazada por `[credencial invalidada — ver P3_SEGURIDAD.md §1]` en el HTML (commit `ea3f1f1` saneado). Sigue en el `.docx` (binario, edición manual pendiente). | Alta — ya gestionado como INC-01. |
+
+**Origen del análisis**: revisión manual del HTML contra los commits del Bloque A. Ver `docs/P3_MEMORIA_INSUMOS.md` para el inventario completo de fuentes y datos de P3.
 
 ### D-5 · Guión de vídeo · docs/P3_VIDEO_SCRIPT.md
 
