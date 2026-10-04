@@ -85,5 +85,14 @@ jobs:
       - name: Exportar dependencias bloqueadas (uv.lock)
         run: uv export --frozen --all-extras --no-emit-project --no-hashes -o requirements-audit.txt
 
+      # Riesgo aceptado R-01 (docs/P3_SEGURIDAD.md): 4 CVE de chromadb sin parche
+      # publicado. Afectan al modo servidor HTTP de Chroma (API /api/v2, RBAC
+      # multi-tenant, trust_remote_code); ROSETTA usa PersistentClient embebido,
+      # sin servidor ni puerto expuesto. Revisar en cada release de chromadb.
       - name: pip-audit
-        run: uvx pip-audit -r requirements-audit.txt --disable-pip --no-deps --strict --desc
+        run: >-
+          uvx pip-audit -r requirements-audit.txt --disable-pip --no-deps --strict --desc
+          --ignore-vuln PYSEC-2026-311
+          --ignore-vuln PYSEC-2026-3813
+          --ignore-vuln PYSEC-2026-3814
+          --ignore-vuln PYSEC-2026-3815
