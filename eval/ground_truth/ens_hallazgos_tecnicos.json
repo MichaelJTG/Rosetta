@@ -1,0 +1,285 @@
+{
+  "metadata": {
+    "description": "Ground truth hallazgos técnicos → ISO 27001:2022. Casos ficticios del escenario TechServ S.A. UN CASO POR FAMILIA ENS (16 familias). PENDIENTE revisión del autor — no usar como verdad definitiva hasta que 'revision' sea 'aprobado'.",
+    "revision_global": "pendiente",
+    "fuente_escenario": "Caso TechServ S.A. (equipo docente) — hallazgos generados de forma ficticia, controles ISO 27001:2022 seleccionados manualmente por el autor del proyecto para arrancar la evaluación. NO generados por IA.",
+    "aviso": "PROHIBIDO usar salida del LLM como ground truth para este fichero. Las correcciones las hace el autor revisando la CCN-STIC 825 y el Anexo A de ISO 27001:2022.",
+    "total_cases": 16,
+    "familias": [
+      "Continuidad del servicio",
+      "Control de acceso",
+      "Explotación",
+      "Gestión del personal",
+      "Marco organizativo",
+      "Monitorización del sistema",
+      "Planificación",
+      "Protección de la información",
+      "Protección de las aplicaciones informáticas",
+      "Protección de las comunicaciones",
+      "Protección de las instalaciones e infraestructuras",
+      "Protección de los equipos",
+      "Protección de los servicios",
+      "Protección de los soportes de información",
+      "Recursos externos",
+      "Servicios en la nube"
+    ]
+  },
+  "cases": [
+    {
+      "hallazgo_id": "HT-01",
+      "familia": "Continuidad del servicio",
+      "descripcion": "Sin prueba de restauración de copia de seguridad en 12 meses",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "manual",
+        "activo_detectado": "servidor-bbdd-01.techserv.local",
+        "evidencia": "Log de backup muestra última verificación: 2023-09-12. Sin registro posterior de restore-test.",
+        "vector_ataque": "Pérdida de datos irrecuperable ante incidente: las copias de seguridad no han sido verificadas en más de 12 meses. No hay garantía de restauración funcional.",
+        "dificultad_explotacion": "media"
+      },
+      "iso_27001_2022_control_ids": ["5.29", "5.30"],
+      "iso_27001_2022_raw": "5.29 Information backup; 5.30 ICT readiness for business continuity",
+      "notas": "Pendiente revisión del autor. Candidatos: 5.29 (backup), 5.30 (continuidad TIC)."
+    },
+    {
+      "hallazgo_id": "HT-02",
+      "familia": "Control de acceso",
+      "descripcion": "Cuenta de administrador sin segundo factor de autenticación (MFA)",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "nuclei",
+        "activo_detectado": "vpn-gw.techserv.local",
+        "evidencia": "Nuclei template auth/mfa-not-required detectó inicio de sesión de admin sin MFA en portal VPN. User: sysadmin@techserv.local.",
+        "vector_ataque": "Cuenta privilegiada accesible con solo contraseña. Ataque de fuerza bruta o credential stuffing permite acceso total a la infraestructura.",
+        "dificultad_explotacion": "alta"
+      },
+      "iso_27001_2022_control_ids": ["8.2", "5.17"],
+      "iso_27001_2022_raw": "8.2 Privileged access rights; 5.17 Authentication information",
+      "notas": "Pendiente revisión del autor. Candidatos: 8.2 (acceso privilegiado), 5.17 (información de autenticación)."
+    },
+    {
+      "hallazgo_id": "HT-03",
+      "familia": "Explotación",
+      "descripcion": "Servidor web con CVE-2024-21338 sin parchear (escalada de privilegios local)",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "nuclei",
+        "activo_detectado": "web-01.techserv.local",
+        "evidencia": "Windows Server 2022 Build 20348 sin KB5034441. CVE-2024-21338 CVSS 7.8. Confirmado vía nuclei/cves/2024/CVE-2024-21338.yaml.",
+        "vector_ataque": "Escalada de privilegios local para cualquier usuario con sesión en el servidor. Combinado con acceso físico o RDP comprometido, permite control total del sistema.",
+        "dificultad_explotacion": "media"
+      },
+      "iso_27001_2022_control_ids": ["8.8"],
+      "iso_27001_2022_raw": "8.8 Management of technical vulnerabilities",
+      "notas": "Pendiente revisión del autor. Control principal: 8.8 (gestión de vulnerabilidades técnicas)."
+    },
+    {
+      "hallazgo_id": "HT-04",
+      "familia": "Gestión del personal",
+      "descripcion": "Cuenta de empleado dado de baja sigue activa en Active Directory",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "manual",
+        "activo_detectado": "dc01.techserv.local",
+        "evidencia": "Usuario jperez@techserv.local activo en AD. Fecha baja en RRHH: 2024-08-15. Cuenta con acceso a carpetas compartidas de producción.",
+        "vector_ataque": "Acceso no autorizado a sistemas y datos confidenciales por ex-empleado. Riesgo de fuga de información o sabotaje por cuenta no revocada.",
+        "dificultad_explotacion": "baja"
+      },
+      "iso_27001_2022_control_ids": ["6.5", "5.11"],
+      "iso_27001_2022_raw": "6.5 Responsibilities after termination or change of employment; 5.11 Return of assets",
+      "notas": "Pendiente revisión del autor. Candidatos: 6.5 (responsabilidades tras cese), 5.11 (devolución de activos)."
+    },
+    {
+      "hallazgo_id": "HT-05",
+      "familia": "Marco organizativo",
+      "descripcion": "Sin política de seguridad de la información documentada ni aprobada por dirección",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "manual",
+        "activo_detectado": "TechServ S.A. — organización",
+        "evidencia": "Entrevista con CISO: no existe documento de política de seguridad aprobado por la dirección. Último borrador data de 2021, sin firma.",
+        "vector_ataque": "Ausencia de marco normativo interno. Los empleados no tienen directrices claras de seguridad. Sin política aprobada, el cumplimiento de ISO 27001 y ENS es imposible de demostrar en auditoría.",
+        "dificultad_explotacion": "baja"
+      },
+      "iso_27001_2022_control_ids": ["5.1", "5.36"],
+      "iso_27001_2022_raw": "5.1 Policies for information security; 5.36 Compliance with policies, rules and standards",
+      "notas": "Pendiente revisión del autor. Candidatos: 5.1 (políticas), 5.36 (cumplimiento de políticas)."
+    },
+    {
+      "hallazgo_id": "HT-06",
+      "familia": "Monitorización del sistema",
+      "descripcion": "Sin sistema de logs centralizado; intentos de login fallidos no alertan",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "manual",
+        "activo_detectado": "infraestructura-techserv",
+        "evidencia": "Revisión de infraestructura: logs de autenticación en cada servidor local, sin centralizar. No existe SIEM ni regla de alerta para más de 5 intentos fallidos en 1 minuto.",
+        "vector_ataque": "Ataques de fuerza bruta y credential stuffing pasan desapercibidos. Sin alertas en tiempo real, el tiempo de detección de intrusiones puede superar días o semanas.",
+        "dificultad_explotacion": "media"
+      },
+      "iso_27001_2022_control_ids": ["8.15", "8.16"],
+      "iso_27001_2022_raw": "8.15 Logging; 8.16 Monitoring activities",
+      "notas": "Pendiente revisión del autor. Candidatos: 8.15 (registro de eventos), 8.16 (monitorización)."
+    },
+    {
+      "hallazgo_id": "HT-07",
+      "familia": "Planificación",
+      "descripcion": "Sin registro de riesgos actualizado ni plan de tratamiento documentado",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "manual",
+        "activo_detectado": "TechServ S.A. — gestión de riesgos",
+        "evidencia": "Solicitud de registro de riesgos: no aportado. CISO indica que la última evaluación formal fue en 2022, sin actualización posterior.",
+        "vector_ataque": "Riesgos actuales no identificados ni mitigados. Sin registro actualizado, las decisiones de inversión en seguridad carecen de base. Incumplimiento directo de ISO 27001 cláusula 6.",
+        "dificultad_explotacion": "baja"
+      },
+      "iso_27001_2022_control_ids": ["5.7", "5.8"],
+      "iso_27001_2022_raw": "5.7 Threat intelligence; 5.8 Information security in project management",
+      "notas": "Pendiente revisión del autor. Los controles de tratamiento de riesgos están en cláusula 6 (no Anexo A). Candidatos Anexo A: 5.7, 5.8."
+    },
+    {
+      "hallazgo_id": "HT-08",
+      "familia": "Protección de la información",
+      "descripcion": "PII de clientes visible en logs de aplicación sin enmascarar",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "manual",
+        "activo_detectado": "app-crm.techserv.local",
+        "evidencia": "Revisión de logs /var/log/crm/app.log: contienen NIF, teléfono y email de clientes en texto plano. Ejemplo: 'Login OK: NIF=12345678A email=cliente@example.com'.",
+        "vector_ataque": "Fuga de datos personales si el sistema de logs es accedido por personal no autorizado, comprometido, o si los backups de logs no están cifrados. Riesgo de sanción RGPD.",
+        "dificultad_explotacion": "baja"
+      },
+      "iso_27001_2022_control_ids": ["8.11", "5.34"],
+      "iso_27001_2022_raw": "8.11 Data masking; 5.34 Privacy and protection of PII",
+      "notas": "Pendiente revisión del autor. Candidatos: 8.11 (enmascaramiento), 5.34 (privacidad y PII)."
+    },
+    {
+      "hallazgo_id": "HT-09",
+      "familia": "Protección de las aplicaciones informáticas",
+      "descripcion": "Inyección SQL confirmada en portal de proveedores",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "nuclei",
+        "activo_detectado": "portal-proveedores.techserv.local",
+        "evidencia": "Nuclei template sqli/error-based-sqli detectó inyección SQL en parámetro 'id' de /portal/proveedor. Payload confirmado: 1' AND 1=CONVERT(int,(SELECT TOP 1 table_name FROM information_schema.tables))--.",
+        "vector_ataque": "Extracción de toda la base de datos de proveedores incluyendo datos bancarios y contratos. Posible escalada a RCE mediante xp_cmdshell si SQL Server está mal configurado.",
+        "dificultad_explotacion": "alta"
+      },
+      "iso_27001_2022_control_ids": ["8.28", "8.25"],
+      "iso_27001_2022_raw": "8.28 Secure coding; 8.25 Secure development life cycle",
+      "notas": "Pendiente revisión del autor. Candidatos: 8.28 (codificación segura), 8.25 (ciclo de vida de desarrollo seguro)."
+    },
+    {
+      "hallazgo_id": "HT-10",
+      "familia": "Protección de las comunicaciones",
+      "descripcion": "Telnet habilitado en switch de core (comunicación en texto plano)",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "nuclei",
+        "activo_detectado": "switch-core-01.techserv.local",
+        "evidencia": "Nuclei template network/telnet-detection detectó Telnet activo en puerto 23/tcp. Sin cifrado. Las credenciales de gestión viajan en texto plano.",
+        "vector_ataque": "Captura de credenciales de administración de red mediante sniffing en el segmento de gestión. Control total de la infraestructura de red.",
+        "dificultad_explotacion": "media"
+      },
+      "iso_27001_2022_control_ids": ["8.20", "8.26"],
+      "iso_27001_2022_raw": "8.20 Networks security; 8.26 Application security requirements",
+      "notas": "Pendiente revisión del autor. Candidatos: 8.20 (seguridad de redes), 8.26 (requisitos de seguridad de aplicaciones)."
+    },
+    {
+      "hallazgo_id": "HT-11",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "descripcion": "Acceso a sala de servidores sin control de entrada ni registro de visitas",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "manual",
+        "activo_detectado": "CPD-planta2-techserv",
+        "evidencia": "Visita física al CPD: la puerta de la sala de servidores se abre con llave mecánica común, sin lectora de tarjeta. No existe registro de quién ha accedido ni cuándo.",
+        "vector_ataque": "Acceso físico no controlado permite manipulación directa de servidores, instalación de keyloggers hardware, extracción de discos. Indetectable sin registro de acceso.",
+        "dificultad_explotacion": "media"
+      },
+      "iso_27001_2022_control_ids": ["7.2", "7.4"],
+      "iso_27001_2022_raw": "7.2 Physical entry; 7.4 Physical security monitoring",
+      "notas": "Pendiente revisión del autor. Candidatos: 7.2 (control de acceso físico), 7.4 (monitorización física)."
+    },
+    {
+      "hallazgo_id": "HT-12",
+      "familia": "Protección de los equipos",
+      "descripcion": "Portátil corporativo sin cifrado de disco y sin política de bloqueo de pantalla",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "manual",
+        "activo_detectado": "laptop-RRHH-042.techserv.local",
+        "evidencia": "Revisión de endpoints RRHH: BitLocker deshabilitado. Política de GPO para bloqueo de pantalla configurada a 'nunca'. Empleado ausente de mesa con sesión abierta.",
+        "vector_ataque": "Robo o extravío del portátil expone todos los datos de RRHH sin barrera adicional. Acceso directo a sesión de Windows sin credenciales adicionales.",
+        "dificultad_explotacion": "baja"
+      },
+      "iso_27001_2022_control_ids": ["8.1", "7.7"],
+      "iso_27001_2022_raw": "8.1 User endpoint devices; 7.7 Clear desk and clear screen",
+      "notas": "Pendiente revisión del autor. Candidatos: 8.1 (dispositivos de usuario), 7.7 (mesa y pantalla despejadas)."
+    },
+    {
+      "hallazgo_id": "HT-13",
+      "familia": "Protección de los servicios",
+      "descripcion": "API REST pública sin control de tasa (rate limiting) ni autenticación",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "nuclei",
+        "activo_detectado": "api.techserv.local",
+        "evidencia": "Nuclei template exposures/apis/unauthenticated-api detectó endpoint /api/v1/clientes accesible sin token. 10.000 peticiones en 1 min sin bloqueo. Datos de clientes expuestos.",
+        "vector_ataque": "Scraping masivo de datos de clientes sin autenticación. Sin rate limiting, ataque DDoS de aplicación trivial. Cumplimiento RGPD comprometido.",
+        "dificultad_explotacion": "baja"
+      },
+      "iso_27001_2022_control_ids": ["8.21", "5.14"],
+      "iso_27001_2022_raw": "8.21 Security of network services; 5.14 Information classification",
+      "notas": "Pendiente revisión del autor. Candidatos: 8.21 (seguridad de servicios de red), 5.14 (clasificación de información)."
+    },
+    {
+      "hallazgo_id": "HT-14",
+      "familia": "Protección de los soportes de información",
+      "descripcion": "Pen drive con datos de clientes encontrado en zona de recepción sin propietario identificado",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "manual",
+        "activo_detectado": "soporte-USB-recepcion-01",
+        "evidencia": "USB Kingston 64GB encontrado en recepción de TechServ. Contenido: 3 hojas de cálculo con nombre, apellido, DNI y saldo de clientes ficticios. Sin cifrado. Sin etiqueta de propietario.",
+        "vector_ataque": "Fuga de datos personales. Obligación de notificación a AEPD si no se localiza al responsable. Violación RGPD Art. 33.",
+        "dificultad_explotacion": "baja"
+      },
+      "iso_27001_2022_control_ids": ["7.10", "7.14"],
+      "iso_27001_2022_raw": "7.10 Storage media; 7.14 Secure disposal or re-use of equipment",
+      "notas": "Pendiente revisión del autor. Candidatos: 7.10 (medios de almacenamiento), 7.14 (desecho seguro)."
+    },
+    {
+      "hallazgo_id": "HT-15",
+      "familia": "Recursos externos",
+      "descripcion": "Proveedor externo con acceso a sistemas de producción sin acuerdo de seguridad firmado",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "manual",
+        "activo_detectado": "TechServ S.A. — gestión de proveedores",
+        "evidencia": "Revisión de contratos: empresa externa tiene acceso VPN a servidores de producción para soporte. No existe cláusula de seguridad en el contrato. Sin evidencia de evaluación de riesgos del proveedor.",
+        "vector_ataque": "Cadena de suministro comprometida. El proveedor puede acceder a datos de producción sin restricciones contractuales de seguridad.",
+        "dificultad_explotacion": "media"
+      },
+      "iso_27001_2022_control_ids": ["5.19", "5.20"],
+      "iso_27001_2022_raw": "5.19 Information security in supplier relationships; 5.20 Addressing information security within supplier agreements",
+      "notas": "Pendiente revisión del autor. Candidatos: 5.19 (relaciones con proveedores), 5.20 (acuerdos con proveedores)."
+    },
+    {
+      "hallazgo_id": "HT-16",
+      "familia": "Servicios en la nube",
+      "descripcion": "Bucket S3 de AWS con datos de contratos accesible públicamente",
+      "revision": "pendiente",
+      "hallazgo": {
+        "origen": "amass",
+        "activo_detectado": "techserv-contratos.s3.amazonaws.com",
+        "evidencia": "Amass S3 discovery detectó bucket techserv-contratos con ACL public-read. Contenido: PDFs de contratos con condiciones comerciales confidenciales.",
+        "vector_ataque": "Exposición pública de información comercial confidencial. Competidores pueden descargar todos los contratos. Incumplimiento de obligaciones de confidencialidad con clientes.",
+        "dificultad_explotacion": "baja"
+      },
+      "iso_27001_2022_control_ids": ["5.23"],
+      "iso_27001_2022_raw": "5.23 Information security for use of cloud services",
+      "notas": "Pendiente revisión del autor. Control principal: 5.23 (seguridad en cloud). Candidato adicional: 5.10 (uso aceptable)."
+    }
+  ]
+}
