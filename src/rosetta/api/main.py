@@ -10,6 +10,7 @@ import tempfile
 import uuid
 from collections.abc import AsyncIterator, Iterable, MutableSequence
 from contextlib import asynccontextmanager
+from ipaddress import IPv4Network, IPv6Network, ip_address, ip_network
 from pathlib import Path
 from typing import Annotated, Any, cast
 
@@ -44,7 +45,14 @@ from rosetta.api.auth import (
     verify_credentials,
 )
 from rosetta.api.dashboard import HTML_DASHBOARD
-from rosetta.api.deps import ControlStoreDep, DiffAnalyzerDep, FindingsDep, GrafoDep, TraductorDep
+from rosetta.api.deps import (
+    ControlStoreDep,
+    DiffAnalyzerDep,
+    FindingsDep,
+    GrafoDep,
+    TraductorDep,
+    ValidadorDep,
+)
 from rosetta.api.schemas import (
     AccionPlan,
     AlertaBlueItem,
@@ -62,6 +70,7 @@ from rosetta.api.schemas import (
     ControlUpdate,
     CopilotApiResponse,
     CopilotRequest,
+    DatosComplianceConValidacion,
     DiffAnalysisRequest,
     DiffAnalysisResponse,
     DiffViolationItem,
@@ -97,6 +106,7 @@ from rosetta.core.models import (
     HallazgoMaestro,
     MarcoNormativo,
     Severidad,
+    Traduccion,
 )
 from rosetta.core.orchestrator import (
     AlcanceAuditoria,
@@ -111,6 +121,28 @@ from rosetta.llm.factory import get_llm_client
 load_dotenv()
 
 logger = structlog.get_logger(__name__)
+
+# ---------------------------------------------------------------------------
+# Trusted proxies (B-4) — solo se acepta X-Real-IP de proxies en la lista
+# ---------------------------------------------------------------------------
+
+_DEFAULT_TRUSTED = "127.0.0.1/32,::1/128,172.17.0.0/16,10.0.0.0/8"
+
+
+def _build_trusted_proxies() -> list[IPv4Network | IPv6Network]:
+    raw = os.getenv("ROSETTA_TRUSTED_PROXIES", _DEFAULT_TRUSTED)
+    networks: list[IPv4Network | IPv6Network] = []
+    for cidr in raw.split(","):
+        cidr = cidr.strip()
+        if cidr:
+            try:
+                networks.append(ip_network(cidr, strict=False))
+            except ValueError:
+                logger.warning("trusted_proxy_invalid_cidr", cidr=cidr)
+    return networks
+
+
+_TRUSTED_PROXIES: list[IPv4Network | IPv6Network] = _build_trusted_proxies()
 
 
 @asynccontextmanager
@@ -227,14 +259,25 @@ app.add_middleware(SecurityHeadersMiddleware)
 # ---------------------------------------------------------------------------
 
 
-def _client_ip(request: Request) -> str:
-    """Extrae la IP real: X-Real-IP fijada por nginx; fallback a la conexión TCP.
+def _is_trusted_proxy(request: Request) -> bool:
+    """True si la conexión TCP viene de un proxy en ROSETTA_TRUSTED_PROXIES."""
+    if request.client is None:
+        return False
+    try:
+        peer = ip_address(request.client.host)
+        return any(peer in net for net in _TRUSTED_PROXIES)
+    except ValueError:
+        return False
 
-    X-Forwarded-For se descarta porque el primer valor lo controla el cliente
-    y puede usarse para eludir los límites de tasa (B-4).
+
+def _client_ip(request: Request) -> str:
+    """Extrae la IP real: X-Real-IP solo si llega de un proxy de confianza (B-4).
+
+    X-Forwarded-For se descarta; nunca se acepta X-Real-IP de un origen
+    no confiable porque permitiría eludir el rate limiting.
     """
     real_ip = request.headers.get("x-real-ip", "").strip()
-    if real_ip:
+    if real_ip and _is_trusted_proxy(request):
         return real_ip
     return str(get_remote_address(request))
 
@@ -315,7 +358,7 @@ async def dashboard() -> HTMLResponse:
 # ---------------------------------------------------------------------------
 
 
-@app.post("/translate", response_model=DatosCompliance, tags=["traductor"])
+@app.post("/translate", response_model=DatosComplianceConValidacion, tags=["traductor"])
 @limiter.limit("30/minute")
 async def translate(
     request: Request,  # noqa: ARG001
@@ -323,11 +366,13 @@ async def translate(
     traductor: TraductorDep,
     grafo: GrafoDep,
     findings: FindingsDep,
-) -> DatosCompliance:
+    validador: ValidadorDep,
+) -> DatosComplianceConValidacion:
     """Traduce un hallazgo técnico a evidencia normativa multi-marco.
 
     Si los marcos del body difieren de los marcos activos del servidor, se
     crea un traductor local con los marcos solicitados (LLM y RAG compartidos).
+    Con validar=true el agente Validador revisa el resultado (aumenta latencia ~2×).
     """
     try:
         if body.marcos != traductor.marcos_activos:
@@ -355,7 +400,22 @@ async def translate(
     if grafo is not None:
         _persist_to_graph(grafo, maestro, compliance)
 
-    return compliance
+    validacion = None
+    if body.validar:
+        marco = body.marcos[0] if body.marcos else MarcoNormativo.ISO_27001_2022
+        tr = Traduccion(
+            marco=marco,
+            datos=compliance,
+            agente_id="rosetta-traductor",
+            fragmentos_usados=list(compliance.controles_incumplidos),
+            confianza=0.8,
+        )
+        try:
+            validacion = await validador.validar(tr, body.hallazgo)
+        except Exception as exc:
+            logger.warning("validador_error", error=str(exc))
+
+    return DatosComplianceConValidacion(**compliance.model_dump(), validacion=validacion)
 
 
 def _persist_to_graph(grafo: Any, maestro: HallazgoMaestro, compliance: DatosCompliance) -> None:

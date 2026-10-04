@@ -17,8 +17,8 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
-from rosetta.api.deps import get_grafo, get_session_findings, get_traductor
-from rosetta.api.main import app
+from rosetta.api.deps import get_grafo, get_session_findings, get_traductor, get_validador
+from rosetta.api.main import _client_ip, _is_trusted_proxy, app
 from rosetta.core.models import (
     DatosCompliance,
     DatosRedTeam,
@@ -26,6 +26,7 @@ from rosetta.core.models import (
     HallazgoMaestro,
     MarcoNormativo,
     Severidad,
+    ValidacionResult,
 )
 
 # ---------------------------------------------------------------------------
@@ -227,6 +228,51 @@ async def test_b4_xrealip_accepted(client: AsyncClient) -> None:
     assert r.status_code == 200
 
 
+def _make_mock_request(peer_host: str, x_real_ip: str | None = None) -> Any:
+    """Crea un Request mock con client.host y cabecera X-Real-IP."""
+    req = MagicMock()
+    req.client = MagicMock()
+    req.client.host = peer_host
+    headers: dict[str, str] = {}
+    if x_real_ip is not None:
+        headers["x-real-ip"] = x_real_ip
+    req.headers = headers
+    return req
+
+
+def test_b4_trusted_proxy_localhost_is_trusted() -> None:
+    """127.0.0.1 está en la lista de proxies de confianza."""
+    req = _make_mock_request("127.0.0.1")
+    assert _is_trusted_proxy(req) is True
+
+
+def test_b4_trusted_proxy_docker_network_is_trusted() -> None:
+    """172.17.0.5 (red Docker por defecto) está en la lista de confianza."""
+    req = _make_mock_request("172.17.0.5")
+    assert _is_trusted_proxy(req) is True
+
+
+def test_b4_untrusted_peer_not_trusted() -> None:
+    """203.0.113.1 (IP pública) NO está en la lista de confianza."""
+    req = _make_mock_request("203.0.113.1")
+    assert _is_trusted_proxy(req) is False
+
+
+def test_b4_xrealip_ignored_from_untrusted_origin() -> None:
+    """X-Real-IP desde origen no confiable se ignora; se usa la IP del peer."""
+    req = _make_mock_request("203.0.113.1", x_real_ip="10.0.0.1")
+    with patch("rosetta.api.main.get_remote_address", return_value="203.0.113.1"):
+        result = _client_ip(req)
+    assert result == "203.0.113.1"
+
+
+def test_b4_xrealip_used_from_trusted_proxy() -> None:
+    """X-Real-IP desde proxy de confianza (127.0.0.1) es aceptado."""
+    req = _make_mock_request("127.0.0.1", x_real_ip="192.0.2.99")
+    result = _client_ip(req)
+    assert result == "192.0.2.99"
+
+
 # ---------------------------------------------------------------------------
 # B-6 · Mensajes de error 500 sin detalles internos
 # ---------------------------------------------------------------------------
@@ -258,3 +304,93 @@ async def test_b6_copilot_error_no_internal_detail(client: AsyncClient) -> None:
     body = r.text
     assert "s3cr3t" not in body
     assert "DB password" not in body
+
+
+# ---------------------------------------------------------------------------
+# RF-09 · Validador opcional en /translate
+# ---------------------------------------------------------------------------
+
+
+def _make_validador(valida: bool = True) -> Any:
+    from rosetta.agents.validator import Validador  # noqa: PLC0415
+
+    mock = MagicMock(spec=Validador)
+    mock.validar = AsyncMock(
+        return_value=ValidacionResult(
+            traduccion_id="test-001",
+            valida=valida,
+            problemas=[] if valida else ["Control 8.99 no existe"],
+            confianza=0.9,
+            razonamiento="Test.",
+        )
+    )
+    return mock
+
+
+@pytest_asyncio.fixture
+async def client_validador() -> AsyncGenerator[AsyncClient, None]:
+    """Cliente con Validador mockeado (valida=True)."""
+    session_findings: list[HallazgoMaestro] = []
+    app.dependency_overrides[get_traductor] = lambda: _make_traductor()
+    app.dependency_overrides[get_grafo] = lambda: None
+    app.dependency_overrides[get_session_findings] = lambda: session_findings
+    app.dependency_overrides[get_validador] = lambda: _make_validador()
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        yield c
+    app.dependency_overrides.clear()
+
+
+_HALLAZGO_BODY = {
+    "origen": "nuclei",
+    "activo_detectado": "api.techserv.local",
+    "evidencia": "https://example.com",
+    "vector_ataque": "CVE-2024-1234 RCE en el servicio X",
+    "dificultad_explotacion": "alta",
+}
+
+
+@pytest.mark.asyncio
+async def test_rf09_translate_without_validar_returns_no_validacion(
+    client_validador: AsyncClient,
+) -> None:
+    """validar=false (default): campo validacion ausente o None."""
+    r = await client_validador.post(
+        "/translate",
+        json={"hallazgo": _HALLAZGO_BODY},
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert data.get("validacion") is None
+
+
+@pytest.mark.asyncio
+async def test_rf09_translate_with_validar_true_returns_validacion(
+    client_validador: AsyncClient,
+) -> None:
+    """validar=true: campo validacion presente con campos esperados."""
+    r = await client_validador.post(
+        "/translate",
+        json={"hallazgo": _HALLAZGO_BODY, "validar": True},
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert data["validacion"] is not None
+    assert "valida" in data["validacion"]
+    assert "confianza" in data["validacion"]
+
+
+@pytest.mark.asyncio
+async def test_rf09_translate_validar_true_valida_false(
+    client_with_finding: AsyncClient,
+) -> None:
+    """validar=true con Validador que rechaza: respuesta 200 con validacion.valida=false."""
+    app.dependency_overrides[get_validador] = lambda: _make_validador(valida=False)
+    r = await client_with_finding.post(
+        "/translate",
+        json={"hallazgo": _HALLAZGO_BODY, "validar": True},
+    )
+    app.dependency_overrides.pop(get_validador, None)
+    assert r.status_code == 200
+    data = r.json()
+    assert data["validacion"]["valida"] is False
+    assert len(data["validacion"]["problemas"]) > 0

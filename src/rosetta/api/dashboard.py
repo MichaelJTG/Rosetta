@@ -1549,6 +1549,9 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
               </div>
         </div>
         <div class="modal-foot">
+          <label class="marco-item" style="margin-right:auto; font-size:12px; color:var(--fg-3); text-transform:none; letter-spacing:0; font-weight:400; cursor:pointer" title="Activa el agente Validador: segunda opinión del LLM. Aumenta la latencia ~2×.">
+            <input type="checkbox" id="chk-validar"> Activar Validador <small style="color:var(--fg-4)">(+latencia)</small>
+          </label>
           <div id="translate-msg"></div>
           <button class="btn btn--ghost" onclick="clearFinding()">Limpiar</button>
           <button class="btn" id="btn-translate" onclick="doTranslate()">Traducir hallazgo</button>
@@ -2441,7 +2444,8 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       btn.disabled = true;
       msgInfo('translate-msg', 'Traduciendo hallazgo a marcos seleccionados…');
       setMsg('translate-result', '<div class="empty">Procesando traducción…</div>');
-      const body = { hallazgo, marcos: opts };
+      const validar = document.getElementById('chk-validar') && document.getElementById('chk-validar').checked;
+      const body = { hallazgo, marcos: opts, validar: !!validar };
       try {
         const r = await authedFetch(API + '/translate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
         const data = await r.json();
@@ -2466,6 +2470,15 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       const controles = (data.controles_incumplidos || []).map(c =>
         '<span style="display:inline-block; padding:2px 8px; background:var(--surface-2); border:1px solid var(--line-2); border-radius:var(--r-pill); font-family:var(--font-mono); font-size:11px; color:var(--accent-hi); margin:0 4px 4px 0">' + esc(c) + '</span>'
       ).join('');
+      let valRow = '';
+      if (data.validacion) {
+        const v = data.validacion;
+        const valClass = v.valida ? 'badge-baja' : 'badge-alta';
+        const valLabel = v.valida ? 'VÁLIDA' : 'CON OBSERVACIONES';
+        const conf = Math.round((v.confianza || 0) * 100) + '%';
+        const problemas = v.valida ? '' : '<br><small style="color:var(--fg-3)">' + esc((v.problemas || []).join('; ')) + '</small>';
+        valRow = '<div class="row"><div class="k">Validación</div><div class="v"><span class="badge ' + valClass + '">' + valLabel + '</span> · ' + conf + problemas + '</div></div>';
+      }
       const html = '<div class="props">' +
         '<div class="row"><div class="k">Impacto legal</div><div class="v">' + badgeHtml(data.impacto_legal) + '</div></div>' +
         '<div class="row"><div class="k">Marcos aplicables</div><div class="v">' + (marcos || '—') + '</div></div>' +
@@ -2474,6 +2487,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         '<div class="row"><div class="k">Justificación</div><div class="v">' + esc(data.justificacion || '—') + '</div></div>' +
         '<div class="row"><div class="k">Acción de mitigación</div><div class="v">' + esc(data.accion_mitigacion || '—') + '</div></div>' +
         '<div class="row"><div class="k">Evidencia auditoría</div><div class="v mono">' + esc(data.evidencia_auditoria || '—') + '</div></div>' +
+        valRow +
         '</div>';
       setMsg('translate-result', html);
     }

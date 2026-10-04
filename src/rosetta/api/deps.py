@@ -10,6 +10,7 @@ from typing import Annotated, cast
 
 from fastapi import Depends, Request
 
+from rosetta.agents.validator import Validador
 from rosetta.core.control_store import ControlStore
 from rosetta.core.diff_analyzer import DiffAnalyzer
 from rosetta.core.session_store import SessionStore
@@ -42,8 +43,14 @@ def get_control_store(request: Request) -> ControlStore:
     return cast(ControlStore, request.app.state.control_store)
 
 
+def get_validador(request: Request) -> Validador:
+    """Crea un Validador compartiendo el LLM del Traductor (sin estado propio)."""
+    return Validador(llm=get_traductor(request).llm)
+
+
 TraductorDep = Annotated[TraductorSimbiotico, Depends(get_traductor)]
 GrafoDep = Annotated[object | None, Depends(get_grafo)]
 FindingsDep = Annotated[SessionStore, Depends(get_session_findings)]
 DiffAnalyzerDep = Annotated[DiffAnalyzer, Depends(get_diff_analyzer)]
 ControlStoreDep = Annotated[ControlStore, Depends(get_control_store)]
+ValidadorDep = Annotated[Validador, Depends(get_validador)]

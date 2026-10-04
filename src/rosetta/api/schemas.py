@@ -11,7 +11,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from rosetta.core.models import DatosRedTeam, MarcoNormativo
+from rosetta.core.models import DatosCompliance, DatosRedTeam, MarcoNormativo, ValidacionResult
 
 
 class TranslateRequest(BaseModel):
@@ -21,6 +21,22 @@ class TranslateRequest(BaseModel):
     marcos: list[MarcoNormativo] = Field(
         default=[MarcoNormativo.ISO_27001_2022],
         description="Marcos normativos contra los que traducir el hallazgo.",
+    )
+    validar: bool = Field(
+        default=False,
+        description=(
+            "Si True, el agente Validador revisa la traducción antes de devolverla. "
+            "Aumenta la latencia (~2× pero mejora la precisión)."
+        ),
+    )
+
+
+class DatosComplianceConValidacion(DatosCompliance):
+    """DatosCompliance extendido con el resultado opcional del agente Validador."""
+
+    validacion: ValidacionResult | None = Field(
+        default=None,
+        description="Resultado del Validador. None si validar=False (por defecto).",
     )
 
 
