@@ -747,9 +747,10 @@ async def ingest_pdf(
 
     Acepta un PDF con informe de auditoría de seguridad. Extrae el texto de
     cada página con pdfplumber; en páginas escaneadas recurre a visión LLM
-    (pypdfium2 + Claude). Cada hallazgo extraído se registra como HallazgoMaestro
-    en la sesión con ``origen=MANUAL`` y se traduce al marco ISO 27001:2022
-    por defecto.
+    (pypdfium2 + LLM con visión). Cada hallazgo extraído se registra como
+    HallazgoMaestro en la sesión con ``origen=MANUAL`` y **sin traducción
+    normativa** (``compliance_data=None``): la extracción no llama al Traductor.
+    Para obtener los controles, el hallazgo se envía después a ``POST /translate``.
     """
     from pathlib import Path
 
