@@ -30,7 +30,7 @@ MANIFEST
 venv/
 ENV/
 env/
-uv.lock
+# uv.lock se versiona para builds reproducibles (B3)
 
 # Testing
 .tox/

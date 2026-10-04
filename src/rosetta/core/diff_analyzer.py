@@ -375,7 +375,7 @@ class DiffAnalyzer:
         self, hunk: DiffHunk, marcos: list[MarcoNormativo]
     ) -> DiffViolation | None:
         """Analiza un hunk individual con el LLM. Devuelve None si no hay violación."""
-        query = f"código añadido en {hunk.archivo}. " f"Contenido: {hunk.contenido_anadido[:400]}"
+        query = f"código añadido en {hunk.archivo}. Contenido: {hunk.contenido_anadido[:400]}"
         fragmentos = self.rag.recuperar(query, marcos, top_k=4)
         contexto_rag = _formatear_contexto_rag(fragmentos)
 

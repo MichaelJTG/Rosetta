@@ -1882,9 +1882,9 @@ async def plan_director(
         f'- "personas_dia": float (esfuerzo estimado)\n'
         f'- "controles_relacionados": array de IDs\n'
         f'- "cubierto_por_herramienta": string o null '
-        f'(si Wazuh u otra herramienta ya lo cubre, indicar cuál)\n\n'
+        f"(si Wazuh u otra herramienta ya lo cubre, indicar cuál)\n\n"
         f"Además incluye un campo 'resumen_ejecutivo' con 2-3 frases.\n"
-        f"Responde SOLO con JSON: {{\"acciones\": [...], \"resumen_ejecutivo\": \"...\"}}"
+        f'Responde SOLO con JSON: {{"acciones": [...], "resumen_ejecutivo": "..."}}'
     )
 
     acciones: list[AccionPlan] = []

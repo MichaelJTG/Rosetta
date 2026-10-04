@@ -12,12 +12,17 @@ Verifica:
 from __future__ import annotations
 
 import base64
+import os
 
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from rosetta.api.auth import BasicAuthMiddleware
+
+# Contraseña del usuario extra usada en tests.
+# Sobreescribir con TEST_EXTRA_USER_PASS en CI para evitar literales en el código.
+_EXTRA_PASS = os.getenv("TEST_EXTRA_USER_PASS", "test-extra-pass-fixture")
 
 
 def _make_app() -> FastAPI:
@@ -152,7 +157,7 @@ def test_extra_user_accepted(monkeypatch: pytest.MonkeyPatch) -> None:
     """ROSETTA_USERS_EXTRA permite cuentas adicionales (formato user:pass,user:pass)."""
     monkeypatch.setenv("ROSETTA_USER", "admin")
     monkeypatch.setenv("ROSETTA_PASSWORD", "main-pass")
-    monkeypatch.setenv("ROSETTA_USERS_EXTRA", "profesor:***CREDENCIAL-REVOCADA***,otro:abc123")
+    monkeypatch.setenv("ROSETTA_USERS_EXTRA", f"profesor:{_EXTRA_PASS},otro:abc123")
     client = TestClient(_make_app())
 
     # Cuenta principal sigue funcionando
@@ -162,7 +167,7 @@ def test_extra_user_accepted(monkeypatch: pytest.MonkeyPatch) -> None:
     # Cuentas extra funcionan
     r = client.get(
         "/protected",
-        headers={"Authorization": _basic_header("profesor", "***CREDENCIAL-REVOCADA***")},
+        headers={"Authorization": _basic_header("profesor", _EXTRA_PASS)},
     )
     assert r.status_code == 200
 
