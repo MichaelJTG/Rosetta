@@ -29,6 +29,9 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response as StarletteResponse
 
 from rosetta import __version__
 from rosetta.api.auth import (
@@ -188,15 +191,51 @@ app.add_middleware(BasicAuthMiddleware)
 
 
 # ---------------------------------------------------------------------------
-# Rate limiting (slowapi) — honra X-Forwarded-For (nginx delante)
+# Security headers middleware (B-3, RNF-11)
+# ---------------------------------------------------------------------------
+
+_CSP = (
+    "default-src 'self'; "
+    "script-src 'self' 'unsafe-inline' https://unpkg.com; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "img-src 'self' data:; "
+    "connect-src 'self'; "
+    "frame-ancestors 'none'; "
+    "object-src 'none'; "
+    "base-uri 'self'"
+)
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(
+        self, request: StarletteRequest, call_next: RequestResponseEndpoint
+    ) -> StarletteResponse:
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Content-Security-Policy"] = _CSP
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
+
+
+# ---------------------------------------------------------------------------
+# Rate limiting (slowapi) — X-Real-IP fijada por nginx, no XFF cliente
 # ---------------------------------------------------------------------------
 
 
 def _client_ip(request: Request) -> str:
-    """Extrae la IP real cuando hay un reverse proxy delante (nginx)."""
-    xff = request.headers.get("x-forwarded-for", "")
-    if xff:
-        return xff.split(",")[0].strip()
+    """Extrae la IP real: X-Real-IP fijada por nginx; fallback a la conexión TCP.
+
+    X-Forwarded-For se descarta porque el primer valor lo controla el cliente
+    y puede usarse para eludir los límites de tasa (B-4).
+    """
+    real_ip = request.headers.get("x-real-ip", "").strip()
+    if real_ip:
+        return real_ip
     return str(get_remote_address(request))
 
 
@@ -696,7 +735,8 @@ async def generate_report(
             nombre_base=body.nombre_base,
         )
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Error generando informe: {exc}") from exc
+        logger.error("report_generate_error", error=str(exc))
+        raise HTTPException(status_code=500, detail="Error interno generando el informe.") from exc
 
     # Al cliente solo se le dan URLs de la API, nunca rutas del servidor (A-3).
     return ReportGenerateResponse(
@@ -1116,7 +1156,9 @@ async def copilot_ask(request: Request, body: CopilotRequest) -> CopilotApiRespo
         response = await consultar_copilot(query=query, llm=llm, rag=rag)
     except Exception as exc:
         logger.error("copilot_error", error=str(exc))
-        raise HTTPException(status_code=500, detail=f"Error en Copilot: {exc}") from exc
+        raise HTTPException(
+            status_code=500, detail="Error interno en el Copilot normativo."
+        ) from exc
 
     return CopilotApiResponse(
         respuesta=response.respuesta,
@@ -1152,7 +1194,7 @@ async def drift_analyze(body: DriftRequest) -> DriftResponse:
         )
     except Exception as exc:
         logger.error("drift_analyze_error", error=str(exc))
-        raise HTTPException(status_code=500, detail=f"Error analizando drift: {exc}") from exc
+        raise HTTPException(status_code=500, detail="Error interno analizando el drift.") from exc
 
     return DriftResponse(
         drift_detectado=resultado.drift_detectado,
