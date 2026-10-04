@@ -1,3 +1,6 @@
+# La imagen solo copia pyproject.toml, uv.lock, README.md, src/ y corpus/
+# (ver Dockerfile). Esta lista reduce el contexto de build y evita que material
+# local (secretos, notas, datos docentes) llegue al daemon de Docker.
 .git
 .gitignore
 .venv
@@ -8,15 +11,31 @@ __pycache__
 .pytest_cache
 .mypy_cache
 .ruff_cache
+.coverage
 .chroma
 *.db
+*.db.bak
 *.sqlite
 .env
-reports/*.pdf
-reports/*.md
+.env.*
+!.env.example
+reports
+data
+vault
+.claude
+docs
+tests
 node_modules
 .DS_Store
-docs/informe/*.pdf
 graphify-out
-uv.lock
-data/fuentes
+*.png
+HANDOFF.md
+PLAN_V4.md
+ROSETTA_FLUJO_COMPLETO.md
+START_HERE.md
+NEXT_STEPS.md
+CLAUDE.md
+PLAYBOOK_*.md
+corpus/**/*.pdf
+corpus/*.pdf
+corpus/*.PDF

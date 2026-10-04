@@ -39,6 +39,8 @@ dependencies = [
     # RAG
     "chromadb>=0.5.0",
     "sentence-transformers>=5.6.0",
+    # Declarado explícitamente para fijar su origen (índice CPU en Linux).
+    "torch>=2.13.0",
     # Grafo
     "neo4j>=5.25.0",
     # Utilidades
@@ -79,6 +81,17 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/rosetta"]
+
+# torch solo se usa para los embeddings del RAG en CPU. En Linux (Docker y CI)
+# se toma del índice CPU de PyTorch: evita varios GB de librerías CUDA de
+# NVIDIA en la imagen. En Windows/macOS PyPI ya distribuye la variante CPU.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.ruff]
 line-length = 100
