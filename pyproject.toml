@@ -28,7 +28,7 @@ dependencies = [
     "pydantic>=2.9.0",
     "pydantic-settings>=2.5.0",
     # API
-    "fastapi>=0.115.0",
+    "fastapi>=0.142.0",
     "uvicorn[standard]>=0.32.0",
     # Auth + rate limiting
     "pyjwt>=2.8.0",
