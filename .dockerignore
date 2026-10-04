@@ -19,3 +19,4 @@ node_modules
 docs/informe/*.pdf
 graphify-out
 uv.lock
+data/fuentes

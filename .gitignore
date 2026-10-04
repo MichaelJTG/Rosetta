@@ -1,6 +1,10 @@
 # Runtime artifacts
 reports/
 
+# Material docente no publicable (SoA del caso ficticio TechServ facilitada
+# por el equipo docente). No se versiona hasta tener permiso expreso.
+data/fuentes/
+
 # Python
 __pycache__/
 *.py[cod]
