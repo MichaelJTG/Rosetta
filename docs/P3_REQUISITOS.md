@@ -24,7 +24,7 @@
 | RF-01 | Traducir hallazgo técnico a controles normativos con cita literal y justificación | `POST /translate` | ✅ Cumplido | Tool-use forzado con Pydantic; agente Validador crítico |
 | RF-02 | Soporte multi-marco: ISO 27001:2022, ENS 2022, NIS2, DORA, RGPD, NIST CSF 2.0, PCI-DSS 4.0 | `POST /translate` + `corpus/` | ✅ Cumplido | Corpus indexado en ChromaDB con `framework_id` |
 | RF-03 | Pipeline RAG con ChromaDB para recuperación semántica del corpus normativo | `src/rosetta/core/rag.py` | ✅ Cumplido | 100% cobertura; embeddings multilingües, filtro por marco |
-| RF-04 | Generación de dosier de auditoría en Markdown y PDF | `POST /reports/generate` · `src/rosetta/core/report_generator.py` | ✅ Cumplido | WeasyPrint para PDF; degrada a MD si WeasyPrint no disponible |
+| RF-04 | Generación de dosier de auditoría en Markdown y PDF | `POST /reports/generate` · `src/rosetta/core/report_generator.py` | 🟡 Parcial | **Bajado a 🟡 el 2026-10-04**: el endpoint devuelve rutas internas del servidor y no hay descarga ni botón en el dashboard (A-3). WeasyPrint para PDF; degrada a MD si no está disponible |
 | RF-05 | Ingesta de PDF de auditoría humana (extracción de hallazgos) | `POST /ingest/pdf` · `src/rosetta/core/pdf_ingestion.py` | ✅ Cumplido | pdfplumber + respaldo visión LLM para páginas escaneadas |
 | RF-06 | Modo Auditoría automática Red Team (Nmap, Nuclei) con progreso WebSocket | `POST /audit/start` · `WS /audit/ws/{audit_id}` · `src/rosetta/adapters/red/` | 🟡 Parcial | Nmap/Nuclei requieren instalación externa; tests con mocks |
 | RF-07 | Integración Blue Team — ingesta de alertas Wazuh (JSON/CSV) | `POST /blue/ingest` · `src/rosetta/adapters/blue/wazuh.py` | ✅ Cumplido | |
@@ -38,7 +38,7 @@
 | RF-15 | Autenticación JWT (Bearer) como esquema principal; HTTP Basic como fallback para clientes heredados y `/docs` | `POST /auth/login` · `POST /auth/refresh` · `src/rosetta/api/auth.py` | ✅ Cumplido | Rate limiting con slowapi; cuentas adicionales vía `ROSETTA_USERS_EXTRA` |
 | RF-16 | Historial de hallazgos persistente en SQLite con ciclo de vida (activo / en progreso / solucionado) | `src/rosetta/core/session_store.py` | ✅ Cumplido | Append-only, seguro ante concurrencia; 82% cobertura |
 | RF-17 | Grafo de correlación interactivo activo↔control (Neo4j + vis.js) | `GET /graph/data` · `src/rosetta/core/graph.py` | ✅ Cumplido | Degrada a modo memoria si Neo4j no disponible; 86% cobertura |
-| RF-18 | CLI Typer: `rosetta translate`, `rosetta indexar-corpus` | `src/rosetta/cli/main.py` | ✅ Cumplido | |
+| RF-18 | CLI Typer: `rosetta translate`, `rosetta load-corpus`, `rosetta version` | `src/rosetta/cli/main.py` | 🟡 Parcial | **Bajado a 🟡 el 2026-10-04**: `cli/main.py` al 0 % de cobertura (sin tests) y el comando real es `load-corpus`, no `indexar-corpus` como decía P1 |
 | RF-19 | Panel de Cumplimiento: estado agregado por marco y controles más incumplidos | `GET /controls/{marco}` · `src/rosetta/core/control_store.py` | ✅ Cumplido | 100% cobertura |
 | RF-20a | Catálogo de controles por marco con detalle y estado | `GET /controls/{marco}` · `GET /controls/{marco}/{control_id}` | ✅ Cumplido | |
 | RF-20b | Roadmap de vulnerabilidades con trazabilidad temporal de hallazgos | `GET /vuln-roadmap` · `PATCH /findings/{id}/timeline` | ✅ Cumplido | |
@@ -56,15 +56,15 @@
 | RNF-01 | Degradación grácil ante Neo4j caído (no debe crashear) | `src/rosetta/core/graph.py` | ✅ Cumplido | Fallback a agregación en memoria |
 | RNF-02 | Cobertura de tests ≥ 80 % en capa core (`src/rosetta/core/`) | pytest-cov | 🟡 Parcial | **Total medido: 77 %**. Core/ entre 76–100 % (pdf_ingestion.py a 76 %, resto ≥ 82 %). ROADMAP exige 80 % core / 60 % adapters. |
 | RNF-03 | Sin errores `mypy --strict` en `src/` | mypy | ✅ Cumplido | 56 ficheros, 0 errores |
-| RNF-04 | Sin violaciones `ruff check` ni `ruff format` | ruff | ✅ Cumplido | 5 archivos corregidos en Fase 0 |
+| RNF-04 | Sin violaciones `ruff check` ni `ruff format` | ruff | 🟡 Parcial | **Bajado a 🟡 el 2026-10-04**: `ruff format --check` fallaba en 2 tests (pre-commit usaba ruff 0.7.4 y el lockfile 0.15.11) |
 | RNF-05 | Instalable desde cero con `uv sync` + `docker compose up -d --build` | Dockerfile · docker-compose.yml | 🟡 Parcial | A verificar en Fase 1 con instalación limpia |
-| RNF-06 | Cero secretos reales en el repositorio | gitleaks · pre-commit detect-private-key | 🟡 Parcial | Literal de la contraseña del evaluador eliminado en Fase 0; historial pendiente de decisión filter-repo |
+| RNF-06 | Cero secretos reales en el repositorio | gitleaks · pre-commit detect-private-key | 🟡 Parcial | Incidente INC-01 (`docs/P3_SEGURIDAD.md`): credenciales retiradas del árbol y **rotadas en producción el 2026-10-04** (las antiguas dan 401). El historial público conserva la antigua, ya invalidada; no se reescribe por decisión del autor |
 | RNF-07 | Rate limiting en endpoints sensibles (slowapi) | `src/rosetta/api/main.py` | ✅ Cumplido | |
-| RNF-08 | Validación de alcance en Modo Auditoría: bloquear IPs privadas/localhost sin declaración explícita | `src/rosetta/core/orchestrator.py:314 _validar_alcance()` | ✅ Cumplido | Lista negra de redes RFC1918 + `_HOSTS_PROHIBIDOS`; declaración mínima 10 chars |
+| RNF-08 | Validación de alcance en Modo Auditoría: bloquear IPs privadas/localhost sin declaración explícita | `src/rosetta/core/orchestrator.py:314 _validar_alcance()` | 🟡 Parcial | **Bajado a 🟡 el 2026-10-04**: un hostname que resuelve a IP interna esquiva el bloqueo porque no se resuelve DNS (B-8). Lista negra RFC1918 + `_HOSTS_PROHIBIDOS`; declaración mínima 10 caracteres |
 | RNF-09 | Tiempo de respuesta del Traductor < 30 s con LLM externo | Pipeline RAG + Claude API | 🟡 Pendiente benchmark | Valor no medido formalmente; depende de latencia Anthropic; Ollama local sin límite |
-| RNF-10 | Build de CI reproducible (lockfile versionado) | `uv.lock` · `ci.yml` | ✅ Cumplido | Resuelto en B3 (Fase 0) |
+| RNF-10 | Build de CI reproducible (lockfile versionado) | `uv.lock` · `ci.yml` | 🟡 Parcial | **Bajado a 🟡 el 2026-10-04**: el lockfile está versionado, pero todos los runs de CI fallaban desde el 20/05 en el paso «Install uv» y la matriz 3.11/3.12 no cambiaba de intérprete |
 | RNF-11 | Cabeceras de seguridad HTTP (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy) | Middleware FastAPI | ❌ Pendiente | A implementar en Fase 2 |
-| RNF-12 | Audit CVE de dependencias en CI (pip-audit) | `ci.yml` job `dependency-audit` | ✅ Cumplido | Añadido en B5 (Fase 0); 0 CVEs en baseline |
+| RNF-12 | Audit CVE de dependencias en CI (pip-audit) | `ci.yml` job `dependency-audit` | 🟡 Parcial | **Bajado a 🟡 el 2026-10-04**: el «0 CVE» era falso; el job auditaba los 28 paquetes de la propia herramienta. Sobre `uv.lock`: 19 paquetes y 140 vulnerabilidades |
 
 ---
 
