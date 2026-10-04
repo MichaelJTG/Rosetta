@@ -38,7 +38,7 @@ dependencies = [
     "rich>=13.9.0",
     # RAG
     "chromadb>=0.5.0",
-    "sentence-transformers>=3.2.0",
+    "sentence-transformers>=5.6.0",
     # Grafo
     "neo4j>=5.25.0",
     # Utilidades
