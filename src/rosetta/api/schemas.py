@@ -210,8 +210,8 @@ class ReportGenerateRequest(BaseModel):
 class ReportGenerateResponse(BaseModel):
     """Respuesta de POST /reports/generate."""
 
-    md_path: str = Field(..., description="Ruta al informe Markdown generado.")
-    pdf_path: str = Field(..., description="Ruta al informe PDF generado.")
+    md_url: str = Field(..., description="URL de descarga autenticada del informe Markdown (GET).")
+    pdf_url: str = Field(..., description="URL de descarga autenticada del informe PDF (GET).")
     total_hallazgos: int = Field(..., description="Número de hallazgos incluidos.")
     nombre_base: str = Field(..., description="Nombre base usado para los archivos.")
 

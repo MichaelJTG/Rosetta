@@ -5,10 +5,12 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 import tempfile
 import uuid
 from collections.abc import AsyncIterator, Iterable, MutableSequence
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Annotated, Any, cast
 
 import structlog
@@ -22,7 +24,7 @@ from fastapi import (
     WebSocket,
     WebSocketDisconnect,
 )
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
@@ -660,8 +662,6 @@ async def generate_report(
     especifican `hallazgo_ids`. El PDF lleva marca ROSETTA y, opcionalmente,
     nombre e información del cliente.
     """
-    from pathlib import Path
-
     from rosetta.core.report_generator import ReportConfig, ReportGenerator
 
     # Filtrar hallazgos si se especifican IDs
@@ -678,23 +678,52 @@ async def generate_report(
     )
     gen = ReportGenerator(config)
 
-    ruta_reports = Path(os.getenv("ROSETTA_REPORTS_DIR", "reports"))
     try:
         md_path, pdf_path = gen.generar(
             hallazgos_seleccionados,
-            ruta_salida=ruta_reports,
+            ruta_salida=_reports_dir(),
             nombre_base=body.nombre_base,
         )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Error generando informe: {exc}") from exc
 
-    nombre_base = md_path.stem
+    # Al cliente solo se le dan URLs de la API, nunca rutas del servidor (A-3).
     return ReportGenerateResponse(
-        md_path=str(md_path),
-        pdf_path=str(pdf_path),
+        md_url=f"/reports/download/{md_path.name}",
+        pdf_url=f"/reports/download/{pdf_path.name}",
         total_hallazgos=len(hallazgos_seleccionados),
-        nombre_base=nombre_base,
+        nombre_base=md_path.stem,
     )
+
+
+# Nombres servibles: lista blanca estricta, sin separadores ni puntos iniciales.
+_NOMBRE_INFORME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,99}\.(md|pdf)")
+
+
+def _reports_dir() -> Path:
+    """Directorio donde se generan y desde donde se sirven los informes."""
+    return Path(os.getenv("ROSETTA_REPORTS_DIR", "reports"))
+
+
+@app.get("/reports/download/{filename}", tags=["reports"])
+async def download_report(filename: str) -> FileResponse:
+    """Descarga autenticada de un informe generado (RF-04).
+
+    Solo sirve ficheros ``.md`` / ``.pdf`` del directorio de informes. El nombre
+    se valida con lista blanca y, como defensa en profundidad, se comprueba que
+    la ruta resuelta no sale de ese directorio. La autenticación la aplica el
+    middleware global igual que en el resto de endpoints.
+    """
+    if not _NOMBRE_INFORME_RE.fullmatch(filename):
+        raise HTTPException(status_code=400, detail="Nombre de informe no válido.")
+
+    base = _reports_dir().resolve()
+    ruta = (base / filename).resolve()
+    if ruta.parent != base or not ruta.is_file():
+        raise HTTPException(status_code=404, detail="Informe no encontrado.")
+
+    media_type = "application/pdf" if ruta.suffix == ".pdf" else "text/markdown; charset=utf-8"
+    return FileResponse(ruta, media_type=media_type, filename=filename)
 
 
 @app.post("/ingest/pdf", response_model=IngestPdfResponse, tags=["ingestion"])

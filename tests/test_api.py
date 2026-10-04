@@ -268,8 +268,8 @@ async def test_generate_report_sin_hallazgos(client: AsyncClient) -> None:
     assert r.status_code == 200
     data = r.json()
     assert data["total_hallazgos"] == 0
-    assert data["md_path"].endswith(".md")
-    assert data["pdf_path"].endswith(".pdf")
+    assert data["md_url"].endswith(".md")
+    assert data["pdf_url"].endswith(".pdf")
     assert "nombre_base" in data
 
 
@@ -307,3 +307,74 @@ async def test_generate_report_nombre_base_personalizado(client: AsyncClient) ->
     assert r.status_code == 200
     data = r.json()
     assert data["nombre_base"] == "informe_acme_2026"
+
+
+# ---------------------------------------------------------------------------
+# Tests descarga del dosier (A-3 · RF-04)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_generate_report_no_expone_rutas_del_servidor(client: AsyncClient) -> None:
+    """La respuesta da URLs de descarga de la API, nunca rutas del sistema de ficheros."""
+    r = await client.post("/reports/generate", json={"nombre_base": "dosier_techserv"})
+    assert r.status_code == 200
+    data = r.json()
+    assert "md_path" not in data
+    assert "pdf_path" not in data
+    assert data["md_url"] == "/reports/download/dosier_techserv.md"
+    assert data["pdf_url"] == "/reports/download/dosier_techserv.pdf"
+
+
+@pytest.mark.asyncio
+async def test_download_report_md_y_pdf(client_with_findings: AsyncClient) -> None:
+    """El dosier generado se descarga como adjunto en Markdown y en PDF."""
+    gen = await client_with_findings.post("/reports/generate", json={"nombre_base": "dosier_e2e"})
+    urls = gen.json()
+
+    md = await client_with_findings.get(urls["md_url"])
+    assert md.status_code == 200
+    assert md.headers["content-type"].startswith("text/markdown")
+    assert "attachment" in md.headers["content-disposition"]
+    assert "activo-0" in md.text
+
+    pdf = await client_with_findings.get(urls["pdf_url"])
+    assert pdf.status_code == 200
+    assert pdf.headers["content-type"] == "application/pdf"
+    assert pdf.content.startswith(b"%PDF")
+
+
+@pytest.mark.asyncio
+async def test_download_report_inexistente_devuelve_404(client: AsyncClient) -> None:
+    """Un nombre válido que no corresponde a ningún informe devuelve 404."""
+    r = await client.get("/reports/download/no_existe.md")
+    assert r.status_code == 404
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("nombre", [".env", "informe.txt", "..md", "informe.md.exe", "a b.md"])
+async def test_download_report_nombre_no_valido_devuelve_400(
+    client: AsyncClient, nombre: str
+) -> None:
+    """Solo se sirven nombres de la lista blanca: [A-Za-z0-9_-] + .md/.pdf."""
+    r = await client.get(f"/reports/download/{nombre}")
+    assert r.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_download_report_traversal_codificado_no_sirve_ficheros(client: AsyncClient) -> None:
+    """Un intento de path traversal codificado no devuelve ficheros del servidor."""
+    r = await client.get("/reports/download/..%2F..%2Fpyproject.toml")
+    assert r.status_code in (400, 404)
+    assert b"[project]" not in r.content
+
+
+@pytest.mark.asyncio
+async def test_download_report_exige_autenticacion(
+    client: AsyncClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Con autenticación activa, descargar sin credenciales devuelve 401."""
+    monkeypatch.setenv("ROSETTA_USER", "admin")
+    monkeypatch.setenv("ROSETTA_PASSWORD", "clave-de-prueba")
+    r = await client.get("/reports/download/cualquiera.md")
+    assert r.status_code == 401

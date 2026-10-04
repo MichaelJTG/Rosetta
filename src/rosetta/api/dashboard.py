@@ -1800,6 +1800,19 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       </div>
       <div class="content">
         <div class="card" style="margin-bottom:var(--s-4)">
+          <div class="card-head"><h2>Dosier de auditoría</h2><span class="meta">Markdown + PDF con todos los hallazgos de la sesión</span></div>
+          <div class="card-body">
+            <div class="row-flex" style="align-items:flex-end">
+              <div style="min-width:240px">
+                <label for="dossier-cliente">Organización auditada (opcional)</label>
+                <input type="text" id="dossier-cliente" maxlength="120" placeholder="TechServ (caso ficticio)">
+              </div>
+              <button class="btn" type="button" onclick="generateDossier()" style="margin-top:0">Generar dosier</button>
+            </div>
+            <div id="dossier-result" style="margin-top:var(--s-3)"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:var(--s-4)">
           <div class="card-head"><h2>Filtros</h2><span class="meta">Excluye solucionados por defecto</span></div>
           <div class="card-body">
             <div class="row-flex" style="align-items:flex-end">
@@ -3569,6 +3582,55 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         a.download = ctrl_id.replace(/[^a-z0-9]/gi,'_') + '_plantilla.md';
         a.click();
       } catch(e) { alert('Error descargando plantilla: ' + e.message); }
+    }
+
+    /* ── Dosier de auditoría (RF-04): generar y descargar con JWT ── */
+    async function generateDossier() {
+      const out = document.getElementById('dossier-result');
+      const cliente = (document.getElementById('dossier-cliente').value || '').trim();
+      out.innerHTML = '<div class="msg-info">Generando dosier…</div>';
+      try {
+        const r = await authedFetch(API + '/reports/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cliente ? { nombre_cliente: cliente } : {}),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(d.detail || ('HTTP ' + r.status));
+        out.textContent = '';
+        const ok = document.createElement('div');
+        ok.className = 'msg-success';
+        ok.textContent = 'Dosier generado con ' + d.total_hallazgos + ' hallazgo(s).';
+        const row = document.createElement('div');
+        row.className = 'row-flex';
+        row.style.marginTop = 'var(--s-3)';
+        [['↓ Descargar Markdown', d.md_url], ['↓ Descargar PDF', d.pdf_url]].forEach(([label, url]) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'btn btn--ghost';
+          b.textContent = label;
+          b.addEventListener('click', () => downloadReport(url));
+          row.appendChild(b);
+        });
+        out.append(ok, row);
+      } catch (e) {
+        out.innerHTML = '<div class="msg-error">Error: ' + esc(e.message) + '</div>';
+      }
+    }
+
+    async function downloadReport(url) {
+      try {
+        const r = await authedFetch(API + url);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const blob = await r.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = url.split('/').pop();
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      } catch (e) { alert('Error descargando el dosier: ' + e.message); }
     }
 
     /* ═══════════════════════════════════════════════════════════════════
