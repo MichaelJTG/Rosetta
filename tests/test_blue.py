@@ -383,12 +383,15 @@ class TestResumenCobertura:
 
 @pytest.fixture
 def client():
+    """Cliente sin lifespan: no inicializa LLM, RAG ni Neo4j (A-6)."""
     from fastapi.testclient import TestClient
 
+    from rosetta.api.deps import get_session_findings
     from rosetta.api.main import app
 
-    with TestClient(app) as c:
-        yield c
+    app.dependency_overrides[get_session_findings] = lambda: []
+    yield TestClient(app)
+    app.dependency_overrides.clear()
 
 
 class TestBlueIngestEndpoint:

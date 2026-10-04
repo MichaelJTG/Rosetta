@@ -678,7 +678,7 @@ async def generate_report(
     )
     gen = ReportGenerator(config)
 
-    ruta_reports = Path("reports")
+    ruta_reports = Path(os.getenv("ROSETTA_REPORTS_DIR", "reports"))
     try:
         md_path, pdf_path = gen.generar(
             hallazgos_seleccionados,
