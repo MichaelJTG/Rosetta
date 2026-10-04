@@ -56,15 +56,15 @@
 | RNF-01 | Degradación grácil ante Neo4j caído (no debe crashear) | `src/rosetta/core/graph.py` | ✅ Cumplido | Fallback a agregación en memoria |
 | RNF-02 | Cobertura de tests ≥ 80 % en capa core (`src/rosetta/core/`) | pytest-cov | 🟡 Parcial | **Total medido: 77 %**. Core/ entre 76–100 % (pdf_ingestion.py a 76 %, resto ≥ 82 %). ROADMAP exige 80 % core / 60 % adapters. |
 | RNF-03 | Sin errores `mypy --strict` en `src/` | mypy | ✅ Cumplido | 56 ficheros, 0 errores |
-| RNF-04 | Sin violaciones `ruff check` ni `ruff format` | ruff | 🟡 Parcial | **Bajado a 🟡 el 2026-10-04**: `ruff format --check` fallaba en 2 tests (pre-commit usaba ruff 0.7.4 y el lockfile 0.15.11) |
+| RNF-04 | Sin violaciones `ruff check` ni `ruff format` | ruff | ✅ Cumplido | Bajado a 🟡 el 2026-10-04 (`ruff format --check` fallaba en 2 tests por desajuste ruff 0.7.4/0.15.11). **Vuelve a ✅**: commit `a4cb5c4` alinea pre-commit con `uv.lock`; CI run 37203612212 (2026-10-04) en verde |
 | RNF-05 | Instalable desde cero con `uv sync` + `docker compose up -d --build` | Dockerfile · docker-compose.yml | 🟡 Parcial | A verificar en Fase 1 con instalación limpia |
 | RNF-06 | Cero secretos reales en el repositorio | gitleaks · pre-commit detect-private-key | 🟡 Parcial | Incidente INC-01 (`docs/P3_SEGURIDAD.md`): credenciales retiradas del árbol y **rotadas en producción el 2026-10-04** (las antiguas dan 401). El historial público conserva la antigua, ya invalidada; no se reescribe por decisión del autor |
 | RNF-07 | Rate limiting en endpoints sensibles (slowapi) | `src/rosetta/api/main.py` | ✅ Cumplido | |
 | RNF-08 | Validación de alcance en Modo Auditoría: bloquear IPs privadas/localhost sin declaración explícita | `src/rosetta/core/orchestrator.py:314 _validar_alcance()` | 🟡 Parcial | **Bajado a 🟡 el 2026-10-04**: un hostname que resuelve a IP interna esquiva el bloqueo porque no se resuelve DNS (B-8). Lista negra RFC1918 + `_HOSTS_PROHIBIDOS`; declaración mínima 10 caracteres |
 | RNF-09 | Tiempo de respuesta del Traductor < 30 s con LLM externo | Pipeline RAG + Claude API | 🟡 Pendiente benchmark | Valor no medido formalmente; depende de latencia Anthropic; Ollama local sin límite |
-| RNF-10 | Build de CI reproducible (lockfile versionado) | `uv.lock` · `ci.yml` | 🟡 Parcial | **Bajado a 🟡 el 2026-10-04**: el lockfile está versionado, pero todos los runs de CI fallaban desde el 20/05 en el paso «Install uv» y la matriz 3.11/3.12 no cambiaba de intérprete |
+| RNF-10 | Build de CI reproducible (lockfile versionado) | `uv.lock` · `ci.yml` | ✅ Cumplido | Bajado a 🟡 el 2026-10-04 (CI rojo desde el 20/05 en «Install uv»). **Vuelve a ✅**: commit `5ea2d2d` (setup-uv v7.6.0, actions fijadas por SHA, `uv sync --locked`, matriz real 3.11/3.12); CI run 37203612212 (2026-10-04) en verde |
 | RNF-11 | Cabeceras de seguridad HTTP (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy) | Middleware FastAPI | ❌ Pendiente | A implementar en Fase 2 |
-| RNF-12 | Audit CVE de dependencias en CI (pip-audit) | `ci.yml` job `dependency-audit` | 🟡 Parcial | **Bajado a 🟡 el 2026-10-04**: el «0 CVE» era falso; el job auditaba los 28 paquetes de la propia herramienta. Sobre `uv.lock`: 19 paquetes y 140 vulnerabilidades |
+| RNF-12 | Audit CVE de dependencias en CI (pip-audit) | `ci.yml` job `dependency-audit` | ✅ Cumplido | Bajado a 🟡 el 2026-10-04 (el job auditaba la herramienta, no el proyecto: 140 vulnerabilidades reales). **Vuelve a ✅**: job sobre `uv.lock` (`5ea2d2d`), 9 tandas de actualización (`d5b8cf7`…`b822427`), solo 4 avisos de chromadb sin parche como riesgo aceptado R-01; CI run 37203612212 (2026-10-04) en verde |
 
 ---
 
