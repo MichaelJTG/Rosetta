@@ -10,29 +10,34 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Mínimo privilegio: el token del workflow solo puede leer el repositorio.
+permissions:
+  contents: read
+
+# Las actions de terceros se fijan por SHA de commit (no por etiqueta móvil)
+# para que nadie pueda cambiar el código que ejecuta nuestro CI.
+
 jobs:
   lint-and-test:
     name: Lint, type-check, test
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
+      - name: Install uv + Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
         with:
-          version: "latest"
+          python-version: ${{ matrix.python-version }}
           enable-cache: true
 
-      - name: Set up Python ${{ matrix.python-version }}
-        run: uv python install ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: uv sync --extra dev
+      - name: Install dependencies (lockfile exacto)
+        run: uv sync --extra dev --locked
 
       - name: Ruff lint
         run: uv run ruff check .
@@ -41,14 +46,14 @@ jobs:
         run: uv run ruff format --check .
 
       - name: Mypy strict
-        run: uv run mypy src/
+        run: uv run mypy --strict src/
 
-      - name: Pytest
-        run: uv run pytest --cov=rosetta --cov-report=xml --cov-report=term-missing
+      - name: Pytest (sin API keys ni LLM real)
+        run: uv run pytest --cov=rosetta --cov-branch --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage
         if: matrix.python-version == '3.12'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: coverage
           path: coverage.xml
@@ -56,11 +61,14 @@ jobs:
   secrets-scan:
     name: Scan for leaked secrets
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -68,16 +76,14 @@ jobs:
     name: Dependency CVE audit (pip-audit)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: "latest"
-          enable-cache: true
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
 
-      - name: Install dependencies
-        run: uv sync --extra dev
+      # Se audita el lockfile del proyecto, no el entorno de la herramienta.
+      - name: Exportar dependencias bloqueadas (uv.lock)
+        run: uv export --frozen --all-extras --no-emit-project --no-hashes -o requirements-audit.txt
 
       - name: pip-audit
-        run: uv tool run pip-audit --strict
+        run: uvx pip-audit -r requirements-audit.txt --disable-pip --no-deps --strict --desc
