@@ -62,6 +62,18 @@ services:
       start_period: 30s
     restart: unless-stopped
 
+  # Laboratorio local del Modo Auditoría (RF-06). Solo con: docker compose --profile lab up -d
+  # Sin puertos publicados: únicamente accesible desde la red interna de compose.
+  # Requiere ROSETTA_AUDIT_ALLOWLIST=lab-objetivo en .env (ver lab/README.md).
+  lab-objetivo:
+    image: nginx:1.27-alpine
+    container_name: rosetta-lab
+    profiles: ["lab"]
+    volumes:
+      - ./lab/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./lab/www:/usr/share/nginx/html:ro
+    restart: "no"
+
 volumes:
   neo4j_data:
   neo4j_logs:

@@ -63,6 +63,8 @@ dmypy.json
 .env
 .env.*
 !.env.example
+# .env FICTICIO del laboratorio del Modo Auditoría (expuesto a propósito, sin datos reales)
+!lab/www/.env
 
 # Claude Code — config local personal, no versionar
 .claude/settings.local.json
