@@ -82,8 +82,13 @@ jobs:
         uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
 
       # Se audita el lockfile del proyecto, no el entorno de la herramienta.
+      # torch se instala desde el índice CPU de PyTorch con versión local
+      # "X.Y.Z+cpu", que no existe en PyPI: se audita como la versión publicada
+      # X.Y.Z equivalente (mismos avisos de seguridad).
       - name: Exportar dependencias bloqueadas (uv.lock)
-        run: uv export --frozen --all-extras --no-emit-project --no-hashes -o requirements-audit.txt
+        run: |
+          uv export --frozen --all-extras --no-emit-project --no-hashes -o requirements-audit.txt
+          sed -i -E 's/^(torch==[0-9.]+)\+cpu/\1/' requirements-audit.txt
 
       # Riesgo aceptado R-01 (docs/P3_SEGURIDAD.md): 4 CVE de chromadb sin parche
       # publicado. Afectan al modo servidor HTTP de Chroma (API /api/v2, RBAC

@@ -76,6 +76,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-editable
 
 COPY corpus/ ./corpus/
+# Script de datos de demostración (se ejecuta con docker compose exec, ver README).
+COPY scripts/ ./scripts/
 
 USER rosetta
 
