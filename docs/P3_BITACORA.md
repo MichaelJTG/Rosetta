@@ -174,3 +174,41 @@ Seis requisitos marcados como ✅ no lo estaban (ver más abajo).
   para que la decisión se tome con datos.
 - **`/ingest/pdf` extrae hallazgos pero no los traduce.** El docstring decía lo
   contrario y se ha corregido (`6da7871`).
+
+---
+
+## Bloque D · Cierre P3
+
+### D-1 · Tests del eval harness · C-2
+
+| | |
+|---|---|
+| **Qué** | 27 tests unitarios en `tests/test_eval_harness.py` para las funciones puras de `eval/run_eval.py`: `_normalize_iso_id` (12 tests), `extract_iso_ids` (7 tests), `score_case` (8 tests). Sin llamadas al LLM. |
+| **Por qué** | El harness de evaluación del Bloque C no tenía tests. Las funciones de normalización y scoring son la parte más crítica del pipeline: un bug ahí invalida todas las métricas. |
+| **Commit** | este bloque D |
+| **Comprobación** | `uv run pytest tests/test_eval_harness.py -v` → 27 passed en 3 s. |
+
+### D-2 · Benchmark RNF-09 · latencia del Traductor
+
+| | |
+|---|---|
+| **Qué** | Benchmark formal de 5 llamadas al Traductor Simbiótico con Ollama qwen2.5:14b. Métricas: p50=8.2 s, avg=16.6 s, max=41.3 s. 4/5 casos bajo el umbral de 30 s. Un caso excedió el límite (41.3 s) por generación LLM verbosa con advertencias `marco_desconocido`. |
+| **Por qué** | RNF-09 estaba pendiente de benchmark formal desde el enunciado. |
+| **Commit** | este bloque D |
+| **Resultado** | `P3_REQUISITOS.md` RNF-09 actualizado con los valores medidos. Estado: 🟡 (p50 y avg cumplen; tail puede exceder con hallazgos complejos). |
+
+### D-3 · Matriz de trazabilidad · docs/P3_MATRIZ.md
+
+| | |
+|---|---|
+| **Qué** | Nuevo fichero `docs/P3_MATRIZ.md`: tabla RF/RNF → commit → tests → evidencia para los 26 RF y 12 RNF. Incluye resumen por bloque y snapshot de tests/cobertura. |
+| **Por qué** | Requerimiento explícito del plan de cierre P3. Permite al evaluador trazar cualquier requisito hasta el código en segundos. |
+| **Commit** | este bloque D |
+
+### D-5 · Guión de vídeo · docs/P3_VIDEO_SCRIPT.md
+
+| | |
+|---|---|
+| **Qué** | Nuevo fichero `docs/P3_VIDEO_SCRIPT.md`: guión de 7–9 minutos con 9 secciones (contexto, login, traducción, multi-marco, dosier, Red Team, eval metrics, copilot, cierre), tiempos, comandos exactos y notas técnicas. |
+| **Por qué** | D-5 del plan de cierre. El autor necesita un guión estructurado para grabar la demo. |
+| **Commit** | este bloque D |
