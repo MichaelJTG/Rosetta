@@ -292,3 +292,11 @@ def test_detect_drift_con_drift(monkeypatch: pytest.MonkeyPatch, tmp_path: Path)
 def test_detect_drift_procedimiento_inexistente(tmp_path: Path) -> None:
     r = runner.invoke(app, ["detect-drift", str(tmp_path / "no.md"), "-o", "obs"])
     assert r.exit_code == 1
+
+
+def test_load_corpus_all_indexa_los_siete_marcos(tmp_path: Path) -> None:
+    """`load-corpus all corpus` indexa cada marco con corpus propio (instalación limpia)."""
+    r = runner.invoke(app, ["load-corpus", "all", "corpus", "--chroma", str(tmp_path)])
+    assert r.exit_code == 0, r.output
+    for marco in ("iso_27001_2022", "ens_2022", "nis2", "dora", "rgpd", "nist_csf_2", "pci_dss_4"):
+        assert marco in r.output

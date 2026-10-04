@@ -93,10 +93,27 @@ def translate(
     console.print(Panel(syntax, title="[bold green]DatosCompliance[/]", expand=False))
 
 
+# Subcarpeta de corpus/ de cada marco con corpus propio (ISO 27002 no tiene:
+# su contenido se cubre con el Anexo A de ISO 27001).
+_CARPETAS_CORPUS: dict[str, str] = {
+    "iso_27001_2022": "iso27001",
+    "ens_2022": "ens",
+    "nis2": "nis2",
+    "dora": "dora",
+    "rgpd": "rgpd",
+    "nist_csf_2": "nist_csf_2",
+    "pci_dss_4": "pci_dss_4",
+}
+
+
 @app.command(name="load-corpus")
 def load_corpus(
-    marco: str = typer.Argument(..., help="Marco normativo, ej: iso_27001_2022."),
-    ruta: str = typer.Argument(..., help="Carpeta con el corpus del marco."),
+    marco: str = typer.Argument(
+        ..., help="Marco normativo (ej: iso_27001_2022) o 'all' para todos."
+    ),
+    ruta: str = typer.Argument(
+        ..., help="Carpeta con el corpus del marco (con 'all': la carpeta corpus/)."
+    ),
     chromadb_path: str = typer.Option(
         None, "--chroma", help="Ruta a ChromaDB. Por defecto usa CHROMADB_PATH del .env."
     ),
@@ -105,11 +122,29 @@ def load_corpus(
 
     Parsea todos los archivos (.yaml, .pdf, .md) en la carpeta indicada,
     genera embeddings y los indexa en ChromaDB para que el Traductor pueda
-    hacer búsqueda semántica.
+    hacer búsqueda semántica. Con ``all`` indexa los siete marcos que tienen
+    corpus propio (paso de la instalación desde cero).
     """
     from rosetta.adapters.compliance.loader import CorpusLoader
     from rosetta.core.models import MarcoNormativo
     from rosetta.core.rag import NormativaRAG
+
+    if marco == "all":
+        base = Path(ruta)
+        chroma_all = chromadb_path or os.getenv("CHROMADB_PATH", ".chroma")
+        rag_all = NormativaRAG(chromadb_path=chroma_all)
+        loader_all = CorpusLoader()
+        total = 0
+        for valor, carpeta in _CARPETAS_CORPUS.items():
+            sub = base / carpeta
+            if not sub.is_dir():
+                console.print(f"[yellow]Sin corpus para {valor}[/] ({sub})")
+                continue
+            n_marco = rag_all.ingestar_corpus(loader_all.cargar(MarcoNormativo(valor), sub))
+            total += n_marco
+            console.print(f"[green]✓[/] {valor}: {n_marco} fragmentos")
+        console.print(f"[green]✓[/] {total} fragmentos indexados en ChromaDB ({chroma_all})")
+        return
 
     try:
         marco_enum = MarcoNormativo(marco)
