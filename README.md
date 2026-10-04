@@ -91,9 +91,15 @@ docker compose ps                # espera a que app y neo4j estén "healthy"
 
 ```bash
 docker compose exec app rosetta load-corpus all corpus
+docker compose restart app
 ```
 
-Indexa en ChromaDB los siete marcos con corpus propio.
+El primer comando indexa en ChromaDB los siete marcos con corpus propio (197
+fragmentos). El reinicio es **necesario**: ChromaDB no admite que dos procesos
+compartan la base, y la API solo ve un índice creado por otro proceso cuando
+vuelve a arrancar. Sin reiniciar, el Traductor trabaja sin contexto normativo.
+Comprobado en la instalación limpia: recuperaba 0 fragmentos y el LLM citaba un
+control inexistente.
 
 ### 6. Cargar los datos de demostración (opcional)
 
