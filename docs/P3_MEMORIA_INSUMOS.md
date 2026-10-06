@@ -86,5 +86,5 @@ Toda demostración y todo test usa datos ficticios para evitar exponer informaci
 | SoA del docente | No se publica el texto; solo IDs de control | Material docente, no redistribuible |
 | `corpus/ens/*.yaml` | Publicado | Texto del BOE (dominio público) |
 | `eval/ground_truth/ens_iso.json` | Publicado (solo IDs ISO, sin texto SoA) | No reproduce el SoA textual |
-| Historial git con contraseña antigua | No reescrito aún | Decisión pendiente del autor (ver INC-01) |
+| Historial git con contraseña antigua | Historial limpiado el 2026-10-06 con `git filter-repo` (`f50957f`→`4aeef3b`): 0 apariciones del literal, gitleaks CI en verde. Commit huérfano `e2819f0` en GitHub; purga a GitHub Support pendiente. | INC-01 cerrado (ver `docs/P3_SEGURIDAD.md`) |
 | `.env` con credenciales de producción | Nunca versionado | `.gitignore` + pre-commit hook |

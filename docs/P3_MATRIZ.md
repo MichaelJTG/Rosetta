@@ -57,7 +57,7 @@
 | RNF-03 | Sin errores `mypy --strict` | (lint continuo) | `mypy src/` | 0 errores en 56 ficheros. Pre-commit activo. |
 | RNF-04 | Sin violaciones `ruff` | `7ec6b66` | `ruff check . && ruff format --check` | CI run 37203612212 verde. Pre-commit alineado con `uv.lock`. |
 | RNF-05 | Instalable: `uv sync` + `docker compose up` | `2339813` | Instalación limpia documentada | Build 165 s, imagen 3.85 GB, 197 fragmentos indexados, tests en verde. |
-| RNF-06 | Cero secretos en el repositorio | `1ef7438` | `gitleaks`, `detect-private-key` | INC-01: credenciales antiguas rotadas (dan 401). Historial no reescrito (decisión del autor). |
+| RNF-06 | Cero secretos en el repositorio | `1ef7438`·`4aeef3b` | `gitleaks`, `detect-private-key` | INC-01: credenciales rotadas 2026-10-04 (dan 401). Historial limpiado 2026-10-06 (`git filter-repo`, `f50957f`→`4aeef3b`): 0 apariciones literal, gitleaks CI verde. Commit huérfano `e2819f0` en GitHub; purga pendiente. |
 | RNF-07 | Rate limiting en endpoints sensibles | `5cf5aac` | `tests/test_auth.py` | `slowapi` activo. `POST /auth/login` → 429 al exceder límite. |
 | RNF-08 | Validación alcance Modo Auditoría | `810812d` | `tests/test_orchestrator.py` | 11 tests: IPs privadas/localhost bloqueadas. DNS resolution + `is_global` + allowlist. |
 | RNF-09 | Tiempo Traductor < 30 s | benchmark D-2 | `eval/run_eval.py` (latency_s) | Benchmark 2026-10-04: p50=8.2s, avg=16.6s, max=41.3s (n=5, Ollama qwen2.5:14b). 4/5 bajo umbral. |
