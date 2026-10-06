@@ -110,12 +110,40 @@ chromadb o de otro paquete, rompe el CI.
 | 2026-09-22 | `uv tool run pip-audit` (CI) | "0 CVE", **falso**: auditaba los 28 paquetes de la propia herramienta, no el proyecto |
 | 2026-10-04 | `pip-audit -r` sobre `uv.lock` exportado | 19 paquetes, 140 vulnerabilidades |
 | 2026-10-04 | Tras 9 tandas de actualización | 1 paquete (chromadb), 4 avisos sin parche (R-01); CI en verde |
+| 2026-10-06 | CI rojo post-commit `4350913`: job `dependency-audit` falla | CVE-2026-104851 en `fsspec 2026.3.0` no estaba en ignore list; parche existe → actualizado a `2026.9.0` (`uv add --upgrade fsspec`); 515 tests OK; commit `697bf04` |
 
 Las actualizaciones se hicieron por tandas, priorizando lo expuesto a peticiones
 HTTP: python-multipart, starlette/fastapi, pypdf, pyjwt, pillow, pila HTTP/TLS,
 pila de embeddings, weasyprint y herramientas de desarrollo. Tras cada tanda se
 ejecutaron la suite completa, ruff y `mypy --strict`. En la pila de embeddings
 (cambio de versión mayor) se verificó además el RAG con el modelo real.
+
+**CVE-2026-104851 (fsspec).** `ReferenceFileSystem.parse()` procesaba JSON
+Kerchunk sin validación de referencias arbitrarias. ROSETTA no usa
+`ReferenceFileSystem` directamente; fsspec es dependencia transitiva de
+`torch`/`huggingface-hub`/`sentence-transformers`. Upgrade defensivo: 0 cambios
+de código. Parche publicado en PyPI el 2026-09-18.
+
+---
+
+## 3b. B-4 en producción (2026-10-06)
+
+El default anterior de `ROSETTA_TRUSTED_PROXIES` incluía `10.0.0.0/8` y
+`172.17.0.0/16` (eliminados en commit `58e4040`). Para aplicar el cambio en el
+servidor de producción (`178.105.160.50`):
+
+1. `docker network inspect rosetta_default` → gateway `172.18.0.1`.
+2. Verificado que `/etc/nginx/sites-enabled/rosetta` contiene
+   `proxy_set_header X-Real-IP $remote_addr` (nginx pone la IP del cliente; el
+   cliente no puede sobrescribirla).
+3. Añadida al `.env` del servidor:
+   `ROSETTA_TRUSTED_PROXIES=127.0.0.1/32,::1/128,172.18.0.1/32`
+4. Reiniciado solo el contenedor `app`
+   (`docker compose up -d --no-deps --no-build --force-recreate app`).
+5. Verificación: dos clientes con `X-Real-IP` distintos (`203.0.113.1` y
+   `198.51.100.2`) desde `127.0.0.1` (proxy confiable) muestran contadores
+   separados en `/auth/login` — el segundo cliente recibe 401, no 429, tras
+   los intentos fallidos del primero.
 
 ---
 

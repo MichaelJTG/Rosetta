@@ -1,7 +1,7 @@
 # docs/P3_MATRIZ.md — Matriz de trazabilidad P3
 
 > Relaciona cada RF/RNF con el commit que lo implementa, los tests que lo verifican y la evidencia demostrable.
-> Generado: 2026-10-04 · Bloque D · Última actualización: 2026-10-04
+> Generado: 2026-10-04 · Bloque D · Última actualización: 2026-10-06
 
 ---
 
@@ -63,7 +63,7 @@
 | RNF-09 | Tiempo Traductor < 30 s | benchmark D-2 | `eval/run_eval.py` (latency_s) | Benchmark 2026-10-04: p50=8.2s, avg=16.6s, max=41.3s (n=5, Ollama qwen2.5:14b). 4/5 bajo umbral. |
 | RNF-10 | Build CI reproducible | `5ea2d2d` | CI workflow `.github/workflows/ci.yml` | CI run 37203612212 verde. `setup-uv v7.6.0`, `uv sync --locked`, matriz 3.11/3.12. |
 | RNF-11 | Cabeceras de seguridad HTTP | `4488ae6` | `tests/test_security.py` | `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, CSP. 3 tests. |
-| RNF-12 | Audit CVE dependencias en CI | `5ea2d2d` | CI job `dependency-audit` | Sobre `uv.lock`. 4 avisos chromadb sin parche → riesgo aceptado R-01. CI verde. |
+| RNF-12 | Audit CVE dependencias en CI | `5ea2d2d`·`697bf04` | CI job `dependency-audit` | Sobre `uv.lock`. 4 avisos chromadb sin parche → R-01. CVE-2026-104851 (fsspec) parchado en `697bf04`. CI verde. |
 
 ---
 
@@ -72,7 +72,7 @@
 | Bloque | Ítems | Commits | Estado |
 |--------|-------|---------|--------|
 | Bloque A (CI, infraestructura, demos) | A-0, A-1, A-3, A-4, A-5, A-6, A-7, A-8, A-9 | `5ea2d2d`…`f89cb28` | ✅ Completo |
-| Bloque B (seguridad) | B-1…B-10 (B-11 pendiente, fuera del alcance MVP) | `f916b39`…`4350913` | ✅ Completo (B-9 implementado: magic bytes + límite 20 MB + tope páginas + 4 tests) |
+| Bloque B (seguridad) | B-1…B-10 (B-11 pendiente, fuera del alcance MVP) | `f916b39`…`58e4040` | ✅ Completo (B-4: default loopback-only + verificado en producción `172.18.0.1/32`; B-9: magic bytes + límite 20 MB + tope páginas + 4 tests) |
 | Bloque C (eval + corpus ENS) | C-1, C-2, C-3, C-4 | `4e23e34` · `ce6fe40` | ✅ Completo |
 | Bloque D (cierre P3) | D-1, D-2, D-3, D-4, D-5 | `b270d34` · `ce6fe40` | ✅ Completo |
 | Bloque E (memoria de insumos) | `docs/P3_MEMORIA_INSUMOS.md` · atribución corpus/ground truth | este commit | ✅ Completo |
