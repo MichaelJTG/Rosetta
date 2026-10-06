@@ -18,7 +18,7 @@
 
 **Qué pasó.** Para dar acceso al profesor se añadió una cuenta adicional
 (`ROSETTA_USERS_EXTRA`). Su contraseña real se escribió como literal en
-`tests/test_auth.py` (commit `e2819f0`, 2026-05-30) y se publicó en GitHub.
+`tests/test_auth.py` (commit `0fafee1`, 2026-05-30) y se publicó en GitHub.
 Durante la auditoría de estado del 2026-10-04 aparecieron además:
 
 - la misma contraseña citada en `docs/P3_REQUISITOS.md` y en el mensaje de un
@@ -45,15 +45,23 @@ cuentas. La contraseña que había en `_shots.py` también da 401.
 
 **Corrección.**
 
-- Los dos commits locales se sanearon **antes** de publicarlos (`ea3f1f1`,
-  `04b9c7e`): sin el literal ni en el contenido ni en el mensaje.
+- Los dos commits locales se sanearon **antes** de publicarlos (`5eb5abd`,
+  `4942403`): sin el literal ni en el contenido ni en el mensaje.
 - `_shots.py` lee la URL y las credenciales de variables de entorno
   (`ROSETTA_SHOTS_*`).
 - Los tests usan una contraseña de prueba ficticia (`TEST_EXTRA_USER_PASS`).
 
-**Decisión sobre el historial público.** No se reescribe (`git filter-repo` /
-force-push). La contraseña antigua sigue en el historial de GitHub, pero ya no
-sirve: se ha rotado y se ha comprobado que el servidor la rechaza.
+**Limpieza del historial (2026-10-06).** Se ejecutó `git filter-repo
+--replace-text` sobre un clon `--mirror` temporal para reemplazar el literal
+de la contraseña en el contenido de los commits y en los mensajes.
+Verificación: `git log -p --all` — 0 apariciones del literal original;
+gitleaks sobre el historial completo (`fetch-depth: 0`) — 0 hallazgos; CI en
+verde tras el force-push (`f50957f` → `4aeef3b`).
+
+El commit original `e2819f0` sigue siendo accesible en GitHub por su hash
+(confirmado HTTP 200 el 2026-10-06): es un objeto huérfano que la purga del
+grafo de objetos de GitHub no ha eliminado todavía. **Pendiente:** purga
+solicitada a GitHub Support (sin respuesta aún).
 
 **Lecciones y controles añadidos.**
 
@@ -110,7 +118,7 @@ chromadb o de otro paquete, rompe el CI.
 | 2026-09-22 | `uv tool run pip-audit` (CI) | "0 CVE", **falso**: auditaba los 28 paquetes de la propia herramienta, no el proyecto |
 | 2026-10-04 | `pip-audit -r` sobre `uv.lock` exportado | 19 paquetes, 140 vulnerabilidades |
 | 2026-10-04 | Tras 9 tandas de actualización | 1 paquete (chromadb), 4 avisos sin parche (R-01); CI en verde |
-| 2026-10-06 | CI rojo post-commit `4350913`: job `dependency-audit` falla | CVE-2026-104851 en `fsspec 2026.3.0` no estaba en ignore list; parche existe → actualizado a `2026.9.0` (`uv add --upgrade fsspec`); 515 tests OK; commit `697bf04` |
+| 2026-10-06 | CI rojo post-commit `1291d3f`: job `dependency-audit` falla | CVE-2026-104851 en `fsspec 2026.3.0` no estaba en ignore list; parche existe → actualizado a `2026.9.0` (`uv add --upgrade fsspec`); 515 tests OK; commit `26e63e5` |
 
 Las actualizaciones se hicieron por tandas, priorizando lo expuesto a peticiones
 HTTP: python-multipart, starlette/fastapi, pypdf, pyjwt, pillow, pila HTTP/TLS,
@@ -129,8 +137,8 @@ de código. Parche publicado en PyPI el 2026-09-18.
 ## 3b. B-4 en producción (2026-10-06)
 
 El default anterior de `ROSETTA_TRUSTED_PROXIES` incluía `10.0.0.0/8` y
-`172.17.0.0/16` (eliminados en commit `58e4040`). Para aplicar el cambio en el
-servidor de producción (`178.105.160.50`):
+`172.17.0.0/16` (eliminados en commit `f06f726`). Para aplicar el cambio en el
+servidor de producción (Hetzner):
 
 1. `docker network inspect rosetta_default` → gateway `172.18.0.1`.
 2. Verificado que `/etc/nginx/sites-enabled/rosetta` contiene
@@ -248,10 +256,26 @@ El perímetro externo es nginx. La API nunca está expuesta directamente a Inter
 
 ---
 
-## 5. Pendientes que requieren al autor
+## 5. Resincronización del servidor de producción tras el filter-repo
+
+Tras el force-push del 2026-10-06, el servidor de producción (Hetzner) apunta
+al historial antiguo. Para resincronizarlo:
+
+```bash
+git fetch origin
+git reset --hard origin/main
+# NO hacer git push desde el servidor; solo recibir.
+```
+
+El servidor de producción **nunca es origen de commits ni de push**. Toda
+actualización fluye de GitHub al servidor, nunca al revés.
+
+---
+
+## 6. Pendientes que requieren al autor
 
 - Revisar tres coincidencias con patrón de clave en el commit antiguo
-  `4324141` (`tests/test_api_diff.py`, `tests/test_diff_analyzer.py`,
+  `be2428c` (`tests/test_api_diff.py`, `tests/test_diff_analyzer.py`,
   `vault/MOC_Roadmap.md`). Probablemente son claves ficticias de los tests del
   Gate CI/CD; si alguna fuera una clave real de un servicio externo, hay que
   revocarla en ese servicio.
