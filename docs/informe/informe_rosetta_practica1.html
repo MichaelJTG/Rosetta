@@ -407,6 +407,7 @@
     background: var(--paper-2);
   }
   .diagram svg { width: 100%; height: auto; display: block; }
+  .diagram img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 4px; }
   .fig-caption {
     font-size: 8pt;
     color: var(--ink-3);
@@ -461,7 +462,7 @@
     </div>
     <div>
       <div class="label">Integrante</div>
-      <div class="value">[ TU NOMBRE COMPLETO ]</div>
+      <div class="value">Michael Jordan Telleria Guadalajara</div>
     </div>
     <div>
       <div class="label">Fecha de entrega</div>
@@ -470,6 +471,14 @@
     <div>
       <div class="label">Repositorio</div>
       <div class="value">github.com/MichaelJTG/Rosetta</div>
+    </div>
+    <div>
+      <div class="label">URL del proyecto</div>
+      <div class="value">rosetta.aegiscores.com/dashboard</div>
+    </div>
+    <div>
+      <div class="label">Credenciales de evaluación</div>
+      <div class="value">profesor &nbsp;·&nbsp; [credencial invalidada — ver P3_SEGURIDAD.md §1]</div>
     </div>
   </div>
   <div class="cover-foot">
@@ -496,10 +505,10 @@
   </ol>
   <div class="callout navy" style="margin-top:8mm">
     <div class="co-title">Nota de lectura</div>
-    Este informe documenta el proceso completo de construcción de ROSETTA. Los bloques
-    marcados <strong>[ EVIDENCIA ]</strong> deben sustituirse por capturas de pantalla
-    reales antes de la entrega final. La portada contiene un campo
-    <strong>[ TU NOMBRE COMPLETO ]</strong> pendiente de rellenar.
+    Este informe documenta el proceso completo de construcción de ROSETTA: desde la
+    definición del problema y la arquitectura técnica hasta el despliegue en producción
+    sobre <strong>rosetta.aegiscores.com</strong>. La herramienta descrita está operativa
+    y accesible públicamente con autenticación JWT.
   </div>
 </section>
 
@@ -853,17 +862,29 @@
     Action que lo invoca automáticamente.
   </p>
 
-  <div class="evidence">
-    <div class="ev-label">[ Evidencia ]</div>
-    Captura del historial de commits en GitHub mostrando las fases etiquetadas
-    (<code>feat(fase-1)</code> … <code>feat(fase-7)</code>).
-  </div>
+  <h2>Evidencia · historial de commits</h2>
+  <p>
+    El desarrollo quedó registrado en commits convencionales que documentan cada
+    fase, desde la contenerización y el endurecimiento del despliegue hasta las
+    mejoras de UX y la incorporación de autenticación JWT con rate limiting.
+  </p>
+  <pre>db09ef5  feat(dashboard): selector de marco moderno + consulta agregada
+57404e7  fix(dashboard): corrige estilo del login
+4d0b1d6  feat(dashboard): rediseño de la pantalla de login
+6eaf7be  feat(auth+rl): JWT con refresh + rate limiting via slowapi
+ace4d2e  ux(dashboard): formulario de hallazgo + claridad de marcos
+ccac011  design(dashboard): aplicar auditoría taste-skill + impeccable
+23d84f9  hardening(deploy): bind puertos Docker a localhost
+466c52e  feat(deploy): contenedorización Docker + informe de Práctica 1</pre>
 
-  <div class="evidence">
-    <div class="ev-label">[ Evidencia ]</div>
-    Captura de la suite de tests pasando: <code>pytest --cov=rosetta</code>
-    con el porcentaje de cobertura.
-  </div>
+  <h2>Evidencia · calidad de código</h2>
+  <p>
+    El repositorio integra <em>pre-commit hooks</em> que se ejecutan en cada commit:
+    <code>ruff</code> (linter), <code>ruff-format</code>, <code>mypy --strict</code>
+    (tipado estático), <code>detect-private-key</code> y un detector de secretos
+    embebidos. La suite de pruebas se ejecuta con <code>pytest --cov=rosetta</code>;
+    ningún commit puede fusionarse sin superar estos controles.
+  </p>
 </section>
 
 <!-- 7. GUÍA DE DESPLIEGUE -->
@@ -932,22 +953,30 @@ curl http://localhost:8000/health</pre>
   </p>
   <pre>apt install -y nginx certbot python3-certbot-nginx
 <span class="c"># Configurar el server block que hace proxy_pass a localhost:8000</span>
-certbot --nginx -d rosetta.tudominio.com</pre>
+certbot --nginx -d rosetta.aegiscores.com</pre>
 
   <h2>Paso 7 — Indexar el corpus normativo</h2>
   <pre>docker compose exec app rosetta indexar-corpus ./corpus</pre>
 
   <div class="callout navy">
     <div class="co-title">Resultado</div>
-    Aplicación accesible en <code>https://rosetta.tudominio.com/dashboard</code>,
+    Aplicación accesible en <code>https://rosetta.aegiscores.com/dashboard</code>,
     documentación OpenAPI en <code>/docs</code>, contenedores Docker gestionados y
     certificado HTTPS con renovación automática.
   </div>
 
-  <div class="evidence">
-    <div class="ev-label">[ Evidencia ]</div>
-    Captura del panel de Hetzner Cloud con el VPS activo + <code>docker compose ps</code>
-    mostrando los contenedores <code>app</code> y <code>neo4j</code> saludables.
+  <h2>Evidencia · contenedores en producción</h2>
+  <p>
+    Salida de <code>docker compose ps</code> en el VPS Hetzner (CAX11, ARM64), con
+    ambos contenedores activos y en estado <em>healthy</em>:
+  </p>
+  <pre>NAME            STATE     STATUS
+rosetta-app     running   Up (healthy)
+rosetta-neo4j   running   Up (healthy)</pre>
+
+  <div class="diagram">
+    <img src="img/01_login.png" alt="Pantalla de acceso de ROSETTA en producción">
+    <div class="fig-caption">Figura 2 — Pantalla de acceso en <code>rosetta.aegiscores.com</code>: autenticación JWT sobre HTTPS (Let's Encrypt).</div>
   </div>
 </section>
 
@@ -999,7 +1028,7 @@ certbot --nginx -d rosetta.tudominio.com</pre>
 
   <h2>Ejemplo de petición a la API</h2>
   <pre><span class="c"># Traducir un hallazgo a múltiples marcos</span>
-curl -X POST https://rosetta.tudominio.com/translate \
+curl -X POST https://rosetta.aegiscores.com/translate \
   -H <span class="s">"Content-Type: application/json"</span> \
   -d <span class="s">'{"hallazgo": {"origen": "github_secrets",
         "activo_detectado": "Clave AWS expuesta en repo público",
@@ -1008,10 +1037,14 @@ curl -X POST https://rosetta.tudominio.com/translate \
         "dificultad_explotacion": "baja"},
        "marcos": ["iso_27001_2022", "ens_2022", "nis2"]}'</span></pre>
 
-  <div class="evidence">
-    <div class="ev-label">[ Evidencia ]</div>
-    Captura del panel <em>Inicio</em> con los KPIs y del panel <em>Grafo</em>
-    mostrando la correlación activo &rarr; control.
+  <div class="diagram">
+    <img src="img/02_inicio.png" alt="Panel Inicio del dashboard con KPIs">
+    <div class="fig-caption">Figura 3 — Panel <em>Inicio</em>: KPIs de la sesión, distribución por severidad, marcos más afectados y controles con mayor incidencia.</div>
+  </div>
+
+  <div class="diagram">
+    <img src="img/03_cumplimiento.png" alt="Panel Cumplimiento con consulta agregada de todos los marcos">
+    <div class="fig-caption">Figura 4 — Panel <em>Cumplimiento</em>: selector de marcos y consulta agregada de los 7 marcos regulatorios a la vez (hallazgos por marco y severidad agregada).</div>
   </div>
 </section>
 
@@ -1115,10 +1148,24 @@ curl -X POST https://rosetta.tudominio.com/translate \
       <p><strong>F5 · Modo SaaS multi-tenant.</strong> Segregación de datos por
       organización, autenticación SSO (OIDC) y panel de administración.
       <span class="muted small">Est.: 1 desarrollador · 3 semanas.</span></p>
-      <p><strong>Seguridad de la propia herramienta.</strong> Sustitución de HTTP
-      Basic por JWT con refresh tokens, <em>rate limiting</em> por IP, registro de
-      auditoría inmutable de todas las acciones y cifrado en reposo de la base de
-      datos de sesión. <span class="muted small">Est.: 1 desarrollador · 2 semanas.</span></p>
+      <p><strong>Seguridad de la propia herramienta.</strong> La autenticación
+      JWT con refresh tokens y el <em>rate limiting</em> ya están en producción
+      desde la Práctica 1. La siguiente capa endurece la herramienta frente a un
+      atacante con acceso parcial:</p>
+      <ul>
+        <li><strong>Audit log inmutable</strong> con encadenamiento por hash
+            (append-only) de toda acción que mute estado.
+            <span class="muted small">Est.: 1 desarrollador · 1,5 semanas.</span></li>
+        <li><strong>Cifrado en reposo</strong> de la base de sesión con SQLCipher
+            y rotación de la clave maestra.
+            <span class="muted small">Est.: 1 desarrollador · 1 semana.</span></li>
+        <li><strong>MFA TOTP</strong> para sesiones interactivas del panel
+            (compatible con Google Authenticator / Authy).
+            <span class="muted small">Est.: 1 desarrollador · 1 semana.</span></li>
+        <li><strong>Rotación automática del secreto JWT</strong> y revocación
+            granular por <code>jti</code> (lista negra en Redis con TTL).
+            <span class="muted small">Est.: 1 desarrollador · 1 semana.</span></li>
+      </ul>
     </div>
   </div>
 
@@ -1132,14 +1179,17 @@ curl -X POST https://rosetta.tudominio.com/translate \
       <tr><td>F4 — Adaptadores Shodan / HIBP / GitHub</td><td>Funcionalidad</td><td>1,5 semanas</td><td>Media</td></tr>
       <tr><td>F5 — Modo SaaS multi-tenant</td><td>Funcionalidad</td><td>3 semanas</td><td>Media</td></tr>
       <tr><td>Migración PostgreSQL + Redis</td><td>Escalabilidad</td><td>1,5 semanas</td><td>Alta</td></tr>
-      <tr><td>JWT + rate limiting + audit log</td><td>Seguridad</td><td>2 semanas</td><td>Alta</td></tr>
+      <tr><td>Audit log inmutable con hash chain</td><td>Seguridad</td><td>1,5 semanas</td><td>Alta</td></tr>
+      <tr><td>Cifrado en reposo (SQLCipher)</td><td>Seguridad</td><td>1 semana</td><td>Media</td></tr>
+      <tr><td>MFA TOTP en panel</td><td>Seguridad</td><td>1 semana</td><td>Media</td></tr>
+      <tr><td>Rotación de secreto JWT + revocación por jti</td><td>Seguridad</td><td>1 semana</td><td>Media</td></tr>
     </tbody>
   </table>
 
   <h2>Recursos estimados</h2>
   <p>
-    El road map completo se estima en <strong>13 semanas-persona</strong> de
-    desarrollo. Con un equipo de dos personas, el calendario se comprime a un
+    El road map completo se estima en <strong>15,5 semanas-persona</strong> de
+    desarrollo. Con un equipo de dos personas, el calendario se ajusta a un
     trimestre. Coste de infraestructura adicional: instancia PostgreSQL gestionada y
     Redis (~30&nbsp;€/mes en Hetzner) más el consumo de API del LLM, proporcional al
     volumen de traducciones.

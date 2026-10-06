@@ -1,23 +1,26 @@
-"""Build script: docs/memoria/memoria.md -> dist/P3_Memoria.pdf"""
+"""Build script: docs/memoria/memoria.md -> dist/P3_GrupoXX_Memoria.pdf"""
 
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 
+# Fill in the two-digit group number before delivery
+GRUPO = "XX"
+
 ROOT = Path(__file__).resolve().parent.parent
 SRC_MD = ROOT / "docs" / "memoria" / "memoria.md"
 SRC_CSS = ROOT / "docs" / "memoria" / "estilos.css"
 DIST = ROOT / "dist"
-OUT_PDF = DIST / "P3_Memoria.pdf"
-OUT_HTML = DIST / "P3_Memoria.html"
+OUT_PDF = DIST / f"P3_Grupo{GRUPO}_Memoria.pdf"
+OUT_HTML = DIST / f"P3_Grupo{GRUPO}_Memoria.html"
 
 
 def md_to_html(md_text: str, css_path: Path) -> str:
     try:
         import markdown_it  # type: ignore[import]
 
-        mdi = markdown_it.MarkdownIt("commonmark", {"breaks": False})
+        mdi = markdown_it.MarkdownIt("commonmark", {"html": True}).enable("table")
         body = mdi.render(md_text)
     except (ImportError, Exception):
         try:
@@ -66,7 +69,7 @@ def build() -> None:
     try:
         from weasyprint import HTML as WP  # type: ignore[import]
 
-        WP(string=html, base_url=str(DIST)).write_pdf(str(OUT_PDF))
+        WP(string=html, base_url=str(ROOT / "docs" / "memoria")).write_pdf(str(OUT_PDF))
         size_kb = OUT_PDF.stat().st_size // 1024
         print(f"PDF written  -> {OUT_PDF}  ({size_kb} KB)")
     except ImportError:

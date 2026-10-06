@@ -24,7 +24,7 @@
 
 body {
   font-family: "Helvetica Neue", Arial, sans-serif;
-  font-size: 10.5pt;
+  font-size: 11pt;
   line-height: 1.55;
   color: #1a1a1a;
   margin: 0;
@@ -176,4 +176,71 @@ hr {
   border: none;
   border-top: 1px solid #e2e8f0;
   margin: 1.2em 0;
+}
+
+/* Page breaks */
+h1.portada-titulo + * {
+  page-break-before: always;
+}
+
+/* Break after portada (first h1 on page) and after TOC (nav/ul after first h2) */
+section.portada {
+  page-break-after: always;
+}
+
+/* TOC navigation list — force page break after it */
+nav + * {
+  page-break-before: always;
+}
+
+/* Portada: first hr signals end of portada section */
+@page :first {
+  margin-top: 4cm;
+}
+
+/* Figure captions */
+figure {
+  counter-increment: figure;
+  margin: 1em 0;
+  page-break-inside: avoid;
+}
+
+figcaption::before {
+  content: "Figura " counter(figure) ". ";
+  font-weight: 600;
+}
+
+figcaption {
+  font-size: 9pt;
+  color: #374151;
+  text-align: center;
+  margin-top: 0.3em;
+}
+
+/* Table header repeat per page */
+thead {
+  display: table-header-group;
+}
+
+/* ToC page numbers via target-counter */
+nav a::after {
+  content: leader('.') target-counter(attr(href url), page);
+  font-size: 9pt;
+  color: #374151;
+}
+
+nav ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+nav li {
+  margin-bottom: 0.3em;
+}
+
+nav a {
+  text-decoration: none;
+  color: #1e3a8a;
+  display: flex;
+  justify-content: space-between;
 }
