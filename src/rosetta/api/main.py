@@ -126,7 +126,7 @@ logger = structlog.get_logger(__name__)
 # Trusted proxies (B-4) — solo se acepta X-Real-IP de proxies en la lista
 # ---------------------------------------------------------------------------
 
-_DEFAULT_TRUSTED = "127.0.0.1/32,::1/128,172.17.0.0/16,10.0.0.0/8"
+_DEFAULT_TRUSTED = "127.0.0.1/32,::1/128"
 
 
 def _build_trusted_proxies() -> list[IPv4Network | IPv6Network]:

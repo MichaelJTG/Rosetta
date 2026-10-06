@@ -246,10 +246,12 @@ def test_b4_trusted_proxy_localhost_is_trusted() -> None:
     assert _is_trusted_proxy(req) is True
 
 
-def test_b4_trusted_proxy_docker_network_is_trusted() -> None:
-    """172.17.0.5 (red Docker por defecto) está en la lista de confianza."""
-    req = _make_mock_request("172.17.0.5")
-    assert _is_trusted_proxy(req) is True
+def test_b4_default_only_loopback_trusted() -> None:
+    """Por defecto, solo loopback (127.0.0.1/::1) está en la lista de confianza.
+    172.17.x.x y 10.x.x.x ya no están en el default (rangos amplios eliminados B-4)."""
+    assert _is_trusted_proxy(_make_mock_request("172.17.0.5")) is False
+    assert _is_trusted_proxy(_make_mock_request("10.1.2.3")) is False
+    assert _is_trusted_proxy(_make_mock_request("::1")) is True
 
 
 def test_b4_untrusted_peer_not_trusted() -> None:
