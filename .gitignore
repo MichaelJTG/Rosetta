@@ -102,8 +102,9 @@ chroma_db/
 *.sqlite
 *.sqlite3
 
-# Informe PDF — se regenera desde el HTML; entrega aparte en campus
+# Informe — PDF y DOCX se entregan aparte en campus, no se versionan
 docs/informe/*.pdf
+docs/informe/*.docx
 
 # Neo4j datos locales
 neo4j_data/

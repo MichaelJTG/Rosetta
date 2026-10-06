@@ -837,6 +837,11 @@ async def download_report(filename: str) -> FileResponse:
     return FileResponse(ruta, media_type=media_type, filename=filename)
 
 
+_PDF_MAGIC = b"%PDF"
+_PDF_MAX_SIZE_MB_DEFAULT = 20
+_PDF_MAX_PAGES_DEFAULT = 500
+
+
 @app.post("/ingest/pdf", response_model=IngestPdfResponse, tags=["ingestion"])
 async def ingest_pdf(
     file: UploadFile,
@@ -851,6 +856,11 @@ async def ingest_pdf(
     HallazgoMaestro en la sesión con ``origen=MANUAL`` y **sin traducción
     normativa** (``compliance_data=None``): la extracción no llama al Traductor.
     Para obtener los controles, el hallazgo se envía después a ``POST /translate``.
+
+    Controles B-9:
+    - Magic bytes (%PDF) verificados en los primeros 4 bytes antes de leer el fichero.
+    - Tamaño configurable vía ``ROSETTA_PDF_MAX_SIZE_MB`` (por defecto 20 MB).
+    - Número de páginas configurable vía ``ROSETTA_PDF_MAX_PAGES`` (por defecto 500).
     """
     from pathlib import Path
 
@@ -859,7 +869,24 @@ async def ingest_pdf(
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="El archivo debe ser un PDF (.pdf).")
 
-    contents = await file.read()
+    # B-9: magic bytes — fast fail antes de leer el fichero completo
+    header = await file.read(4)
+    if len(header) < 4 or not header.startswith(_PDF_MAGIC):
+        raise HTTPException(
+            status_code=400,
+            detail="El archivo no es un PDF válido (magic bytes incorrectos).",
+        )
+
+    # B-9: size limit configurable via ROSETTA_PDF_MAX_SIZE_MB (default 20 MB)
+    max_mb = int(os.getenv("ROSETTA_PDF_MAX_SIZE_MB", str(_PDF_MAX_SIZE_MB_DEFAULT)))
+    max_bytes = max_mb * 1024 * 1024
+    await file.seek(0)
+    contents = await file.read(max_bytes + 1)
+    if len(contents) > max_bytes:
+        raise HTTPException(
+            status_code=413,
+            detail=f"El PDF supera el límite de {max_mb} MB.",
+        )
     if not contents:
         raise HTTPException(status_code=400, detail="El archivo PDF está vacío.")
 
@@ -869,8 +896,25 @@ async def ingest_pdf(
         tmp_path = Path(tmp.name)
 
     try:
+        # B-9: page count limit configurable via ROSETTA_PDF_MAX_PAGES (default 500)
+        import pdfplumber  # noqa: PLC0415
+
+        max_pages = int(os.getenv("ROSETTA_PDF_MAX_PAGES", str(_PDF_MAX_PAGES_DEFAULT)))
+        try:
+            with pdfplumber.open(tmp_path) as pdf_doc:
+                n_pages = len(pdf_doc.pages)
+        except Exception:
+            n_pages = 0  # El ingester reportará el error con más detalle
+        if n_pages > max_pages:
+            raise HTTPException(
+                status_code=422,
+                detail=f"El PDF tiene {n_pages} páginas; el límite es {max_pages}.",
+            )
+
         ingester = PdfAuditorIngester(llm_client=traductor.llm)
         result = await ingester.ingestar(tmp_path)
+    except HTTPException:
+        raise
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     finally:

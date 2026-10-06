@@ -184,7 +184,7 @@ ejecutaron la suite completa, ruff y `mypy --strict`. En la pila de embeddings
 | ID | Amenaza | Componente afectado | Control existente | Riesgo residual |
 |----|---------|--------------------|--------------------|-----------------|
 | D-1 | Abuso de `/translate` para agotar cuota del LLM | `POST /translate` | Rate limiting (120 req/min por IP); autenticación obligatoria | Medio — economic DoS si la clave API se filtra |
-| D-2 | Subida de PDF gigante para agotar memoria | `POST /ingest/pdf` | Pendiente B-9 (sin límite de tamaño ni comprobación de magic bytes aún) | **Alto** — sin mitigar en MVP actual |
+| D-2 | Subida de PDF gigante para agotar memoria | `POST /ingest/pdf` | **B-9 implementado**: comprobación de magic bytes `%PDF` (fast-fail antes de leer el fichero completo), límite configurable vía `ROSETTA_PDF_MAX_SIZE_MB` (20 MB por defecto, rechazo 413 antes del read completo), tope de páginas configurable vía `ROSETTA_PDF_MAX_PAGES` (500 por defecto, rechazo 422). 4 tests en `tests/test_security.py` | Bajo |
 | D-3 | Bucle de agente LLM que no termina | Pipeline RAG + LLM | Timeout del cliente HTTP (aiohttp/httpx) configurado en el SDK | Medio — no hay circuit breaker explícito |
 | D-4 | Escaneo masivo de activos internos via Modo Auditoría | `POST /audit/start` | Validación de alcance con DNS + `is_global` + allowlist de servidor (B-8) | Bajo |
 

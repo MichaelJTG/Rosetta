@@ -394,3 +394,78 @@ async def test_rf09_translate_validar_true_valida_false(
     data = r.json()
     assert data["validacion"]["valida"] is False
     assert len(data["validacion"]["problemas"]) > 0
+
+
+# ---------------------------------------------------------------------------
+# B-9 · Validaciones de seguridad en POST /ingest/pdf
+# ---------------------------------------------------------------------------
+
+_MINIMAL_PDF = (
+    b"%PDF-1.4\n"
+    b"1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"
+    b"2 0 obj\n<< /Type /Pages /Kids [] /Count 0 >>\nendobj\n"
+    b"xref\n0 3\n"
+    b"0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n"
+    b"trailer\n<< /Size 3 /Root 1 0 R >>\nstartxref\n110\n%%EOF"
+)
+
+
+@pytest.mark.asyncio
+async def test_b9_wrong_magic_bytes_rejected(client: AsyncClient) -> None:
+    """Archivo sin magic bytes %PDF → 400."""
+    fake_content = b"NOTPDF" + b"\x00" * 50
+    r = await client.post(
+        "/ingest/pdf",
+        files={"file": ("report.pdf", fake_content, "application/pdf")},
+    )
+    assert r.status_code == 400
+    assert "magic bytes" in r.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_b9_oversized_pdf_rejected(client: AsyncClient) -> None:
+    """PDF que supera ROSETTA_PDF_MAX_SIZE_MB → 413."""
+    import os
+    from unittest.mock import patch
+
+    with patch.dict(os.environ, {"ROSETTA_PDF_MAX_SIZE_MB": "0"}):
+        r = await client.post(
+            "/ingest/pdf",
+            files={"file": ("report.pdf", _MINIMAL_PDF, "application/pdf")},
+        )
+    assert r.status_code == 413
+    assert "mb" in r.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_b9_too_many_pages_rejected(client: AsyncClient) -> None:
+    """PDF con páginas > ROSETTA_PDF_MAX_PAGES → 422."""
+    import os
+    from unittest.mock import patch
+
+    mock_pdf = MagicMock()
+    mock_pdf.pages = [MagicMock()] * 501
+    mock_ctx = MagicMock()
+    mock_ctx.__enter__ = MagicMock(return_value=mock_pdf)
+    mock_ctx.__exit__ = MagicMock(return_value=False)
+
+    with (
+        patch.dict(os.environ, {"ROSETTA_PDF_MAX_PAGES": "500"}),
+        patch("pdfplumber.open", return_value=mock_ctx),
+    ):
+        r = await client.post(
+            "/ingest/pdf",
+            files={"file": ("report.pdf", _MINIMAL_PDF, "application/pdf")},
+        )
+    assert r.status_code == 422
+    assert "páginas" in r.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_b9_non_pdf_extension_rejected(client: AsyncClient) -> None:
+    """Fichero con extensión .exe (no .pdf) → 400."""
+    r = await client.post(
+        "/ingest/pdf",
+        files={"file": ("malware.exe", _MINIMAL_PDF, "application/pdf")},
+    )
+    assert r.status_code == 400

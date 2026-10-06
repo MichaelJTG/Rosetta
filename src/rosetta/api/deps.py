@@ -32,9 +32,10 @@ def get_session_findings(request: Request) -> SessionStore:
     return cast(SessionStore, request.app.state.session_findings)
 
 
-def get_diff_analyzer(request: Request) -> DiffAnalyzer:
+def get_diff_analyzer(
+    traductor: Annotated[TraductorSimbiotico, Depends(get_traductor)],
+) -> DiffAnalyzer:
     """Devuelve un DiffAnalyzer compartiendo LLM y RAG del Traductor."""
-    traductor = get_traductor(request)
     return DiffAnalyzer(llm=traductor.llm, rag=traductor.rag)
 
 
@@ -43,9 +44,11 @@ def get_control_store(request: Request) -> ControlStore:
     return cast(ControlStore, request.app.state.control_store)
 
 
-def get_validador(request: Request) -> Validador:
+def get_validador(
+    traductor: Annotated[TraductorSimbiotico, Depends(get_traductor)],
+) -> Validador:
     """Crea un Validador compartiendo el LLM del Traductor (sin estado propio)."""
-    return Validador(llm=get_traductor(request).llm)
+    return Validador(llm=traductor.llm)
 
 
 TraductorDep = Annotated[TraductorSimbiotico, Depends(get_traductor)]
