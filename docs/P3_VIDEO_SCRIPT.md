@@ -16,8 +16,9 @@ docker compose up -d
 docker compose ps       # rosetta: healthy, neo4j: healthy
 
 # Verificar corpus cargado
-curl -s http://localhost:8000/health | python -m json.tool
-# → fragments: 197, frameworks: 7
+docker compose exec app rosetta load-corpus all corpus
+# → ✓ 229 fragmentos indexados en ChromaDB (7 marcos)
+docker compose restart app
 
 # Poblar la demo con hallazgos ficticios
 uv run python scripts/seed_demo.py
@@ -88,13 +89,17 @@ rosetta translate \
 **Mostrar el modo validado:**
 
 ```bash
-curl -s -X POST "http://localhost:8000/translate?validar=true" \
+curl -s -X POST "http://localhost:8000/translate" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"texto": "Servidor web con CVE-2024-21413", "marco": "ens"}'
+  -d '{"hallazgo": {"origen": "manual", "activo_detectado": "vpn.techserv.example",
+       "evidencia": "4 cuentas de administración sin MFA",
+       "vector_ataque": "Acceso VPN de administradores solo con contraseña",
+       "dificultad_explotacion": "media"},
+       "marcos": ["ens_2022"], "validar": true}'
 ```
 
-> «Con `validar=true`, el agente Validador actúa como segunda opinión sobre la
+> «Con `"validar": true` en el cuerpo, el agente Validador actúa como segunda opinión sobre la
 > traducción. Añade latencia, pero está disponible para casos críticos.
 > El cliente controla el coste-calidad.»
 
@@ -105,12 +110,12 @@ curl -s -X POST "http://localhost:8000/translate?validar=true" \
 **[Pantalla: terminal]**
 
 ```bash
-curl -s http://localhost:8000/health | python -m json.tool
+docker compose exec app rosetta load-corpus all corpus
 ```
 
-Mostrar:
-- `fragments`: 197
-- `frameworks`: 7 → ISO 27001:2022, ENS 2022, NIS2, DORA, RGPD, NIST CSF 2.0, PCI-DSS 4.0
+Mostrar (salida del comando; `GET /health` solo devuelve `status` y `version`):
+- 229 fragmentos indexados
+- 7 marcos → ISO 27001:2022, ENS 2022, NIS2, DORA, RGPD, NIST CSF 2.0, PCI-DSS 4.0
 
 > «El corpus incluye el Anexo II completo del RD 311/2022 (73 medidas ENS),
 > los 114 controles de ISO 27001:2022, y cinco marcos adicionales.
@@ -349,11 +354,11 @@ uv run pytest --cov=src --cov-report=term-missing -q 2>&1 | tail -5
 
 | Punto | Detalle |
 |-------|---------|
-| Token de demo | `docker compose exec rosetta uv run python -c "import httpx; r=httpx.post('http://localhost:8000/auth/login',json={'username':'admin','password':'<contraseña_nueva>'}); print(r.json()['access_token'][:40]+'...')"` |
+| Token de demo | `docker compose exec app python -c "import httpx; r=httpx.post('http://localhost:8000/auth/login',json={'username':'auditor-demo','password':'cambia-esta-clave-de-prueba'}); print(r.json()['access_token'][:40]+'...')"` |
 | LLM en demo | Usar Ollama local (`LLM_PROVIDER=ollama`) para evitar costes y latencia de red |
-| Corpus pre-cargado | Verificar con `GET /health` antes de grabar → `fragments: 197` |
+| Corpus pre-cargado | Verificar con `rosetta load-corpus all corpus` antes de grabar → 229 fragmentos, y reiniciar la app |
 | Caso TechServ | `scripts/seed_demo.py` crea hallazgos ficticios listos para mostrar |
 | Duración LLM | Las llamadas al LLM toman 5–20 s con Ollama. No acelerar el vídeo en esas partes |
-| Validador | Mostrar primero sin `validar=true`, luego con él, para contrastar latencia y veredicto |
+| Validador | Mostrar primero sin `"validar": true`, luego con él, para contrastar latencia y veredicto |
 | B-9 demo | Preparar fichero no-PDF (`printf "fake" > /tmp/fake.pdf`) y PDF grande para el 413 |
 | Eval reports | Tener terminales con los MD ya abiertos en `less`, no leerlos en directo |

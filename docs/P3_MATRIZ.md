@@ -28,7 +28,7 @@
 | RF-06 | Modo Auditoría Red Team (Nmap, Nuclei) + WebSocket | `419b737` | `tests/test_orchestrator.py` | `POST /audit/start` → `WS /audit/ws/{id}`. Nmap 7.95 + Nuclei 3.11.1 en imagen Docker. |
 | RF-07 | Ingesta de alertas Wazuh (JSON/CSV) | `b64dd2b` | `tests/test_wazuh.py` | `POST /blue/ingest` → alertas normalizadas a `DatosBlue`. |
 | RF-08 | Correlación Red↔Blue | `b64dd2b` | `tests/test_blue_enrichment.py` | `BlueEnrichment.enriquecer()` cruza hallazgos. 96 % cobertura. |
-| RF-09 | Arquitectura multi-agente (Soundwave + Validador) | `4ebeade` | `tests/test_agents.py` · `tests/test_security.py` (RF-09) | `RosettaOrchestrator` + `Validador` implementados. `POST /translate?validar=true` invoca Validador (por defecto `false`). Benchmark: rejection_precision@F1<0.5=1.0 (10 casos piloto). |
+| RF-09 | Arquitectura multi-agente (Soundwave + Validador) | `4ebeade` | `tests/test_agents.py` · `tests/test_security.py` (RF-09) | `RosettaOrchestrator` + `Validador` implementados. `POST /translate` con `"validar": true` en el cuerpo invoca Validador (por defecto `false`). Benchmark: rejection_precision@F1<0.5=1.0 (10 casos piloto). |
 | RF-10 | Copilot normativo con citas y confianza | `b64dd2b` | `tests/test_copilot.py` | `POST /copilot/ask` → respuesta con campo `confianza`. 94 % cobertura. |
 | RF-11 | Detección de procedure drift | `b64dd2b` | `tests/test_drift.py` | `POST /drift/analyze` → `drift_score`, diferencias detectadas. 95 % cobertura. |
 | RF-12 | Dashboard SPA 16 paneles | `92a5989` | `tests/test_security.py` (XSS) | `GET /dashboard` → HTML con los 16 paneles. Todos los `innerHTML` con `esc()`. |

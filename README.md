@@ -94,7 +94,7 @@ docker compose exec app rosetta load-corpus all corpus
 docker compose restart app
 ```
 
-El primer comando indexa en ChromaDB los siete marcos con corpus propio (197
+El primer comando indexa en ChromaDB los siete marcos con corpus propio (229
 fragmentos). El reinicio es **necesario**: ChromaDB no admite que dos procesos
 compartan la base, y la API solo ve un índice creado por otro proceso cuando
 vuelve a arrancar. Sin reiniciar, el Traductor trabaja sin contexto normativo.
