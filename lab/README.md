@@ -7,12 +7,15 @@ desde el contenedor de ROSETTA.
 
 Tiene errores de configuración **intencionados** y contenido **ficticio**:
 
-| Fallo intencionado | Fichero | Qué debería detectar |
+| Fallo intencionado | Fichero | Qué detecta (auditoría real del 2026-10-10) |
 |---|---|---|
-| Versión del servidor visible (`server_tokens on`) | `nginx.conf` | Nmap / Nuclei (divulgación de tecnología) |
-| Listado de directorio en `/backups/` | `nginx.conf` | Nuclei (directory listing) |
-| Fichero `.env` publicado con valores falsos | `www/.env` | Nuclei (exposición de configuración) |
-| Sin cabeceras de seguridad HTTP | `nginx.conf` | Nuclei (cabeceras ausentes) |
+| Versión del servidor visible (`server_tokens on`) | `nginx.conf` | Nuclei `nginx-version`, `nginx-eol`, `tech-detect` (info) y Nmap (puerto 80/tcp abierto, servicio identificado con `-sV`) |
+| Fichero `.env` publicado con valores falsos | `www/.env` | Nuclei `generic-env`, `laravel-env`, `codeigniter-env` (high) |
+| Sin cabeceras de seguridad HTTP | `nginx.conf` | Nuclei `http-missing-security-headers` (info) |
+| Listado de directorio en `/backups/` | `nginx.conf` | **No lo detecta**: ninguna plantilla pública de Nuclei prueba la ruta `/backups/`, y Nuclei no rastrea enlaces |
+
+Resultado con la configuración por defecto (`ROSETTA_NUCLEI_TAGS=exposure,misconfig,tech`,
+todas las severidades): 18 hallazgos, 17 de Nuclei y 1 de Nmap, en unos 40 s.
 
 ## Uso
 

@@ -367,3 +367,13 @@ Fallos encontrados al hacer las capturas de la memoria con el stack local (Docke
 | **Eval** | No se repite: sus prompts (1 marco, ~1200 tokens) nunca superaron la ventana, así que el eval del 2026-10-04 y el benchmark RNF-09 no se hicieron con prompts recortados. |
 | **Test** | `tests/test_llm.py`: `num_ctx` por defecto 16384, valor desde `OLLAMA_NUM_CTX` y error con valores inválidos. |
 | **Commit** | este commit |
+
+### F-3 · Modo Auditoría: 0 hallazgos contra el laboratorio · RF-06, RNF-08
+
+| | |
+|---|---|
+| **Qué** | Dos causas. (1) Nuclei: con el nombre interno `lab-objetivo`, algunas peticiones fallaban con `no address found for host` y, al acumular errores, Nuclei marcaba el host como caído y se saltaba las 11 144 plantillas restantes. (2) Nmap recibía la URL `http://lab-objetivo` tal cual y escaneaba 0 hosts. |
+| **Cambio** | `NucleiAdapter` añade `-nmhe` (no descartar el host), `-ni` (sin interactsh: ningún tráfico fuera del objetivo), `-duc`, y tags y severidades configurables (`ROSETTA_NUCLEI_TAGS`, por defecto `exposure,misconfig,tech`; `ROSETTA_NUCLEI_SEVERITY`, por defecto todas), validados al crear el adaptador. `NmapAdapter` pasa a Nmap el host de la URL. |
+| **Prueba real** | Auditoría `33b77c5f9e30` contra el laboratorio: 18 hallazgos (17 de Nuclei, 1 de Nmap: `172.24.0.3:80/tcp`) en 42 s, 0 errores. Detecta el `.env` publicado (high), la versión de nginx y las cabeceras ausentes. El listado de `/backups/` no lo detecta ninguna plantilla pública; documentado en `lab/README.md`. |
+| **Test** | `tests/test_nuclei_adapter.py`: comando por defecto, tags y severidades desde entorno y por parámetro, configuración inválida, invocación simulada con salida del laboratorio. `tests/test_orchestrator.py`: Nmap recibe el host, no la URL. |
+| **Commit** | este commit |

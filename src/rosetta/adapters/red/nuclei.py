@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
+import re
 from typing import Any
 
 import structlog
@@ -30,6 +32,34 @@ _SEVERIDAD_MAP: dict[str, Severidad] = {
     "critical": Severidad.CRITICA,
     "unknown": Severidad.MEDIA,
 }
+
+# Default selection covers what an audit of a web asset needs (exposed files,
+# misconfigurations, technology/version disclosure) without the ~11k templates.
+_DEFAULT_TAGS = "exposure,misconfig,tech"
+_DEFAULT_SEVERIDADES = "info,low,medium,high,critical"
+_TAG_RE = re.compile(r"^[a-z0-9][a-z0-9_.-]*$")
+
+
+def _lista_env(variable: str, defecto: str) -> list[str]:
+    """Lee una lista separada por comas de una variable de entorno."""
+    raw = os.getenv(variable, defecto)
+    return [item.strip().lower() for item in raw.split(",") if item.strip()]
+
+
+def _validar_tags(tags: list[str], origen: str) -> list[str]:
+    for tag in tags:
+        if not _TAG_RE.match(tag):
+            raise ValueError(f"{origen}: tag de Nuclei no válido {tag!r}.")
+    return tags
+
+
+def _validar_severidades(severidades: list[str], origen: str) -> list[str]:
+    for sev in severidades:
+        if sev not in _SEVERIDAD_MAP:
+            raise ValueError(
+                f"{origen}: severidad {sev!r} no válida; usa {', '.join(_SEVERIDAD_MAP)}."
+            )
+    return severidades
 
 
 class NucleiAdapter(RedTeamAdapter):
@@ -50,16 +80,35 @@ class NucleiAdapter(RedTeamAdapter):
         binario: str = "nuclei",
         templates: list[str] | None = None,
         timeout_segundos: int = 300,
+        tags: list[str] | None = None,
+        severidades: list[str] | None = None,
     ) -> None:
         """
         Args:
             binario: Ruta al ejecutable de Nuclei (por defecto "nuclei" en PATH).
             templates: Lista de IDs de templates a usar (None = todos los instalados).
             timeout_segundos: Timeout máximo para el escaneo completo.
+            tags: Tags de plantillas a ejecutar. None = ``ROSETTA_NUCLEI_TAGS``
+                (por defecto ``exposure,misconfig,tech``); lista vacía = sin filtro.
+            severidades: Severidades a reportar. None = ``ROSETTA_NUCLEI_SEVERITY``
+                (por defecto todas).
+
+        Raises:
+            ValueError: Si un tag o una severidad no son válidos.
         """
         self.binario = binario
         self.templates = templates
         self.timeout = timeout_segundos
+        self.tags = _validar_tags(
+            tags if tags is not None else _lista_env("ROSETTA_NUCLEI_TAGS", _DEFAULT_TAGS),
+            "ROSETTA_NUCLEI_TAGS",
+        )
+        self.severidades = _validar_severidades(
+            severidades
+            if severidades is not None
+            else _lista_env("ROSETTA_NUCLEI_SEVERITY", _DEFAULT_SEVERIDADES),
+            "ROSETTA_NUCLEI_SEVERITY",
+        )
 
     async def escanear(self, objetivo: str, **_kwargs: Any) -> list[DatosRedTeam]:
         """Ejecuta `nuclei -u <objetivo> -jsonl -silent` y normaliza la salida.
@@ -115,8 +164,20 @@ class NucleiAdapter(RedTeamAdapter):
         return hallazgos
 
     def _construir_comando(self, objetivo: str) -> list[str]:
-        """Construye el comando CLI de Nuclei."""
-        cmd = [self.binario, "-u", objetivo, "-jsonl", "-silent", "-nc"]
+        """Construye el comando CLI de Nuclei.
+
+        - ``-nmhe``: sin ella, unos pocos fallos de DNS con nombres internos
+          (``lab-objetivo`` en Docker) marcaban el host como caído y Nuclei se
+          saltaba el resto de plantillas: 0 hallazgos contra el laboratorio.
+        - ``-ni``: sin interactsh; las pruebas out-of-band contactan servidores
+          externos, y el Modo Auditoría solo debe tocar el objetivo autorizado.
+        - ``-duc``: sin comprobación de versiones contra GitHub en cada escaneo.
+        """
+        cmd = [self.binario, "-u", objetivo, "-jsonl", "-silent", "-nc", "-nmhe", "-ni", "-duc"]
+        if self.tags:
+            cmd += ["-tags", ",".join(self.tags)]
+        if self.severidades:
+            cmd += ["-severity", ",".join(self.severidades)]
         if self.templates:
             for tmpl in self.templates:
                 cmd += ["-t", tmpl]

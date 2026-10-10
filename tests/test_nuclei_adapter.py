@@ -89,6 +89,100 @@ def test_construir_comando_con_templates() -> None:
     assert "cves/2021/CVE-2021-41773.yaml" in cmd
 
 
+def _valor(cmd: list[str], flag: str) -> str:
+    return cmd[cmd.index(flag) + 1]
+
+
+def test_construir_comando_por_defecto_no_descarta_host_ni_sale_del_objetivo(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Por defecto: tags y severidades acotados, sin descartar el host tras errores
+    de DNS (-nmhe) y sin interactsh (-ni), es decir, sin tráfico fuera del objetivo."""
+    monkeypatch.delenv("ROSETTA_NUCLEI_TAGS", raising=False)
+    monkeypatch.delenv("ROSETTA_NUCLEI_SEVERITY", raising=False)
+    cmd = NucleiAdapter()._construir_comando("http://lab-objetivo")
+    assert _valor(cmd, "-u") == "http://lab-objetivo"
+    assert _valor(cmd, "-tags") == "exposure,misconfig,tech"
+    assert _valor(cmd, "-severity") == "info,low,medium,high,critical"
+    assert "-nmhe" in cmd
+    assert "-ni" in cmd
+    assert "-duc" in cmd
+
+
+def test_construir_comando_tags_y_severidad_desde_entorno(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("ROSETTA_NUCLEI_TAGS", "exposure, cve")
+    monkeypatch.setenv("ROSETTA_NUCLEI_SEVERITY", "high,critical")
+    cmd = NucleiAdapter()._construir_comando("http://lab-objetivo")
+    assert _valor(cmd, "-tags") == "exposure,cve"
+    assert _valor(cmd, "-severity") == "high,critical"
+
+
+def test_construir_comando_tags_vacios_no_filtra_por_tag(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """ROSETTA_NUCLEI_TAGS vacío = todas las plantillas instaladas."""
+    monkeypatch.setenv("ROSETTA_NUCLEI_TAGS", "")
+    cmd = NucleiAdapter()._construir_comando("http://lab-objetivo")
+    assert "-tags" not in cmd
+
+
+def test_construir_comando_parametros_tienen_prioridad_sobre_entorno(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("ROSETTA_NUCLEI_TAGS", "cve")
+    cmd = NucleiAdapter(tags=["misconfig"], severidades=["medium"])._construir_comando("x")
+    assert _valor(cmd, "-tags") == "misconfig"
+    assert _valor(cmd, "-severity") == "medium"
+
+
+@pytest.mark.parametrize(
+    ("variable", "valor"),
+    [
+        ("ROSETTA_NUCLEI_SEVERITY", "urgent"),
+        ("ROSETTA_NUCLEI_TAGS", "exposure;rm -rf"),
+        ("ROSETTA_NUCLEI_TAGS", "-t/etc"),
+    ],
+)
+def test_configuracion_invalida_lanza_valueerror(
+    variable: str, valor: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv(variable, valor)
+    with pytest.raises(ValueError, match=variable):
+        NucleiAdapter()
+
+
+async def test_escanear_invoca_nuclei_acotado_y_normaliza_hallazgos_del_lab(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Invocación simulada: el subprocess recibe los flags acotados y la salida
+    del laboratorio (.env expuesto) se convierte en hallazgos."""
+    monkeypatch.delenv("ROSETTA_NUCLEI_TAGS", raising=False)
+    monkeypatch.delenv("ROSETTA_NUCLEI_SEVERITY", raising=False)
+    salida_lab = json.dumps(
+        {
+            "template-id": "generic-env",
+            "info": {"name": "Generic Env File Disclosure", "severity": "high", "tags": []},
+            "type": "http",
+            "host": "http://lab-objetivo",
+            "matched-at": "http://lab-objetivo/.env",
+        }
+    )
+    proc_mock = _make_proc_mock(salida_lab, returncode=0)
+    exec_mock = AsyncMock(return_value=proc_mock)
+
+    with patch("asyncio.create_subprocess_exec", exec_mock):
+        hallazgos = await NucleiAdapter().escanear("http://lab-objetivo")
+
+    args = list(exec_mock.call_args.args)
+    assert args[:3] == ["nuclei", "-u", "http://lab-objetivo"]
+    assert "-nmhe" in args and "-ni" in args and "-tags" in args
+    assert len(hallazgos) == 1
+    assert hallazgos[0].activo_detectado == "http://lab-objetivo/.env"
+    assert hallazgos[0].dificultad_explotacion == Severidad.ALTA
+
+
 # ---------------------------------------------------------------------------
 # Tests de _normalizar
 # ---------------------------------------------------------------------------

@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 import xml.etree.ElementTree as ET
 from typing import Any
+from urllib.parse import urlsplit
 
 import structlog
 
@@ -46,6 +47,16 @@ _PUERTOS_RIESGO: dict[int, Severidad] = {
 
 # Puertos de administración expuestos a internet → media
 _PUERTOS_ADMIN: set[int] = {22, 80, 443, 8080, 8443, 9090, 9200, 9300}
+
+
+def _host_de_objetivo(objetivo: str) -> str:
+    """Nmap no entiende URLs: de 'http://host:puerto/ruta' se queda con 'host'.
+
+    IPs, dominios y rangos CIDR se devuelven sin cambios.
+    """
+    if "://" not in objetivo:
+        return objetivo
+    return urlsplit(objetivo).hostname or objetivo
 
 
 class NmapAdapter(RedTeamAdapter):
@@ -101,7 +112,7 @@ class NmapAdapter(RedTeamAdapter):
             "-",
             "--host-timeout",
             f"{self.timeout}s",
-            objetivo,
+            _host_de_objetivo(objetivo),
         ]
         logger.info("nmap_escaneo_inicio", objetivo=objetivo, top_ports=self.top_ports)
 

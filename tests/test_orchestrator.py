@@ -485,3 +485,31 @@ class TestNmapAdapterEscanear:
             hallazgos = await adapter.escanear("192.0.2.1")
 
         assert hallazgos == []
+
+
+# ---------------------------------------------------------------------------
+# NmapAdapter: el objetivo puede llegar como URL desde el Modo Auditoría
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("objetivo", "esperado"),
+    [
+        ("http://lab-objetivo", "lab-objetivo"),
+        ("https://citas.techserv.example:8443/portal", "citas.techserv.example"),
+        ("203.0.113.24", "203.0.113.24"),
+        ("198.51.100.0/24", "198.51.100.0/24"),
+        ("lab-objetivo", "lab-objetivo"),
+    ],
+)
+async def test_nmap_escanea_el_host_y_no_la_url(objetivo: str, esperado: str) -> None:
+    """Nmap no entiende URLs: con 'http://lab-objetivo' escaneaba 0 hosts."""
+    proc = MagicMock()
+    proc.communicate = AsyncMock(return_value=(b"<nmaprun></nmaprun>", b""))
+    proc.returncode = 0
+    exec_mock = AsyncMock(return_value=proc)
+
+    with patch("asyncio.create_subprocess_exec", exec_mock):
+        await NmapAdapter().escanear(objetivo)
+
+    assert exec_mock.call_args.args[-1] == esperado
