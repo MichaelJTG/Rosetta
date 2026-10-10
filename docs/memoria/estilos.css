@@ -2,7 +2,7 @@
 
 @page {
   size: A4;
-  margin: 2.5cm 2cm 2.5cm 2cm;
+  margin: 2.5cm;
 
   @top-center {
     content: "ROSETTA — Memoria técnica P3";
@@ -15,6 +15,7 @@
     content: counter(page) " / " counter(pages);
     font-size: 8pt;
     color: #666;
+    font-family: "Helvetica Neue", Arial, sans-serif;
   }
 }
 
@@ -94,7 +95,8 @@ pre {
   color: #e2e8f0;
   padding: 12px 14px;
   border-radius: 6px;
-  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
   page-break-inside: avoid;
   margin: 0.8em 0;
   line-height: 1.5;
@@ -113,7 +115,6 @@ table {
   border-collapse: collapse;
   font-size: 9pt;
   margin: 0.8em 0;
-  page-break-inside: avoid;
 }
 
 thead tr {
@@ -140,6 +141,35 @@ tbody td {
   padding: 5px 8px;
   border-bottom: 1px solid #e2e8f0;
   vertical-align: top;
+}
+
+/* Long paths and endpoints must wrap inside table cells */
+td code {
+  word-break: break-all;
+}
+
+/* Wide traceability matrix: smaller type so it fits the text block */
+.tabla-ancha table {
+  font-size: 8pt;
+}
+
+.tabla-ancha td,
+.tabla-ancha th {
+  padding: 4px 5px;
+}
+
+/* Status glyphs (build_memoria.py replaces the emoji) */
+.st {
+  font-family: "DejaVu Sans", sans-serif;
+  font-weight: 700;
+}
+
+.st-ok {
+  color: #15803d;
+}
+
+.st-parcial {
+  color: #b45309;
 }
 
 mark {
@@ -178,36 +208,41 @@ hr {
   margin: 1.2em 0;
 }
 
-/* Page breaks */
-h1.portada-titulo + * {
-  page-break-before: always;
-}
-
-/* Break after portada (first h1 on page) and after TOC (nav/ul after first h2) */
+/* Page breaks: portada and índice each on their own page */
 section.portada {
   page-break-after: always;
 }
 
-/* TOC navigation list — force page break after it */
-nav + * {
+nav.indice {
+  page-break-after: always;
+}
+
+/* Anexos start on a new page so the body page count is unambiguous */
+h2#sec-13 {
   page-break-before: always;
 }
 
-/* Portada: first hr signals end of portada section */
 @page :first {
   margin-top: 4cm;
 }
 
-/* Figure captions */
+/* Figures: numbered by hand in the caption ("Figura N. ... (RF-xx)") */
 figure {
-  counter-increment: figure;
   margin: 1em 0;
   page-break-inside: avoid;
 }
 
-figcaption::before {
-  content: "Figura " counter(figure) ". ";
-  font-weight: 600;
+figure img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  max-height: 12cm;
+  border: 1px solid #e2e8f0;
+}
+
+figure img.diagrama {
+  max-height: 15cm;
+  border: none;
 }
 
 figcaption {
@@ -222,25 +257,26 @@ thead {
   display: table-header-group;
 }
 
-/* ToC page numbers via target-counter */
-nav a::after {
-  content: leader('.') target-counter(attr(href url), page);
-  font-size: 9pt;
-  color: #374151;
-}
-
-nav ul {
+/* Índice with page numbers via target-counter */
+nav.indice ul {
   list-style: none;
   padding-left: 0;
 }
 
-nav li {
-  margin-bottom: 0.3em;
+nav.indice li {
+  margin-bottom: 0.45em;
 }
 
-nav a {
+nav.indice a {
   text-decoration: none;
   color: #1e3a8a;
-  display: flex;
-  justify-content: space-between;
+}
+
+nav.indice a::after {
+  content: leader('.') target-counter(attr(href), page);
+  color: #374151;
+}
+
+.tabla-ancha code {
+  font-size: 7.5pt;
 }

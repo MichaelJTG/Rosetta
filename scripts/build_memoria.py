@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -14,6 +15,11 @@ SRC_CSS = ROOT / "docs" / "memoria" / "estilos.css"
 DIST = ROOT / "dist"
 OUT_PDF = DIST / f"P3_Grupo{GRUPO}_Memoria.pdf"
 OUT_HTML = DIST / f"P3_Grupo{GRUPO}_Memoria.html"
+
+STATUS_GLYPHS = {
+    "✅": '<span class="st st-ok">✔</span>',
+    "🟡": '<span class="st st-parcial">◐</span>',
+}
 
 
 def md_to_html(md_text: str, css_path: Path) -> str:
@@ -38,6 +44,13 @@ def md_to_html(md_text: str, css_path: Path) -> str:
             )
             escaped = md_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             body = f"<pre style='white-space:pre-wrap'>{escaped}</pre>"
+
+    # Anchor ids for the table of contents (nav.indice -> target-counter)
+    body = re.sub(r"<h2>(\d+)\. ", r'<h2 id="sec-\1">\1. ', body)
+
+    # The app image has no emoji font: map status emoji to DejaVu glyphs
+    for emoji, html in STATUS_GLYPHS.items():
+        body = body.replace(emoji, html)
 
     css = css_path.read_text(encoding="utf-8")
     return f"""<!DOCTYPE html>

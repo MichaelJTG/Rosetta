@@ -1,0 +1,72 @@
+// Diagrama de componentes de ROSETTA (memoria P3, figura 1).
+// Comprobado contra los imports de src/rosetta/ (api/main.py, api/deps.py,
+// core/*, agents/validator.py, cli/main.py, llm/factory.py) y contra
+// .github/workflows/ y action/action.yml.
+// Regenerar: dot -Tsvg componentes.dot -o componentes.svg
+digraph rosetta {
+  graph [rankdir=LR, fontname="DejaVu Sans", fontsize=10, nodesep=0.12, ranksep=0.22,
+         newrank=true, pad=0.05];
+  node  [shape=box, style="rounded,filled", fillcolor="#ffffff", color="#1e3a8a",
+         fontname="DejaVu Sans", fontsize=10, margin="0.06,0.03"];
+  edge  [color="#475569", fontname="DejaVu Sans", fontsize=8.5, arrowsize=0.5];
+
+  nav  [label="Navegador\n(dashboard)"];
+
+  subgraph cluster_github {
+    label="GitHub Actions"; style="rounded,dashed"; color="#94a3b8"; fontcolor="#334155";
+    gate [label="Gate CI/CD\nrosetta-gate.yml"];
+    ci   [label="CI ci.yml\nruff · mypy\npytest · gitleaks\npip-audit", fillcolor="#f1f5f9"];
+  }
+
+  subgraph cluster_server {
+    label="Servidor de producción (Hetzner) · Docker Compose"; style="rounded"; color="#1e3a8a";
+    fontcolor="#1e3a8a";
+
+    nginx [label="nginx\nTLS :443", fillcolor="#dbeafe"];
+
+    subgraph cluster_app {
+      label="Contenedor app · 127.0.0.1:8000"; style="rounded,filled"; fillcolor="#f8fafc";
+      color="#64748b"; fontcolor="#334155";
+      api [label="FastAPI\napi/main.py\n30 REST + 1 WS\nauth.py · JWT\ndashboard.py", fillcolor="#dbeafe"];
+      cli [label="CLI Typer\ncli/main.py"];
+
+      raglm [label="RAG + LLM\nTraductorSimbiotico\nCopilot\nDiffAnalyzer", fillcolor="#fef9c3"];
+      lmonly [label="Solo LLM\nValidador · DriftDetector\nPdfAuditorIngester\ngap · plan · riesgos", fillcolor="#fef9c3"];
+      orch  [label="Orchestrator\nNmap · Nuclei"];
+      det   [label="Sin LLM\nWazuh + enriquecer\nReportGenerator"];
+      stores[label="SessionStore\nControlStore"];
+      grafo [label="GrafoCorrelacion"];
+
+      rag   [label="NormativaRAG"];
+      llmf  [label="llm/factory.py\nLLM_PROVIDER", fillcolor="#fef9c3"];
+    }
+
+    chroma [label="ChromaDB\nembebido", shape=cylinder, fillcolor="#ecfdf5", color="#047857"];
+    sqlite [label="SQLite", shape=cylinder, fillcolor="#ecfdf5", color="#047857"];
+    neo4j  [label="Neo4j 5", shape=cylinder, fillcolor="#ecfdf5", color="#047857"];
+  }
+
+  subgraph cluster_llm {
+    label="Proveedor LLM"; style="rounded,dashed"; color="#94a3b8"; fontcolor="#334155";
+    prov [label="Ollama local\nClaude API\nOpenAI compatible"];
+  }
+
+  subgraph cluster_lab {
+    label="Solo local (perfil lab)"; style="rounded,dashed"; color="#b91c1c"; fontcolor="#b91c1c";
+    lab [label="lab-objetivo", fillcolor="#fee2e2", color="#b91c1c"];
+  }
+
+  nav  -> nginx [label="HTTPS"];
+  gate -> nginx;
+  nginx -> api;
+
+  api -> raglm; api -> lmonly; api -> orch; api -> det; api -> stores; api -> grafo;
+  cli -> raglm [style=dashed]; cli -> rag [style=dashed];
+
+  raglm -> rag; raglm -> llmf; lmonly -> llmf;
+  rag -> chroma;
+  stores -> sqlite;
+  grafo -> neo4j [style=dashed, label="opcional"];
+  llmf -> prov;
+  orch -> lab [color="#b91c1c", label="allowlist"];
+}
