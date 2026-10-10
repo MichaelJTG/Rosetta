@@ -396,3 +396,13 @@ Fallos encontrados al hacer las capturas de la memoria con el stack local (Docke
 | **Cambio** | `request: Request` y los hallazgos por la dependencia `FindingsDep`. |
 | **Test** | `tests/test_api.py`: estado de una auditoría existente (200) y de una inexistente (404); los dos fallaban con 422. |
 | **Commit** | este commit |
+
+### F-6 · Textos de la interfaz escritos a mano · RF-12, RF-05
+
+| | |
+|---|---|
+| **Qué** | El dashboard decía «Claude Sonnet 4.6» en el panel «Traducir», «pypdfium2 + Claude» en «Ingesta PDF», «llm claude» y «marco iso_27001_2022» en el pie, y «max 200 MB» en la ingesta, aunque el LLM activo fuera Ollama y el límite real 20 MB (B-9). |
+| **Cambio** | Nuevo `GET /config/ui` (autenticado; no está entre las rutas públicas): proveedor y modelo del cliente LLM en uso (atributo `proveedor` en cada cliente y su `model`), marcos activos del Traductor y límite de PDF leído de `ROSETTA_PDF_MAX_SIZE_MB`, el mismo helper que usa la ingesta. El dashboard rellena esos textos con `textContent` tras el login. |
+| **Comprobación** | Imagen reconstruida: sin token, 401; con token, `{"llm_proveedor":"ollama","llm_modelo":"qwen2.5:14b","marcos_activos":["iso_27001_2022"],"pdf_max_mb":20}`. |
+| **Test** | `tests/test_api.py`: `/config/ui` con LLM, marcos y límite configurados; límite por defecto; ruta no pública; el HTML ya no contiene los textos fijos. `tests/test_llm.py`: cada cliente declara su proveedor. |
+| **Commit** | este commit |

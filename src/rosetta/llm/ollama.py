@@ -50,6 +50,8 @@ class OllamaClient:
     schema de la tool.
     """
 
+    proveedor = "ollama"
+
     def __init__(
         self,
         base_url: str | None = None,

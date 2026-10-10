@@ -24,6 +24,8 @@ logger = structlog.get_logger(__name__)
 class ClaudeClient:
     """Wrapper sobre Anthropic Python SDK que implementa LLMClient."""
 
+    proveedor = "claude"
+
     def __init__(
         self,
         api_key: str | None = None,

@@ -489,3 +489,66 @@ async def test_audit_status_desconocida_404(client: AsyncClient) -> None:
     finally:
         del app.state.audits
     assert r.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# GET /config/ui: el dashboard muestra lo que corre de verdad (proveedor y
+# modelo del LLM, marcos activos y límite de PDF), no textos escritos a mano.
+# ---------------------------------------------------------------------------
+
+
+@pytest_asyncio.fixture
+async def client_ollama() -> AsyncGenerator[AsyncClient, None]:
+    traductor = _make_traductor()
+    traductor.llm.proveedor = "ollama"
+    traductor.llm.model = "qwen2.5:14b"
+    traductor.marcos_activos = [MarcoNormativo.ISO_27001_2022, MarcoNormativo.ENS_2022]
+    app.dependency_overrides[get_traductor] = lambda: traductor
+    app.dependency_overrides[get_grafo] = lambda: None
+    app.dependency_overrides[get_session_findings] = lambda: []
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        yield c
+    app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_config_ui_refleja_llm_marcos_y_limite_pdf(
+    client_ollama: AsyncClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("ROSETTA_PDF_MAX_SIZE_MB", "7")
+    r = await client_ollama.get("/config/ui")
+    assert r.status_code == 200
+    assert r.json() == {
+        "llm_proveedor": "ollama",
+        "llm_modelo": "qwen2.5:14b",
+        "marcos_activos": ["iso_27001_2022", "ens_2022"],
+        "pdf_max_mb": 7,
+    }
+
+
+@pytest.mark.asyncio
+async def test_config_ui_limite_pdf_por_defecto(
+    client_ollama: AsyncClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("ROSETTA_PDF_MAX_SIZE_MB", raising=False)
+    r = await client_ollama.get("/config/ui")
+    assert r.json()["pdf_max_mb"] == 20
+
+
+def test_config_ui_requiere_autenticacion() -> None:
+    from rosetta.api.auth import _PUBLIC_PATHS
+
+    assert "/config/ui" not in _PUBLIC_PATHS
+
+
+@pytest.mark.asyncio
+async def test_dashboard_sin_proveedor_modelo_ni_limite_escritos_a_mano(
+    client: AsyncClient,
+) -> None:
+    html = (await client.get("/dashboard")).text
+    assert "Claude Sonnet 4.6" not in html
+    assert "200 MB" not in html
+    assert "pypdfium2 + Claude" not in html
+    assert '<span class="v" id="footer-llm">claude</span>' not in html
+    assert "/config/ui" in html
+    assert 'id="pdf-max-mb"' in html

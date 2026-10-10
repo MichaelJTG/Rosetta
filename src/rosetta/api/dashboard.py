@@ -1389,8 +1389,8 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     <button onclick="switchTab('riesgos',this)">Análisis de Riesgos</button>
 
     <div class="nav-footer">
-      <div class="nav-footer-row"><span>marco</span><span class="v">iso_27001_2022</span></div>
-      <div class="nav-footer-row"><span>llm</span><span class="v" id="footer-llm">claude</span></div>
+      <div class="nav-footer-row"><span>marco</span><span class="v" id="footer-marco">—</span></div>
+      <div class="nav-footer-row"><span>llm</span><span class="v" id="footer-llm">—</span></div>
       <div class="nav-footer-row"><span>session</span><span class="v">sqlite</span></div>
       <button onclick="doLogout()" style="margin-top:6px; padding:5px 10px; background:transparent; border:1px solid var(--line-2); color:var(--fg-3); border-radius:var(--r-1); font-family:var(--font-mono); font-size:10.5px; cursor:pointer; text-align:left">Cerrar sesión</button>
     </div>
@@ -1435,7 +1435,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       <div class="page-intro">
         <div class="eyebrow">Traductor Simbiótico</div>
         <h1>De hallazgo técnico a evidencia normativa.</h1>
-        <p class="lead">Convierte un hallazgo Red Team en controles incumplidos, citas literales y acciones de mitigación auditables. Tool-use forzado sobre Claude Sonnet 4.6 con RAG por marco.</p>
+        <p class="lead">Convierte un hallazgo Red Team en controles incumplidos, citas literales y acciones de mitigación auditables. Tool-use forzado sobre <span data-ui="llm">el LLM configurado</span> con RAG por marco.</p>
       </div>
       <div class="content">
         <div class="card">
@@ -1631,11 +1631,11 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
       <div class="page-intro">
         <div class="eyebrow">Ingesta de informes</div>
         <h1>Convierte un PDF de auditoría en hallazgos estructurados.</h1>
-        <p class="lead">pdfplumber para texto digital; fallback a visión LLM (pypdfium2 + Claude) en páginas escaneadas. Cada hallazgo extraído se registra como HallazgoMaestro.</p>
+        <p class="lead">pdfplumber para texto digital; fallback a visión LLM (pypdfium2 + <span data-ui="llm">el LLM configurado</span>) en páginas escaneadas. Cada hallazgo extraído se registra como HallazgoMaestro.</p>
       </div>
       <div class="content">
         <div class="card">
-          <div class="card-head"><h2>Documento</h2><span class="meta">multipart · max 200 MB</span></div>
+          <div class="card-head"><h2>Documento</h2><span class="meta">multipart · max <span id="pdf-max-mb">—</span> MB</span></div>
           <div class="card-body">
             <label class="dropzone" id="pdf-drop">
               <div class="dz-title">Arrastra el PDF aquí o haz clic para seleccionar</div>
@@ -2237,6 +2237,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         document.getElementById('login-pass').value = '';
         try { updateFindingsCount(); } catch (_) {}
         try { loadInicio(); } catch (_) {}
+        try { loadUiConfig(); } catch (_) {}
       } catch (e) {
         loginError(e.message || 'Error de inicio de sesión.');
       } finally {
@@ -3493,6 +3494,21 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     /* loadGraph ya inyecta incluir_archivados directamente en su URL;
        no se necesita monkey-patch sobre window.fetch (rompía authedFetch). */
 
+    /* ── Configuración real del backend: LLM, marcos y límite de PDF ── */
+    const LLM_NOMBRES = { ollama: 'Ollama', claude: 'Claude', openai: 'OpenAI' };
+    async function loadUiConfig() {
+      try {
+        const r = await authedFetch('/config/ui');
+        if (!r.ok) return;
+        const c = await r.json();
+        const llm = (LLM_NOMBRES[c.llm_proveedor] || c.llm_proveedor) + ' ' + c.llm_modelo;
+        document.querySelectorAll('[data-ui="llm"]').forEach(el => { el.textContent = llm; });
+        document.getElementById('footer-llm').textContent = c.llm_proveedor + ' · ' + c.llm_modelo;
+        document.getElementById('footer-marco').textContent = (c.marcos_activos || []).join(', ');
+        document.getElementById('pdf-max-mb').textContent = String(c.pdf_max_mb);
+      } catch (_) {}
+    }
+
     /* ── Boot ──────────────────────────────────────────────────────── */
     checkHealth();
     syncMarcoAll();
@@ -3501,6 +3517,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
     } else {
       updateFindingsCount();
       loadInicio();
+      loadUiConfig();
     }
     try {
       const saved = sessionStorage.getItem('rosetta:tab');

@@ -95,6 +95,7 @@ from rosetta.api.schemas import (
     TimelineUpdate,
     TokenResponse,
     TranslateRequest,
+    UiConfigResponse,
     VulnRoadmapItem,
     VulnRoadmapResponse,
 )
@@ -576,6 +577,22 @@ async def update_finding_estado(
     return _maestro_to_item(maestro, estados_map)
 
 
+@app.get("/config/ui", response_model=UiConfigResponse, tags=["meta"])
+async def config_ui(traductor: TraductorDep) -> UiConfigResponse:
+    """Configuración real que muestra el dashboard: LLM en uso, marcos y límite de PDF.
+
+    Requiere autenticación (no está entre las rutas públicas): no se expone el
+    proveedor ni el modelo a usuarios anónimos.
+    """
+    llm = traductor.llm
+    return UiConfigResponse(
+        llm_proveedor=str(getattr(llm, "proveedor", type(llm).__name__)),
+        llm_modelo=str(getattr(llm, "model", "desconocido")),
+        marcos_activos=[m.value for m in traductor.marcos_activos],
+        pdf_max_mb=_pdf_max_size_mb(),
+    )
+
+
 @app.get("/stats", response_model=StatsResponse, tags=["stats"])
 async def get_stats(findings: FindingsDep) -> StatsResponse:
     """KPIs agregados para pantalla de inicio."""
@@ -862,6 +879,13 @@ async def download_report(filename: str) -> FileResponse:
 
 _PDF_MAGIC = b"%PDF"
 _PDF_MAX_SIZE_MB_DEFAULT = 20
+
+
+def _pdf_max_size_mb() -> int:
+    """Límite de tamaño de PDF en MB (B-9); lo usan la ingesta y el dashboard."""
+    return int(os.getenv("ROSETTA_PDF_MAX_SIZE_MB", str(_PDF_MAX_SIZE_MB_DEFAULT)))
+
+
 _PDF_MAX_PAGES_DEFAULT = 500
 
 
@@ -901,7 +925,7 @@ async def ingest_pdf(
         )
 
     # B-9: size limit configurable via ROSETTA_PDF_MAX_SIZE_MB (default 20 MB)
-    max_mb = int(os.getenv("ROSETTA_PDF_MAX_SIZE_MB", str(_PDF_MAX_SIZE_MB_DEFAULT)))
+    max_mb = _pdf_max_size_mb()
     max_bytes = max_mb * 1024 * 1024
     await file.seek(0)
     contents = await file.read(max_bytes + 1)

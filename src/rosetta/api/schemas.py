@@ -110,6 +110,15 @@ class FindingEstadoUpdate(BaseModel):
     )
 
 
+class UiConfigResponse(BaseModel):
+    """Respuesta de GET /config/ui — configuración real que muestra el dashboard."""
+
+    llm_proveedor: str = Field(..., description="Proveedor LLM en uso: ollama, claude u openai.")
+    llm_modelo: str = Field(..., description="Modelo del proveedor LLM en uso.")
+    marcos_activos: list[str] = Field(..., description="Marcos por defecto del Traductor.")
+    pdf_max_mb: int = Field(..., description="Límite de tamaño de PDF (ROSETTA_PDF_MAX_SIZE_MB).")
+
+
 class StatsResponse(BaseModel):
     """Respuesta de GET /stats — KPIs agregados para pantalla de inicio."""
 

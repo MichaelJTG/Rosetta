@@ -34,6 +34,8 @@ class OpenAIClient:
     - Cualquier endpoint OpenAI-compatible (vLLM, LM Studio, Together AI...)
     """
 
+    proveedor = "openai"
+
     def __init__(
         self,
         api_key: str | None = None,

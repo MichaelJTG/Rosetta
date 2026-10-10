@@ -416,3 +416,12 @@ def test_openai_client_lanza_error_sin_api_key(
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     with pytest.raises(ValueError, match="OPENAI_API_KEY"):
         OpenAIClient()
+
+
+@pytest.mark.parametrize(
+    ("cliente", "esperado"),
+    [(ClaudeClient, "claude"), (OllamaClient, "ollama"), (OpenAIClient, "openai")],
+)
+def test_cada_cliente_declara_su_proveedor(cliente: type, esperado: str) -> None:
+    """El dashboard muestra el proveedor real a partir de este atributo."""
+    assert cliente.proveedor == esperado
