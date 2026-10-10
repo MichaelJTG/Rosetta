@@ -23,6 +23,22 @@ logger = structlog.get_logger(__name__)
 
 _DEFAULT_OLLAMA_URL = "http://localhost:11434"
 _DEFAULT_OLLAMA_MODEL = "llama3.1:8b"
+# Ollama's default window (4096) silently drops the start of longer prompts: the
+# Copilot prompt (~5100 tokens) and a translation against all frameworks (~5700)
+# lost the question/instructions. 16384 leaves room for both plus the answer.
+_DEFAULT_NUM_CTX = 16384
+
+
+def _num_ctx_from_env() -> int:
+    """Lee OLLAMA_NUM_CTX; falla al arrancar si no es un entero positivo."""
+    raw = os.getenv("OLLAMA_NUM_CTX", str(_DEFAULT_NUM_CTX)).strip()
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise ValueError(f"OLLAMA_NUM_CTX debe ser un entero positivo, no {raw!r}.") from exc
+    if value <= 0:
+        raise ValueError(f"OLLAMA_NUM_CTX debe ser un entero positivo, no {raw!r}.")
+    return value
 
 
 class OllamaClient:
@@ -48,7 +64,13 @@ class OllamaClient:
             model if model is not None else os.getenv("OLLAMA_MODEL", _DEFAULT_OLLAMA_MODEL)
         )
         self.timeout = timeout
-        logger.info("ollama_client_initialized", model=self.model, base_url=self.base_url)
+        self.num_ctx = _num_ctx_from_env()
+        logger.info(
+            "ollama_client_initialized",
+            model=self.model,
+            base_url=self.base_url,
+            num_ctx=self.num_ctx,
+        )
 
     async def completar(
         self,
@@ -69,6 +91,7 @@ class OllamaClient:
             "model": self.model,
             "messages": ollama_messages,
             "stream": False,
+            "options": {"num_ctx": self.num_ctx},
         }
 
         if tools:

@@ -6,7 +6,7 @@ Todos los tests usan mocks — no realizan llamadas reales a ninguna API.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -258,6 +258,51 @@ async def test_ollama_client_normaliza_tool_calls(
     assert len(result.tool_calls) == 1
     assert result.tool_calls[0].tool_name == "registrar_traduccion"
     assert result.tool_calls[0].tool_input["controles"] == ["A.8.24"]
+
+
+async def _payload_enviado(client: OllamaClient, mensaje: Message) -> dict[str, Any]:
+    """Ejecuta completar() con httpx simulado y devuelve el JSON enviado a /api/chat."""
+    mock_resp = MagicMock()
+    mock_resp.json.return_value = {"message": {"content": "ok"}, "done_reason": "stop"}
+    mock_resp.raise_for_status = MagicMock()
+    mock_http_client = AsyncMock()
+    mock_http_client.post = AsyncMock(return_value=mock_resp)
+
+    with patch("rosetta.llm.ollama.httpx.AsyncClient") as MockHttpx:
+        MockHttpx.return_value.__aenter__ = AsyncMock(return_value=mock_http_client)
+        MockHttpx.return_value.__aexit__ = AsyncMock(return_value=False)
+        await client.completar(system="System.", messages=[mensaje])
+
+    _, call_kwargs = mock_http_client.post.call_args
+    return cast(dict[str, Any], call_kwargs["json"])
+
+
+async def test_ollama_client_envia_num_ctx_por_defecto(
+    mensaje_usuario: Message, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Sin OLLAMA_NUM_CTX se envía num_ctx=16384: Ollama no recorta prompts largos."""
+    monkeypatch.delenv("OLLAMA_NUM_CTX", raising=False)
+    payload = await _payload_enviado(OllamaClient(), mensaje_usuario)
+    assert payload["options"]["num_ctx"] == 16384
+
+
+async def test_ollama_client_num_ctx_desde_entorno(
+    mensaje_usuario: Message, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """OLLAMA_NUM_CTX fija el contexto enviado en cada llamada."""
+    monkeypatch.setenv("OLLAMA_NUM_CTX", "8192")
+    payload = await _payload_enviado(OllamaClient(), mensaje_usuario)
+    assert payload["options"]["num_ctx"] == 8192
+
+
+@pytest.mark.parametrize("valor", ["abc", "0", "-4096"])
+def test_ollama_client_num_ctx_invalido_lanza_valueerror(
+    valor: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Un OLLAMA_NUM_CTX no entero o no positivo falla al crear el cliente."""
+    monkeypatch.setenv("OLLAMA_NUM_CTX", valor)
+    with pytest.raises(ValueError, match="OLLAMA_NUM_CTX"):
+        OllamaClient()
 
 
 # ---------------------------------------------------------------------------

@@ -356,3 +356,14 @@ Fallos encontrados al hacer las capturas de la memoria con el stack local (Docke
 | **Qué** | La CSP de B-3 (`c552729`) solo admitía scripts de `https://unpkg.com`, y FastAPI carga Swagger UI y ReDoc desde `cdn.jsdelivr.net`: `/docs` salía en blanco (`SwaggerUIBundle is not defined`). Ahora `/docs`, `/docs/oauth2-redirect` y `/redoc` reciben `_CSP_DOCS` (jsDelivr para scripts y estilos, `blob:` para el worker de ReDoc, favicon de FastAPI); el resto de rutas mantiene la CSP estricta. |
 | **Test** | `tests/test_security.py`: CSP de `/docs` y `/redoc`, y CSP estricta en `/health`, `/dashboard` y `/openapi.json`. `tests/e2e/test_docs_ui.py` (Playwright, fuera de la CI): falla contra la imagen anterior (timeout esperando `.opblock`) y pasa con la nueva. |
 | **Commit** | este commit |
+
+### F-2 · Ollama recortaba los prompts largos · RF-10, RF-01
+
+| | |
+|---|---|
+| **Qué** | `OllamaClient` no enviaba `num_ctx` y Ollama usaba su ventana por defecto (4096 tokens): cuando el prompt la supera, conserva solo la segunda mitad (log de Ollama: `truncating input prompt limit=2050 prompt=5129`). Ahora cada llamada envía `options.num_ctx`, configurable con `OLLAMA_NUM_CTX` (por defecto 16384; un valor no entero o no positivo impide arrancar). Documentado en `.env.example` y en el README. |
+| **Medición antes** (`prompt_eval_count`, mismo código que la API) | Copilot (7 marcos): **2050** de 5099 → recortado; el modelo no veía la pregunta y respondió sobre XSS. `/translate` con 1 marco (modo del eval y del benchmark RNF-09): 1189, sin recorte. Con 3 marcos (seed): 3635, sin recorte. Con los 7 marcos: 5655 → recortado a 2050 y el LLM no llamó a la herramienta (`ValueError`). |
+| **Medición después** | Copilot 5078 · 1 marco 1189 · 3 marcos 3635 · 7 marcos 5637; ningún aviso de recorte. Memoria de `qwen2.5:14b` (`ollama ps`): 9,47 GB con 4096 → 11,9 GB con 16384. |
+| **Eval** | No se repite: sus prompts (1 marco, ~1200 tokens) nunca superaron la ventana, así que el eval del 2026-10-04 y el benchmark RNF-09 no se hicieron con prompts recortados. |
+| **Test** | `tests/test_llm.py`: `num_ctx` por defecto 16384, valor desde `OLLAMA_NUM_CTX` y error con valores inválidos. |
+| **Commit** | este commit |
