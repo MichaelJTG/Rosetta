@@ -199,6 +199,48 @@ async def test_b3_csp_allows_unpkg_and_fonts(client: AsyncClient) -> None:
     assert "fonts.googleapis.com" in csp
 
 
+def _directive(csp: str, name: str) -> str:
+    """Devuelve el valor de una directiva CSP (cadena vacía si no está)."""
+    for part in csp.split(";"):
+        tokens = part.strip().split(" ", 1)
+        if tokens[0] == name:
+            return tokens[1] if len(tokens) > 1 else ""
+    return ""
+
+
+@pytest.mark.asyncio
+async def test_b3_csp_docs_allows_swagger_ui_assets(client: AsyncClient) -> None:
+    """/docs recibe una CSP que permite los recursos de Swagger UI (cdn.jsdelivr.net)."""
+    r = await client.get("/docs")
+    assert r.status_code == 200
+    assert "cdn.jsdelivr.net/npm/swagger-ui-dist" in r.text
+    csp = r.headers.get("content-security-policy", "")
+    assert "https://cdn.jsdelivr.net" in _directive(csp, "script-src")
+    assert "https://cdn.jsdelivr.net" in _directive(csp, "style-src")
+    assert _directive(csp, "frame-ancestors") == "'none'"
+    assert _directive(csp, "object-src") == "'none'"
+
+
+@pytest.mark.asyncio
+async def test_b3_csp_redoc_allows_redoc_worker(client: AsyncClient) -> None:
+    """/redoc permite el bundle de ReDoc y su web worker (blob:)."""
+    r = await client.get("/redoc")
+    assert r.status_code == 200
+    csp = r.headers.get("content-security-policy", "")
+    assert "https://cdn.jsdelivr.net" in _directive(csp, "script-src")
+    assert "blob:" in _directive(csp, "worker-src")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("path", ["/health", "/dashboard", "/openapi.json"])
+async def test_b3_csp_strict_outside_docs(client: AsyncClient, path: str) -> None:
+    """Fuera de /docs y /redoc la CSP sigue siendo la estricta: sin cdn.jsdelivr.net."""
+    r = await client.get(path)
+    csp = r.headers.get("content-security-policy", "")
+    assert "cdn.jsdelivr.net" not in csp
+    assert "blob:" not in csp
+
+
 # ---------------------------------------------------------------------------
 # B-4 · X-Real-IP — XFF no controla la clave de rate limiting
 # ---------------------------------------------------------------------------

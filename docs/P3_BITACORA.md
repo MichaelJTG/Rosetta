@@ -342,3 +342,17 @@ B-11 (limpieza del historial con `git filter-repo`) no se ejecutó. Decisión do
 | **Qué** | Nuevo fichero `docs/P3_VIDEO_SCRIPT.md`: guión de 7–9 minutos con 9 secciones (contexto, login, traducción, multi-marco, dosier, Red Team, eval metrics, copilot, cierre), tiempos, comandos exactos y notas técnicas. |
 | **Por qué** | D-5 del plan de cierre. El autor necesita un guión estructurado para grabar la demo. |
 | **Commit** | este bloque D |
+
+---
+
+## Bloque F · Correcciones antes de la congelación (2026-10-10)
+
+Fallos encontrados al hacer las capturas de la memoria con el stack local (Docker + Ollama `qwen2.5:14b`). Afectan a requisitos que salen en el vídeo, así que se corrigen; no se declaran como limitación. Un commit por fallo, cada uno con su test.
+
+### F-1 · Swagger UI en blanco por la CSP · RF-13, RNF-11
+
+| | |
+|---|---|
+| **Qué** | La CSP de B-3 (`c552729`) solo admitía scripts de `https://unpkg.com`, y FastAPI carga Swagger UI y ReDoc desde `cdn.jsdelivr.net`: `/docs` salía en blanco (`SwaggerUIBundle is not defined`). Ahora `/docs`, `/docs/oauth2-redirect` y `/redoc` reciben `_CSP_DOCS` (jsDelivr para scripts y estilos, `blob:` para el worker de ReDoc, favicon de FastAPI); el resto de rutas mantiene la CSP estricta. |
+| **Test** | `tests/test_security.py`: CSP de `/docs` y `/redoc`, y CSP estricta en `/health`, `/dashboard` y `/openapi.json`. `tests/e2e/test_docs_ui.py` (Playwright, fuera de la CI): falla contra la imagen anterior (timeout esperando `.opblock`) y pasa con la nueva. |
+| **Commit** | este commit |

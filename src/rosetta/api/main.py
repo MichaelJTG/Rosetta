@@ -238,6 +238,23 @@ _CSP = (
     "base-uri 'self'"
 )
 
+# Swagger UI and ReDoc (FastAPI defaults) load their bundles from cdn.jsdelivr.net,
+# ReDoc spawns a blob: web worker and Swagger shows the FastAPI favicon. Only these
+# pages get the relaxed policy; everything else keeps _CSP.
+_DOCS_PATHS = frozenset({"/docs", "/docs/oauth2-redirect", "/redoc"})
+_CSP_DOCS = (
+    "default-src 'self'; "
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "img-src 'self' data: https://fastapi.tiangolo.com https://cdn.redoc.ly; "
+    "worker-src 'self' blob:; "
+    "connect-src 'self'; "
+    "frame-ancestors 'none'; "
+    "object-src 'none'; "
+    "base-uri 'self'"
+)
+
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(
@@ -247,7 +264,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        response.headers["Content-Security-Policy"] = _CSP
+        csp = _CSP_DOCS if request.url.path in _DOCS_PATHS else _CSP
+        response.headers["Content-Security-Policy"] = csp
         return response
 
 
