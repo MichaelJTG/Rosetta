@@ -387,3 +387,12 @@ Fallos encontrados al hacer las capturas de la memoria con el stack local (Docke
 | **Pendiente operativo** | Los hallazgos ya guardados en Neo4j antes de este cambio conservan las relaciones erróneas; en local se regeneran vaciando el volumen y repitiendo el seed. En producción habría que hacer lo mismo con los datos de demo. |
 | **Test** | `tests/test_api.py`: estado por marco en memoria (ISO, ENS, PCI-DSS, NIS2) y persistencia en el grafo con cada control en su marco. `tests/test_control_marcos.py`: control no declarado, ambiguo, desconocido y normalización. |
 | **Commit** | este commit |
+
+### F-5 · `GET /audit/{audit_id}` respondía siempre 422 · RF-06
+
+| | |
+|---|---|
+| **Qué** | Encontrado al verificar F-3: el parámetro `request` estaba anotado como `Any`, así que FastAPI lo trataba como parámetro de query obligatorio y la consulta del estado de una auditoría devolvía 422 (`missing query request`). El dashboard no lo notaba porque sigue la auditoría por WebSocket. |
+| **Cambio** | `request: Request` y los hallazgos por la dependencia `FindingsDep`. |
+| **Test** | `tests/test_api.py`: estado de una auditoría existente (200) y de una inexistente (404); los dos fallaban con 422. |
+| **Commit** | este commit |

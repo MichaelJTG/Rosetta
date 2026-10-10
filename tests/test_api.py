@@ -448,3 +448,44 @@ def test_persist_to_graph_registra_cada_control_solo_en_su_marco() -> None:
         ("ens_2022", "op.ext.4"),
         ("pci_dss_4", "Req.6.4"),
     }
+
+
+# ---------------------------------------------------------------------------
+# GET /audit/{audit_id} (RF-06): `request` estaba tipado como Any y FastAPI lo
+# trataba como parámetro de query obligatorio, así que respondía siempre 422.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_audit_status_devuelve_resultado(client: AsyncClient) -> None:
+    from rosetta.core.orchestrator import ResultadoAuditoria
+
+    resultado = ResultadoAuditoria(
+        audit_id="lab0001",
+        estado="completado",
+        objetivos_procesados=["http://lab-objetivo"],
+        hallazgos=[_DATOS_RED_TEAM, _DATOS_RED_TEAM],
+        errores=[],
+        inicio=datetime(2026, 10, 10, 12, 0, 0),
+        fin=datetime(2026, 10, 10, 12, 0, 42),
+    )
+    app.state.audits = {"lab0001": resultado}
+    try:
+        r = await client.get("/audit/lab0001")
+    finally:
+        del app.state.audits
+    assert r.status_code == 200
+    data = r.json()
+    assert data["estado"] == "completado"
+    assert data["total_hallazgos"] == 2
+    assert data["objetivos_procesados"] == 1
+
+
+@pytest.mark.asyncio
+async def test_audit_status_desconocida_404(client: AsyncClient) -> None:
+    app.state.audits = {}
+    try:
+        r = await client.get("/audit/no-existe")
+    finally:
+        del app.state.audits
+    assert r.status_code == 404

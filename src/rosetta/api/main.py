@@ -1094,17 +1094,15 @@ async def audit_ws(websocket: WebSocket, audit_id: str) -> None:
 
 
 @app.get("/audit/{audit_id}", response_model=AuditStatusResponse, tags=["audit"])
-async def audit_status(audit_id: str, request: Any) -> AuditStatusResponse:
+async def audit_status(
+    audit_id: str, request: Request, findings: FindingsDep
+) -> AuditStatusResponse:
     """Consulta el estado y resultados de una auditoría por su ID."""
     resultado: ResultadoAuditoria | None = request.app.state.audits.get(audit_id)
     if resultado is None:
         raise HTTPException(status_code=404, detail=f"Auditoría '{audit_id}' no encontrada.")
 
-    hallazgo_ids = [
-        m.id_hallazgo
-        for m in request.app.state.session_findings
-        if m.id_hallazgo.startswith("AUD-")
-    ]
+    hallazgo_ids = [m.id_hallazgo for m in findings if m.id_hallazgo.startswith("AUD-")]
 
     return AuditStatusResponse(
         audit_id=resultado.audit_id,
