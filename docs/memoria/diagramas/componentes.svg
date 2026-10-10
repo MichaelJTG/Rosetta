@@ -83,7 +83,7 @@
 <path fill="#dbeafe" stroke="#1e3a8a" d="M320.53,-297.03C320.53,-297.03 257.14,-297.03 257.14,-297.03 251.14,-297.03 245.14,-291.03 245.14,-285.03 245.14,-285.03 245.14,-240.97 245.14,-240.97 245.14,-234.97 251.14,-228.97 257.14,-228.97 257.14,-228.97 320.53,-228.97 320.53,-228.97 326.53,-228.97 332.53,-234.97 332.53,-240.97 332.53,-240.97 332.53,-285.03 332.53,-285.03 332.53,-291.03 326.53,-297.03 320.53,-297.03"/>
 <text text-anchor="middle" x="288.83" y="-285.38" font-family="DejaVu Sans" font-size="10.00">FastAPI</text>
 <text text-anchor="middle" x="288.83" y="-272.62" font-family="DejaVu Sans" font-size="10.00">api/main.py</text>
-<text text-anchor="middle" x="288.83" y="-259.88" font-family="DejaVu Sans" font-size="10.00">30 REST + 1 WS</text>
+<text text-anchor="middle" x="288.83" y="-259.88" font-family="DejaVu Sans" font-size="10.00">31 REST + 1 WS</text>
 <text text-anchor="middle" x="288.83" y="-247.12" font-family="DejaVu Sans" font-size="10.00">auth.py · JWT</text>
 <text text-anchor="middle" x="288.83" y="-234.38" font-family="DejaVu Sans" font-size="10.00">dashboard.py</text>
 </g>

@@ -44,15 +44,15 @@ ROSETTA es una plataforma de cumplimiento normativo continuo que recibe hallazgo
 
 **Destinatarios:** responsable de cumplimiento, CISO, auditor técnico que necesita transformar evidencia operativa en evidencia de auditoría sin trabajo manual.
 
-**Estado de entrega:** producto funcional en producción (Hetzner). Cumple 24 de 26 ítems RF (2 en 🟡 con condiciones: RF-06, RF-09) y 10 de 12 ítems RNF (2 en 🟡: RNF-02 al 77 %, RNF-09 con 1 caso que excede 30 s). Eval cuantitativa ejecutada: F1 = 0,2648 (correspondencia ENS→ISO, 73 casos, 0 % alucinación) y F1 = 0,2813 (hallazgos técnicos, 16 casos, 0 % alucinación). CI verde.
+**Estado de entrega:** producto funcional en producción (Hetzner). Cumple 24 de 26 ítems RF (2 en 🟡 con condiciones: RF-06, RF-09) y 11 de 12 ítems RNF (1 en 🟡: RNF-09, con 1 caso que excede 30 s). Eval cuantitativa ejecutada: F1 = 0,2648 (correspondencia ENS→ISO, 73 casos, 0 % alucinación) y F1 = 0,2813 (hallazgos técnicos, 16 casos, 0 % alucinación). CI verde.
 
-**Cifras clave (2026-10-06):**
+**Cifras clave (2026-10-10):**
 
 | Indicador | Valor |
 |---|---|
-| Tests automatizados | 515 (pytest) |
-| Cobertura global | 77 % |
-| Endpoints HTTP | 30 REST + 1 WebSocket |
+| Tests automatizados | 556 (pytest) + 1 E2E con Playwright fuera de la CI |
+| Cobertura | 85 % global · 92 % en `core/` |
+| Endpoints HTTP | 31 REST + 1 WebSocket |
 | Paneles en el dashboard | 16 (requisito base: 10) |
 | Marcos normativos | 7 |
 | Fragmentos en corpus | 229 |
@@ -85,7 +85,7 @@ ROSETTA en la Práctica 1 era ya una plataforma funcional desplegada en producci
 - **24 ficheros de test:** ruff + mypy --strict activos; CI configurada pero rota desde el 2026-05-20.
 - **Herramientas de IA en P1:** Claude Code como asistente de programación en todas las fases (ciclos investigar → diseñar → implementar + tests → revisar → commit). <mark>[PENDIENTE: detalle completo de herramientas IA usadas en P1]</mark>
 
-Varias de estas afirmaciones del informe de la P1 resultaron inexactas al revisarlas en la P3: Amass tenía adaptador pero no estaba instalado ni conectado al Modo Auditoría; la API tenía 18 rutas REST y no 15 (hoy son 30); y la latencia «<4 s» con Claude nunca se midió. El detalle está en el apartado 5.4 (Cambios respecto a la P1).
+Varias de estas afirmaciones del informe de la P1 resultaron inexactas al revisarlas en la P3: Amass tenía adaptador pero no estaba instalado ni conectado al Modo Auditoría; la API tenía 18 rutas REST y no 15 (hoy son 31); y la latencia «<4 s» con Claude nunca se midió. El detalle está en el apartado 5.4 (Cambios respecto a la P1).
 
 En resumen: ROSETTA en P1 era una aplicación de producción con API, dashboard, RAG, multi-agente, Docker y 7 marcos normativos. La P3 no partió de cero; partió de una base funcional con bloqueos concretos documentados en la tabla del apartado 3.3.
 
@@ -146,7 +146,7 @@ En resumen: ROSETTA en P1 era una aplicación de producción con API, dashboard,
 | ID | Descripción | Estado |
 |----|-------------|--------|
 | RNF-01 | Degradación grácil sin Neo4j | ✅ |
-| RNF-02 | Cobertura ≥ 80 % en core | 🟡 77 % global; core entre 76–100 % |
+| RNF-02 | Cobertura ≥ 80 % en core | ✅ 92 % en `core/`; 85 % global (solo `pdf_ingestion.py` por debajo: 76 %) |
 | RNF-03 | Sin errores `mypy --strict` | ✅ 0 errores en 56 ficheros |
 | RNF-04 | Sin violaciones `ruff` | ✅ |
 | RNF-05 | Instalable desde cero con `uv sync` + `docker compose up` | ✅ |
@@ -166,7 +166,7 @@ En resumen: ROSETTA en P1 era una aplicación de producción con API, dashboard,
 | RF-15 | HTTP Basic | JWT Bearer como principal + Basic como fallback | Seguridad: JWT con expiración; Basic solo para clientes heredados y `/docs` |
 | RF-20 | Un único ítem «panel avanzado» | Desglosado en RF-20a…RF-20f | Necesario para trazabilidad en matriz y vídeo |
 | RF-21 (P1) | Adaptadores Shodan/HIBP | Movido a trabajo futuro | Solo existe enum y mapa de controles; sin adaptador implementado |
-| RNF-02 | ≥ 80 % «estimado» | 77 % medido; objetivo pendiente en `pdf_ingestion.py` | Medición real detecta brecha |
+| RNF-02 | ≥ 80 % «estimado» | 77 % medido el 2026-10-04 (~503 tests); 85 % global y 92 % en `core/` el 2026-10-10 (556 tests) | Medición real con el comando de la CI |
 | RNF-09 | Sin umbral definido | < 30 s con LLM; benchmark en D-2 | Benchmark cuantificado con Ollama qwen2.5:14b |
 | RNF-10 | `uv.lock` en `.gitignore` | Lockfile versionado | Build reproducible exigible por el enunciado |
 
@@ -244,7 +244,7 @@ Los cambios de arquitectura principales introducidos en P3:
 
 | Informe de la P1 | Realidad comprobada |
 |---|---|
-| «FastAPI expone 15 endpoints REST y un WebSocket» | En la versión entregada (commit `992bf42`, 2026-05-20) había 18 rutas REST y 1 WebSocket. Hoy son 30 rutas REST (29 en OpenAPI, más `/dashboard`) y 1 WebSocket. |
+| «FastAPI expone 15 endpoints REST y un WebSocket» | En la versión entregada (commit `992bf42`, 2026-05-20) había 18 rutas REST y 1 WebSocket. Hoy son 31 rutas REST (30 en OpenAPI, más `/dashboard`) y 1 WebSocket. |
 | Adaptadores Red Team: Nuclei, Nmap y Amass | Amass tiene adaptador (`adapters/red/amass.py`), pero no está instalado en la imagen ni conectado al orquestador. El Modo Auditoría solo usa Nmap y Nuclei. |
 | Latencia típica «<4 s por traducción» con Claude | Nunca se midió. El único benchmark (RNF-09, P3) es con Ollama `qwen2.5:14b`: p50 = 8,2 s. |
 | Tasa de alucinación como métrica ya medida | No existía harness de evaluación; se creó en la P3 (`eval/run_eval.py`, apartado 8.5). |
@@ -327,8 +327,10 @@ Los cambios de arquitectura principales introducidos en P3:
 
 <figure>
 <img src="img/fig05-modo-auditoria-lab.png" alt="Panel Modo Auditoría contra el laboratorio local">
-<figcaption>Figura 5. Panel «Modo Auditoría» contra el laboratorio local (<code>http://lab-objetivo</code>) con Nuclei y Nmap y progreso por WebSocket. La ejecución del 2026-10-10 terminó con 0 hallazgos (ver apartado 10.1). (RF-06, RNF-08)</figcaption>
+<figcaption>Figura 5. Panel «Modo Auditoría» contra el laboratorio local (<code>http://lab-objetivo</code>) con Nuclei y Nmap y progreso por WebSocket. La ejecución del 2026-10-10 terminó con 18 hallazgos y 0 errores. (RF-06, RNF-08)</figcaption>
 </figure>
+
+**Resultado contra el laboratorio (2026-10-10):** 18 hallazgos en unos 45 s: 17 de Nuclei (el `.env` publicado, con severidad alta; la versión de nginx; las cabeceras de seguridad ausentes) y 1 de Nmap (puerto 80/tcp). El listado de `/backups/` no lo detecta ninguna plantilla pública de Nuclei. Las plantillas se filtran con `ROSETTA_NUCLEI_TAGS` (por defecto `exposure,misconfig,tech`) y `ROSETTA_NUCLEI_SEVERITY`, y Nuclei corre sin interactsh: no envía tráfico a servidores externos.
 
 **Limitación:** la demo en el vídeo se realiza contra el laboratorio local (objetivo sin IPs reales para proteger a terceros).
 
@@ -369,7 +371,12 @@ Los cambios de arquitectura principales introducidos en P3:
 
 **Requisitos:** RF-10.
 
-<mark>[PENDIENTE: captura — con Ollama el Copilot respondió sobre XSS a una pregunta sobre doble factor en la VPN; error de código pendiente, ver apartado 10.1]</mark> Figura 7. Panel «Copilot» respondiendo una pregunta sobre ENS. (RF-10)
+Con Ollama, el prompt del Copilot (unos 5100 tokens con los 7 marcos) no cabe en la ventana por defecto de Ollama; ROSETTA pide `OLLAMA_NUM_CTX` (16384 por defecto) en cada llamada.
+
+<figure>
+<img src="img/fig07-copilot-ens.png" alt="Panel Copilot respondiendo una pregunta sobre el ENS">
+<figcaption>Figura 7. Panel «Copilot»: pregunta sobre el doble factor en la VPN de TechServ (caso ficticio); la respuesta cita la medida <code>op.acc.6</code> del ENS. (RF-10)</figcaption>
+</figure>
 
 ---
 
@@ -449,8 +456,8 @@ Los cambios de arquitectura principales introducidos en P3:
 **Requisitos:** RF-19, RF-20a…RF-20f.
 
 <figure>
-<img src="img/fig11-cumplimiento-todos.png" alt="Panel Cumplimiento con el estado agregado de todos los marcos">
-<figcaption>Figura 11. Panel «Cumplimiento» con el estado agregado de todos los marcos: hallazgos por marco y severidad. (RF-19)</figcaption>
+<img src="img/fig11-cumplimiento-iso27001.png" alt="Panel Cumplimiento filtrado por ISO 27001">
+<figcaption>Figura 11. Panel «Cumplimiento» filtrado por ISO 27001: solo controles del Anexo A, con su recuento y la distribución por severidad. (RF-19)</figcaption>
 </figure>
 
 ---
@@ -465,11 +472,14 @@ Los cambios de arquitectura principales introducidos en P3:
 
 ### 6.16 OpenAPI / Swagger UI (RF-13)
 
-**Qué hace:** FastAPI genera automáticamente el esquema en `GET /openapi.json`: 28 rutas y 29 operaciones (las 30 rutas REST menos `/dashboard`, excluida del esquema). Swagger UI se sirve en `GET /docs`, pero el 2026-10-10 se comprobó que la CSP de B-3 bloquea sus recursos de cdn.jsdelivr.net y la página sale en blanco (apartado 10.1).
+**Qué hace:** FastAPI genera automáticamente el esquema en `GET /openapi.json`: 29 rutas y 30 operaciones (las 31 rutas REST menos `/dashboard`, excluida del esquema). Swagger UI se sirve en `GET /docs` y ReDoc en `GET /redoc`, con una CSP propia que permite sus recursos de cdn.jsdelivr.net; el resto de rutas mantiene la CSP estricta de B-3.
 
 **Requisitos:** RF-13.
 
-<mark>[PENDIENTE: captura — <code>/docs</code> se muestra en blanco porque la CSP bloquea Swagger UI desde cdn.jsdelivr.net; error de código pendiente, ver apartado 10.1]</mark> Figura 12. Swagger UI con las rutas documentadas. (RF-13)
+<figure>
+<img src="img/fig12-swagger-ui.png" alt="Swagger UI de la API de ROSETTA">
+<figcaption>Figura 12. Swagger UI en <code>/docs</code> con las operaciones de la API agrupadas por etiqueta. (RF-13)</figcaption>
+</figure>
 
 ---
 
@@ -481,7 +491,7 @@ Los cambios de arquitectura principales introducidos en P3:
 |---|---|---|
 | B-1 | Path traversal en descarga de informes (`/reports/download`) | `5ca3ca8` |
 | B-2 | XSS via salida del LLM: `esc()` en todos los `innerHTML` con datos LLM/usuario | `5ca3ca8` |
-| B-3 | Cabeceras de seguridad HTTP: CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy | `c552729` |
+| B-3 | Cabeceras de seguridad HTTP: CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy; CSP propia para `/docs` y `/redoc` | `c552729` · `c78a0c7` |
 | B-4 | Rate limiting de `slowapi` + validación de proxies confiables (solo loopback/`172.18.0.1/32`) | `5cf5aac` · `f06f726` |
 | B-5 | JWT refresh + ROSETTA_USERS_EXTRA desde entorno (no hardcodeado) | `5cf5aac` |
 | B-6 | Mensajes de error genéricos en 500; stack trace solo en log | `5ca3ca8` |
@@ -632,8 +642,8 @@ De las 38 pruebas definidas (tabla completa en Anexo E):
 
 | Estado | Cantidad | Pruebas |
 |---|---|---|
-| ✅ Pasado | 32 | PR-01..PR-05, PR-07, PR-08, PR-10..PR-12, PR-14..PR-26, PR-28..PR-30, PR-32..PR-34, PR-36..PR-38 |
-| 🟡 Condicionado | 5 | PR-06 (solo lab. local), PR-09 (10 casos piloto), PR-13 (`/docs` en blanco por la CSP), PR-27 (77 % vs. 80 %), PR-35 (1/5 excede 30 s) |
+| ✅ Pasado | 34 | PR-01..PR-05, PR-07, PR-08, PR-10..PR-30, PR-32..PR-34, PR-36..PR-38 |
+| 🟡 Condicionado | 3 | PR-06 (solo lab. local), PR-09 (10 casos piloto), PR-35 (1/5 excede 30 s) |
 | <mark>[PENDIENTE]</mark> | 1 | PR-31 (instalación por persona ajena) |
 
 ### 8.3 Pruebas con resultado no ideal y lección aprendida
@@ -645,6 +655,12 @@ De las 38 pruebas definidas (tabla completa en Anexo E):
 | **140 vulnerabilidades en pip-audit** (RNF-12) | CI auditaba la herramienta, no el proyecto | 9 tandas de actualización; solo 4 CVEs de chromadb sin parche quedan como R-01 (commit `9a611d7`) |
 | **41,3 s en RNF-09** (1 caso de 5) | Excede el umbral de 30 s | Ollama qwen2.5:14b es verboso para algunos hallazgos complejos; p50 (8,2 s) y promedio (16,6 s) cumplen |
 | **B-4 proxies ampliados** | Rate limiting evitable desde red interna | Eliminados rangos `10.0.0.0/8` y `172.17.0.0/16` del default (commit `f06f726`) |
+| **Swagger UI en blanco** (RF-13), visto al capturar esta memoria | `/docs` sin interfaz: la CSP de B-3 bloqueaba cdn.jsdelivr.net | CSP propia para `/docs` y `/redoc`; test E2E con Playwright (`c78a0c7`) |
+| **Prompts recortados por Ollama** (RF-10, RF-01) | Con la ventana por defecto (4096), el Copilot (5099 tokens) y las traducciones contra los 7 marcos (5655) se recortaban a 2050: respuesta sobre XSS a una pregunta sobre MFA y traducciones sin llamada a la herramienta | `num_ctx` en cada llamada, `OLLAMA_NUM_CTX` = 16384 por defecto (`c56d54c`). El eval y el benchmark RNF-09 usan 1 marco (~1200 tokens) y no se recortaban: sus cifras siguen siendo válidas |
+| **Modo Auditoría sin hallazgos contra el laboratorio** (RF-06) | Nuclei descartaba el host tras errores de DNS con el nombre interno de Docker; Nmap recibía la URL y escaneaba 0 hosts | Nuclei sin descarte de host, sin interactsh y con tags y severidades configurables; Nmap recibe el host (`b95505f`). Resultado: 18 hallazgos |
+| **Estado por marco mezclaba marcos** (RF-19) | Con ISO 27001 aparecían controles de PCI-DSS, RGPD y ENS | Índice control → marco construido desde el corpus (`e244421`). Los datos de demo ya guardados en Neo4j hay que regenerarlos |
+| **`GET /audit/{id}` respondía siempre 422** (RF-06) | El estado de una auditoría no se podía consultar por REST | Parámetro `request` tipado como `Request` (`3286ed8`) |
+| **Textos de la interfaz escritos a mano** (RF-12) | El dashboard decía «Claude Sonnet 4.6» y «max 200 MB» con Ollama y un límite de 20 MB | `GET /config/ui` con el LLM en uso, los marcos y `ROSETTA_PDF_MAX_SIZE_MB` (`5b2a3c1`) |
 
 ---
 
@@ -725,7 +741,7 @@ El Validador no cambia la traducción: la aprueba o la rechaza. En los 10 casos 
 | RF-10 | Copilot normativo | ✅ | `src/rosetta/core/copilot.py` · `POST /copilot/ask` · `b64dd2b` | PR-10 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.8 |
 | RF-11 | Procedure drift | ✅ | `src/rosetta/core/drift.py` · `POST /drift/analyze` · `b64dd2b` | PR-11 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.9 |
 | RF-12 | Dashboard 10 pan. (base) · 16 (P3) | ✅ superado | `src/rosetta/api/dashboard.py` · `GET /dashboard` · `92a5989` | PR-12 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.10 |
-| RF-13 | OpenAPI / Swagger UI | ✅ | `src/rosetta/api/main.py` (FastAPI auto) | PR-13 | `GET /openapi.json` → 29 operaciones · `/docs` en blanco por CSP (Apdo. 10.1) |
+| RF-13 | OpenAPI / Swagger UI | ✅ | `src/rosetta/api/main.py` (FastAPI auto) | PR-13 | `GET /openapi.json` → 30 operaciones · Swagger UI · Apdo. 6.16 / fig. 12 |
 | RF-14 | Gate CI/CD diff analyzer | ✅ | `src/rosetta/core/diff_analyzer.py` · `POST /analyze-diff` · `.github/workflows/rosetta-gate.yml` · `b64dd2b` | PR-14 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.15 |
 | RF-15 | Auth JWT + Basic + rate limiting | ✅ | `src/rosetta/api/auth.py` · `POST /auth/login` · `5cf5aac` | PR-15 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.11 |
 | RF-16 | Historial SQLite append-only | ✅ | `src/rosetta/core/session_store.py` · `b64dd2b` | PR-16 | 82 % cobertura |
@@ -739,7 +755,7 @@ El Validador no cambia la traducción: la aprueba o la rechaza. En los 10 casos 
 | RF-20e | Plan director | ✅ | `src/rosetta/api/main.py` · `POST /plan-director/{marco}` · `b64dd2b` | PR-24 | Apdo. 6.14 |
 | RF-20f | Análisis riesgos | ✅ | `src/rosetta/api/main.py` · `POST /risk-analysis` · `b64dd2b` | PR-25 | Apdo. 6.14 |
 | RNF-01 | Degradación grácil Neo4j | ✅ | `src/rosetta/core/graph.py` (`verify_connectivity`) · `src/rosetta/api/main.py` (`neo4j_unavailable_api_continues`) · `1c567c4` | PR-26 | 4 tests degradación · Apdo. 6.12 |
-| RNF-02 | Cobertura 77 % | 🟡 77 % | `pytest --cov=src` · `3e8a0ed` | PR-27 | Por debajo del objetivo |
+| RNF-02 | Cobertura ≥ 80 % en core | ✅ 92 % en `core/` | `pytest --cov=rosetta --cov-branch` (CI) | PR-27 | 85 % global · `pdf_ingestion.py` 76 % |
 | RNF-03 | mypy 0 errores | ✅ | `mypy src/` (56 ficheros) | PR-28 | 0 errores |
 | RNF-04 | ruff 0 violaciones | ✅ | `ruff check . && ruff format --check` · `7ec6b66` | PR-29 | CI run 37203612212 verde |
 | RNF-05 | Instalación limpia | ✅ | `Dockerfile` · `docker-compose.yml` · `uv.lock` · `2339813` | PR-30, PR-31 | Build 165 s · PR-31 <mark>[PENDIENTE]</mark> |
@@ -759,16 +775,7 @@ El Validador no cambia la traducción: la aprueba o la rechaza. En los 10 casos 
 
 ### 10.1 Qué no funciona
 
-- **RNF-02 — Cobertura global al 77 %** (objetivo: 80 %): `pdf_ingestion.py` está al 76 %. Las ramas de fallback visión LLM son difíciles de testear sin un PDF escaneado real.
 - **Commit huérfano `e2819f0` accesible en GitHub:** el objeto persiste tras el filter-repo porque GitHub requiere una solicitud explícita de purga al soporte. Pendiente de respuesta.
-
-Fallos encontrados el 2026-10-10 al hacer las capturas de esta memoria con el stack local (Docker + Ollama `qwen2.5:14b`):
-
-- **Swagger UI (`/docs`) en blanco (RF-13).** La CSP de B-3 (`c552729`) solo admite scripts de `https://unpkg.com`, y FastAPI carga Swagger UI desde `cdn.jsdelivr.net`; el navegador lo bloquea (`SwaggerUIBundle is not defined`). `GET /openapi.json` sí responde. <mark>[PENDIENTE: corregir la CSP o rebajar RF-13 a 🟡 en los apartados 4 y 9]</mark>
-- **Copilot con Ollama responde fuera de tema (RF-10).** A la pregunta sobre doble factor en la VPN respondió sobre XSS, con `confianza` 100 %. Causa probable: recupera 5 fragmentos por marco en los 7 marcos (~35) y el modelo local corre con un contexto de 4096 tokens sin `num_ctx` configurado, así que el principio del prompt, donde va la pregunta, se pierde. No se ha probado con Claude. <mark>[PENDIENTE: corregir o rebajar RF-10]</mark>
-- **Modo Auditoría contra el laboratorio: 0 hallazgos (RF-06).** Con el comando del adaptador (`nuclei -u http://lab-objetivo -jsonl -silent -nc`), Nuclei no devuelve nada; el mismo binario con `-tags exposure,misconfig,tech` sí detecta el `.env` publicado (plantilla `codeigniter-env`, severidad alta). Nmap termina en 1 s sin resultados. <mark>[PENDIENTE: corregir antes de grabar la demo del vídeo]</mark>
-- **Filtro por marco del panel de Cumplimiento (RF-19).** `GET /compliance/state/iso_27001_2022` devuelve también controles de otros marcos (`Req.6.4` de PCI-DSS, `Art.32.1` del RGPD, `mp.info.1` del ENS). La figura 11 muestra la vista agregada de todos los marcos. <mark>[PENDIENTE: corregir o documentar como limitación]</mark>
-- **Textos de la interfaz desactualizados.** El panel «Traducir» dice «Claude Sonnet 4.6» y el pie de la barra lateral «llm claude» aunque el LLM activo sea Ollama; el panel «Ingesta PDF» anuncia «max 200 MB» cuando el límite real es 20 MB (B-9).
 
 ### 10.2 Qué funciona con condiciones
 
@@ -869,7 +876,7 @@ curl http://localhost:8000/health
 **Problemas encontrados durante la instalación limpia (2026-10-04):**
 
 1. **Reinicio tras `load-corpus`:** tras indexar el corpus desde `docker compose exec`, la API no ve los fragmentos sin reiniciar. Solución: `docker compose restart app`.
-2. **Memoria para Ollama:** el modelo `qwen2.5:14b` requiere ~10 GB de RAM. Solución: usar `qwen2.5:7b` con `OLLAMA_MODEL=qwen2.5:7b` en `.env` (mayor tasa de discrepancia en el eval).
+2. **Memoria para Ollama:** el modelo `qwen2.5:14b` ocupa 11,9 GB de RAM o VRAM con la ventana que pide ROSETTA (`OLLAMA_NUM_CTX=16384`); con 4096 baja a 9,5 GB, pero Ollama recorta los prompts largos. Solución: usar `qwen2.5:7b` con `OLLAMA_MODEL=qwen2.5:7b` en `.env` (mayor tasa de discrepancia en el eval).
 3. **Neo4j en modo degradado sin advertencia:** si Neo4j no arranca, la app arranca igualmente y el grafo funciona en modo memoria. Verificar con `docker compose ps`.
 
 ---
@@ -954,14 +961,14 @@ Las credenciales de producción se facilitan al equipo docente por canal privado
 | PR-03 | RF-03 | `rosetta load-corpus all corpus` y reinicio de la app | Los 7 marcos indexados en ChromaDB | 229 fragmentos en la salida del comando (2026-10-10) | ✅ |
 | PR-04 | RF-04 | `POST /reports/generate` + `GET /reports/download/{nombre}.md` | 200, fichero MD descargable con hallazgos | MD descargado con estructura correcta; PDF también descargado | ✅ |
 | PR-05 | RF-05 | `POST /ingest/pdf` con PDF de ejemplo TechServ | Lista de hallazgos extraídos | 3 hallazgos extraídos del PDF de ejemplo | ✅ |
-| PR-06 | RF-06 | `POST /audit/start` + `WS /audit/ws/{id}` contra laboratorio local | WebSocket emite progreso; hallazgos almacenados | Nmap y Nuclei ejecutan; progreso visible en dashboard | 🟡 Solo laboratorio local |
+| PR-06 | RF-06 | `POST /audit/start` + `WS /audit/ws/{id}` contra laboratorio local | WebSocket emite progreso; hallazgos almacenados | Nmap y Nuclei ejecutan; progreso visible en dashboard; 18 hallazgos contra el laboratorio (2026-10-10) | 🟡 Solo laboratorio local |
 | PR-07 | RF-07 | `POST /blue/ingest` con JSON de alertas Wazuh | `DatosBlue` normalizado, 200 | Alertas normalizadas correctamente | ✅ |
 | PR-08 | RF-08 | `BlueEnrichment.enriquecer()` con hallazgos Red + alertas Blue | Hallazgos enriquecidos con correlación | Cruce correcto por activo; 96 % cobertura | ✅ |
 | PR-09 | RF-09 | `POST /translate` con `"validar": true` | Respuesta con campo `validacion` del Validador | Validador invocado; rechazo si F1 < 0,5 | 🟡 10 casos piloto |
 | PR-10 | RF-10 | `POST /copilot/ask` con pregunta sobre ENS | Respuesta con `confianza` ≥ 0 y citas del corpus | Cita de ENS `org.2` correcta; confianza 0,82 | ✅ |
 | PR-11 | RF-11 | `POST /drift/analyze` con procedimiento y hallazgos | `drift_score` y lista de diferencias | Score 0,45 con 2 diferencias detectadas | ✅ |
 | PR-12 | RF-12 | `GET /dashboard` | HTML con los 16 paneles | 200; los 16 paneles visibles en navegador | ✅ |
-| PR-13 | RF-13 | `GET /openapi.json` y `GET /docs` | Todas las rutas REST salvo `/dashboard` en el esquema; Swagger UI visible | 28 rutas y 29 operaciones en el JSON; Swagger UI en blanco por la CSP (2026-10-10, apdo. 10.1) | 🟡 Esquema correcto; `/docs` en blanco |
+| PR-13 | RF-13 | `GET /openapi.json` y `GET /docs` | Todas las rutas REST salvo `/dashboard` en el esquema; Swagger UI visible | 29 rutas y 30 operaciones en el JSON; Swagger UI carga en el navegador (`tests/e2e/test_docs_ui.py`, 2026-10-10) | ✅ |
 | PR-14 | RF-14 | `POST /analyze-diff` con diff ficticio que añade endpoint sin auth | `decision=block` | `decision=block`; mensaje con control incumplido | ✅ |
 | PR-15 | RF-15 | `POST /auth/login` con credenciales incorrectas 11 veces | 429 en el intento 11 | 429 tras 10 intentos fallidos | ✅ |
 | PR-16 | RF-16 | `POST /translate` × 3; `GET /findings` | 3 registros en historial | 3 hallazgos en SQLite con timestamps correctos | ✅ |
@@ -975,7 +982,7 @@ Las credenciales de producción se facilitan al equipo docente por canal privado
 | PR-24 | RF-20e | `POST /plan-director/iso27001` | Plan priorizado | Lista de acciones ordenadas por prioridad | ✅ |
 | PR-25 | RF-20f | `POST /risk-analysis` | Activos con scoring | Activos con score calculado a partir de severidad y exposición | ✅ |
 | PR-26 | RNF-01 | Arrancar con `NEO4J_URI=bolt://localhost:9999` (Neo4j inaccesible) | App arranca; todos los endpoints 200 | App arranca en 3 s; `GET /graph/data` → 200 con grafo vacío | ✅ |
-| PR-27 | RNF-02 | `uv run pytest --cov=src` | Cobertura global ≥ 80 % | 77 % (🟡 por debajo del objetivo en `pdf_ingestion.py`) | 🟡 |
+| PR-27 | RNF-02 | `uv run pytest --cov=rosetta --cov-branch` | Cobertura ≥ 80 % en `core/` | 85 % global y 92 % en `core/` (2026-10-10); `pdf_ingestion.py` 76 % | ✅ |
 | PR-28 | RNF-03 | `mypy src/` | 0 errores | 0 errores en 56 ficheros | ✅ |
 | PR-29 | RNF-04 | `ruff check . && ruff format --check` | 0 violaciones | CI run 37203612212 verde | ✅ |
 | PR-30 | RNF-05 | Instalación limpia desde cero | App funcional en < 10 min | Build 165 s; 197 fragmentos indexados (corpus anterior a la ampliación del ENS); login OK | ✅ |

@@ -58,7 +58,7 @@ Abrir el navegador en `http://localhost:8000/dashboard`.
 3. Mostrar el panel de inicio: métricas de cumplimiento por marco.
 4. Señalar los 16 paneles del menú lateral.
 
-> «ROSETTA tiene 30 endpoints HTTP documentados en Swagger. El dashboard da acceso
+> «ROSETTA tiene 31 endpoints HTTP, documentados en Swagger. El dashboard da acceso
 > visual a los más relevantes. Vamos directamente a lo que importa: la traducción.»
 
 ---
@@ -318,12 +318,12 @@ curl -s -X POST http://localhost:8000/audit/start \
 > y pip-audit sobre el uv.lock.»
 
 ```bash
-uv run pytest --cov=src --cov-report=term-missing -q 2>&1 | tail -5
-# 515 tests, cobertura 77 %
+uv run pytest --cov=rosetta --cov-branch --cov-report=term-missing -q 2>&1 | tail -5
+# 556 tests, cobertura 85 % (core/ 92 %)
 ```
 
-> «515 tests, cobertura global 77%. RNF-02 pide 80% en core/; la mayoría
-> lo supera. pdf_ingestion.py está en 76% — documentado como 🟡 en
+> «556 tests, cobertura global del 85 % y del 92 % en core/, por encima del
+> 80 % que pide RNF-02. pdf_ingestion.py sigue en 76 %, documentado en
 > P3_REQUISITOS.md. La honestidad sobre los límites del sistema es parte
 > de la calidad de la entrega.»
 
@@ -342,7 +342,7 @@ uv run pytest --cov=src --cov-report=term-missing -q 2>&1 | tail -5
 
 > «Resumen:
 > - 26 RF: 24 ✅, 2 🟡.
-> - 12 RNF: 11 ✅, 1 🟡 (cobertura 77% vs 80%).
+> - 12 RNF: 11 ✅, 1 🟡 (RNF-09: 1 de 5 traducciones supera 30 s).
 > - Bloque B: 10/11 bloques. B-9 implementado en esta entrega.
 > - Eval: 0% de controles inventados en 89 casos. El Validador discrimina
 >   correctamente con precision@F1<0.5 = 1.0.

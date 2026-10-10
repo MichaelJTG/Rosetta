@@ -169,6 +169,7 @@ IP privadas y `localhost`.
 |---|---|---|
 | `LLM_PROVIDER` | `ollama`, `claude` u `openai` | `ollama` |
 | `OLLAMA_URL` / `OLLAMA_MODEL` | Ollama local | `http://host.docker.internal:11434` / `qwen2.5:14b` |
+| `ROSETTA_NUCLEI_TAGS` / `ROSETTA_NUCLEI_SEVERITY` | Plantillas de Nuclei (por tag) y severidades del Modo Auditoría | `exposure,misconfig,tech` / todas |
 | `OLLAMA_NUM_CTX` | Ventana de contexto pedida a Ollama en cada llamada. Con `qwen2.5:14b`, 16384 ocupa 11,9 GB y 4096 ocupa 9,5 GB, pero con 4096 Ollama recorta el prompt del Copilot y las traducciones contra muchos marcos | `16384` |
 | `ANTHROPIC_API_KEY` | Solo con `LLM_PROVIDER=claude` | placeholder no válido |
 | `ROSETTA_MARCOS` | Marcos por defecto del Traductor | `iso_27001_2022,ens_2022` |
@@ -214,7 +215,7 @@ Núcleo — Traductor Simbiótico
                  │  DatosCompliance
                  ▼
 Salida
-  API REST (30 endpoints + 1 WebSocket) · Dashboard SPA · CLI
+  API REST (31 endpoints + 1 WebSocket) · Dashboard SPA · CLI
   Dosier MD/PDF descargable · Gate CI/CD (GitHub Action)
 ```
 

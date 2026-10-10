@@ -406,3 +406,11 @@ Fallos encontrados al hacer las capturas de la memoria con el stack local (Docke
 | **Comprobación** | Imagen reconstruida: sin token, 401; con token, `{"llm_proveedor":"ollama","llm_modelo":"qwen2.5:14b","marcos_activos":["iso_27001_2022"],"pdf_max_mb":20}`. |
 | **Test** | `tests/test_api.py`: `/config/ui` con LLM, marcos y límite configurados; límite por defecto; ruta no pública; el HTML ya no contiene los textos fijos. `tests/test_llm.py`: cada cliente declara su proveedor. |
 | **Commit** | este commit |
+
+### F-7 · Memoria, capturas y documentos tras F-1…F-6
+
+| | |
+|---|---|
+| **Qué** | Datos de demo regenerados (volúmenes locales de Neo4j y SQLite vaciados y `seed_demo.py` repetido: 12 pasos, 0 errores) para que el grafo refleje F-4. Las 11 capturas rehechas: las figuras 2, 4 y 9 mostraban los textos fijos de F-6, la 5 los 0 hallazgos de F-3 y la 11 el filtro de F-4; la 7 (Copilot) y la 12 (Swagger UI) ya se pueden hacer. Memoria: los fallos pasan del apartado 10.1 a pruebas fallidas (8.3) con su commit; cifras al día. |
+| **Cifras** | 556 tests (+1 E2E fuera de la CI); cobertura 85 % global y 92 % en `core/` con el comando de la CI, así que RNF-02 pasa a ✅ (el 77 % era del 2026-10-04, con ~503 tests); 31 rutas REST (30 en OpenAPI) + 1 WebSocket. PDF: cuerpo de 35 páginas, 12 figuras, 32 tablas; gitleaks 0. |
+| **Commit** | este commit |

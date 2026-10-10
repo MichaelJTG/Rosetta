@@ -32,7 +32,7 @@
 | RF-10 | Copilot normativo con citas y confianza | `b64dd2b` | `tests/test_copilot.py` | `POST /copilot/ask` → respuesta con campo `confianza`. 94 % cobertura. |
 | RF-11 | Detección de procedure drift | `b64dd2b` | `tests/test_drift.py` | `POST /drift/analyze` → `drift_score`, diferencias detectadas. 95 % cobertura. |
 | RF-12 | Dashboard SPA 16 paneles | `92a5989` | `tests/test_security.py` (XSS) | `GET /dashboard` → HTML con los 16 paneles. Todos los `innerHTML` con `esc()`. |
-| RF-13 | OpenAPI / Swagger UI | (base del proyecto) | `tests/test_api.py` | `GET /docs` → 200. `GET /openapi.json` → 30 endpoints documentados. |
+| RF-13 | OpenAPI / Swagger UI | (base del proyecto) | `tests/test_api.py` | `GET /docs` → 200 y Swagger UI carga en navegador (`tests/e2e/test_docs_ui.py`, tras `c78a0c7`). `GET /openapi.json` → 30 operaciones documentadas. |
 | RF-14 | Gate CI/CD: bloquear PRs que incumplen controles | `b64dd2b` | `tests/test_diff_analyzer.py` | `POST /analyze-diff` → decisión `block/warn`. `.github/workflows/rosetta-gate.yml`. 88 % cobertura. |
 | RF-15 | Auth JWT Bearer + HTTP Basic fallback | `5cf5aac` | `tests/test_auth.py` | `POST /auth/login` → JWT. Bearer en endpoints protegidos. Rate limiting `slowapi`. |
 | RF-16 | Historial SQLite append-only | `b64dd2b` | `tests/test_session_store.py` | `SessionStore.guardar()` → registro permanente. 82 % cobertura. |
@@ -53,7 +53,7 @@
 | RNF | Descripción breve | Commit | Tests / Mecanismo | Evidencia |
 |-----|-------------------|--------|-------------------|-----------|
 | RNF-01 | Degradación grácil sin Neo4j | `1c567c4` | `tests/test_degradacion.py` | 4 tests: Neo4j caído al arrancar → 200 en todos los endpoints. Timeouts 5 s. |
-| RNF-02 | Cobertura ≥ 80 % core | `3e8a0ed` | `pytest --cov` | 77 % total medido. Core entre 76–100 %; `pdf_ingestion.py` a 76 %. |
+| RNF-02 | Cobertura ≥ 80 % core | `3e8a0ed` | `pytest --cov=rosetta --cov-branch` | 2026-10-10: 92 % en `core/`, 85 % global (556 tests); `pdf_ingestion.py` a 76 %. |
 | RNF-03 | Sin errores `mypy --strict` | (lint continuo) | `mypy src/` | 0 errores en 56 ficheros. Pre-commit activo. |
 | RNF-04 | Sin violaciones `ruff` | `7ec6b66` | `ruff check . && ruff format --check` | CI run 37203612212 verde. Pre-commit alineado con `uv.lock`. |
 | RNF-05 | Instalable: `uv sync` + `docker compose up` | `2339813` | Instalación limpia documentada | Build 165 s, imagen 3.85 GB, 197 fragmentos indexados, tests en verde. |
@@ -95,5 +95,5 @@
 | `src/rosetta/core/graph.py` + degradación | 8 | 86 % |
 | **Total acumulado** | **≥ 503** | **~77 % global** |
 
-> Cobertura global 77 %; objetivo ≥ 80 % en `core/` (RNF-02 en 🟡).
+> Snapshot del 2026-10-04. El 2026-10-10: 556 tests, 85 % global y 92 % en `core/` (RNF-02 ✅).
 > Tag de entrega: `v1.0-practica3` (pendiente de crear por el autor).

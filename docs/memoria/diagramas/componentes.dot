@@ -27,7 +27,7 @@ digraph rosetta {
     subgraph cluster_app {
       label="Contenedor app · 127.0.0.1:8000"; style="rounded,filled"; fillcolor="#f8fafc";
       color="#64748b"; fontcolor="#334155";
-      api [label="FastAPI\napi/main.py\n30 REST + 1 WS\nauth.py · JWT\ndashboard.py", fillcolor="#dbeafe"];
+      api [label="FastAPI\napi/main.py\n31 REST + 1 WS\nauth.py · JWT\ndashboard.py", fillcolor="#dbeafe"];
       cli [label="CLI Typer\ncli/main.py"];
 
       raglm [label="RAG + LLM\nTraductorSimbiotico\nCopilot\nDiffAnalyzer", fillcolor="#fef9c3"];
