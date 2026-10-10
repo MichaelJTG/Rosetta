@@ -378,3 +378,73 @@ async def test_download_report_exige_autenticacion(
     monkeypatch.setenv("ROSETTA_PASSWORD", "clave-de-prueba")
     r = await client.get("/reports/download/cualquiera.md")
     assert r.status_code == 401
+
+
+# ---------------------------------------------------------------------------
+# /compliance/state/{marco} filtra los controles por su marco (RF-19)
+# ---------------------------------------------------------------------------
+
+# Hallazgo traducido contra varios marcos: el LLM solo declaró ISO como marco
+# aplicable, pero citó controles de ENS y PCI-DSS (caso real de la demo).
+_COMPLIANCE_MULTIMARCO = DatosCompliance(
+    marcos_aplicables=[MarcoNormativo.ISO_27001_2022],
+    controles_incumplidos=["A.8.12", "op.ext.4", "Req.6.4"],
+    cita_normativa="A.8.12 Prevención de fuga de datos: ...",
+    justificacion="Fichero .env publicado.",
+    impacto_legal=Severidad.CRITICA,
+    accion_mitigacion="Retirar el fichero y rotar credenciales.",
+    evidencia_auditoria="https://citas.techserv.example/.env",
+)
+
+
+def _finding_multimarco() -> HallazgoMaestro:
+    return _make_finding("citas").model_copy(update={"compliance_data": _COMPLIANCE_MULTIMARCO})
+
+
+@pytest_asyncio.fixture
+async def client_multimarco() -> AsyncGenerator[AsyncClient, None]:
+    session_findings = [_finding_multimarco()]
+    app.dependency_overrides[get_traductor] = lambda: _make_traductor()
+    app.dependency_overrides[get_grafo] = lambda: None
+    app.dependency_overrides[get_session_findings] = lambda: session_findings
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        yield c
+    app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("marco", "esperados"),
+    [
+        ("iso_27001_2022", ["A.8.12"]),
+        ("ens_2022", ["op.ext.4"]),
+        ("pci_dss_4", ["Req.6.4"]),
+        ("nis2", []),
+    ],
+)
+async def test_compliance_state_memoria_solo_controles_del_marco(
+    client_multimarco: AsyncClient, marco: str, esperados: list[str]
+) -> None:
+    r = await client_multimarco.get(f"/compliance/state/{marco}")
+    assert r.status_code == 200
+    data = r.json()
+    assert [c["control_id"] for c in data["controles_incumplidos"]] == esperados
+    assert data["total_hallazgos"] == (1 if esperados else 0)
+
+
+def test_persist_to_graph_registra_cada_control_solo_en_su_marco() -> None:
+    from rosetta.api.main import _persist_to_graph
+
+    grafo = MagicMock()
+    maestro = _finding_multimarco()
+    assert maestro.compliance_data is not None
+    _persist_to_graph(grafo, maestro, maestro.compliance_data)
+
+    pares = {
+        (c.kwargs["marco"], c.kwargs["control_id"]) for c in grafo.registrar_hallazgo.call_args_list
+    }
+    assert pares == {
+        ("iso_27001_2022", "A.8.12"),
+        ("ens_2022", "op.ext.4"),
+        ("pci_dss_4", "Req.6.4"),
+    }

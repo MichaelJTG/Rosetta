@@ -98,6 +98,7 @@ from rosetta.api.schemas import (
     VulnRoadmapItem,
     VulnRoadmapResponse,
 )
+from rosetta.core.control_marcos import marcos_de_control
 from rosetta.core.diff_analyzer import DiffAnalysisResult, DiffViolation
 from rosetta.core.models import (
     DatosCompliance,
@@ -437,10 +438,14 @@ async def translate(
 
 
 def _persist_to_graph(grafo: Any, maestro: HallazgoMaestro, compliance: DatosCompliance) -> None:
-    """Persiste el hallazgo en Neo4j para cada control incumplido."""
+    """Persiste el hallazgo en Neo4j, cada control bajo el marco al que pertenece.
+
+    Antes se registraba cada control bajo cada marco aplicable, y el estado de
+    ISO 27001 mostraba controles de ENS o PCI-DSS.
+    """
     try:
-        for marco in compliance.marcos_aplicables:
-            for ctrl_id in compliance.controles_incumplidos:
+        for ctrl_id in compliance.controles_incumplidos:
+            for marco in marcos_de_control(ctrl_id, compliance.marcos_aplicables):
                 grafo.registrar_hallazgo(
                     hallazgo_id=maestro.id_hallazgo,
                     activo=maestro.red_team_data.activo_detectado,
@@ -1222,21 +1227,30 @@ async def blue_ingest(
 def _state_from_memory(
     findings: Iterable[HallazgoMaestro], marco: MarcoNormativo
 ) -> ComplianceStateResponse:
-    """Calcula el estado de cumplimiento desde los hallazgos en sesión."""
-    relevant = [
-        m for m in findings if m.compliance_data and marco in m.compliance_data.marcos_aplicables
-    ]
+    """Calcula el estado de cumplimiento desde los hallazgos en sesión.
 
+    Un hallazgo cuenta para el marco si al menos uno de sus controles pertenece
+    a él, y solo se cuentan esos controles.
+    """
     ctrl_counts: dict[str, int] = {}
     sev_dist: dict[str, int] = {}
+    total = 0
 
-    for m in relevant:
+    for m in findings:
         compliance = m.compliance_data
         if compliance is None:
             continue
+        del_marco = [
+            ctrl
+            for ctrl in compliance.controles_incumplidos
+            if marco in marcos_de_control(ctrl, compliance.marcos_aplicables)
+        ]
+        if not del_marco:
+            continue
+        total += 1
         sev = compliance.impacto_legal.value
         sev_dist[sev] = sev_dist.get(sev, 0) + 1
-        for ctrl in compliance.controles_incumplidos:
+        for ctrl in del_marco:
             ctrl_counts[ctrl] = ctrl_counts.get(ctrl, 0) + 1
 
     top_controles = sorted(ctrl_counts.items(), key=lambda x: x[1], reverse=True)[:10]
@@ -1244,7 +1258,7 @@ def _state_from_memory(
 
     return ComplianceStateResponse(
         marco=marco.value,
-        total_hallazgos=len(relevant),
+        total_hallazgos=total,
         controles_incumplidos=controles,
         severidad_distribution=sev_dist,
     )

@@ -377,3 +377,13 @@ Fallos encontrados al hacer las capturas de la memoria con el stack local (Docke
 | **Prueba real** | Auditoría `33b77c5f9e30` contra el laboratorio: 18 hallazgos (17 de Nuclei, 1 de Nmap: `172.24.0.3:80/tcp`) en 42 s, 0 errores. Detecta el `.env` publicado (high), la versión de nginx y las cabeceras ausentes. El listado de `/backups/` no lo detecta ninguna plantilla pública; documentado en `lab/README.md`. |
 | **Test** | `tests/test_nuclei_adapter.py`: comando por defecto, tags y severidades desde entorno y por parámetro, configuración inválida, invocación simulada con salida del laboratorio. `tests/test_orchestrator.py`: Nmap recibe el host, no la URL. |
 | **Commit** | este commit |
+
+### F-4 · `/compliance/state/{marco}` no filtraba por marco · RF-19
+
+| | |
+|---|---|
+| **Qué** | `_persist_to_graph` registraba cada control incumplido bajo **cada** marco aplicable (producto cartesiano), y el cálculo en memoria contaba todos los controles de cualquier hallazgo que incluyera el marco. Con `iso_27001_2022` aparecían `Req.6.4` (PCI-DSS), `Art.32.1` (RGPD) o `mp.info.1` (ENS). Además el LLM no siempre declara todos los marcos: en la demo, un hallazgo con controles ENS solo declaraba ISO. |
+| **Cambio** | Nuevo `core/control_marcos.py`: índice control → marco construido desde el corpus (226 identificadores; solo `Art.5.1`, `Art.6.1` y `Art.28.1` están a la vez en DORA y en el RGPD). Cada control se registra y se cuenta solo en su marco; si es ambiguo, en los marcos declarados que lo contienen; si no está en el corpus, solo cuando hay un único marco declarado. |
+| **Pendiente operativo** | Los hallazgos ya guardados en Neo4j antes de este cambio conservan las relaciones erróneas; en local se regeneran vaciando el volumen y repitiendo el seed. En producción habría que hacer lo mismo con los datos de demo. |
+| **Test** | `tests/test_api.py`: estado por marco en memoria (ISO, ENS, PCI-DSS, NIS2) y persistencia en el grafo con cada control en su marco. `tests/test_control_marcos.py`: control no declarado, ambiguo, desconocido y normalización. |
+| **Commit** | este commit |
