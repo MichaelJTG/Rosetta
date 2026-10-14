@@ -436,11 +436,12 @@ Fallos encontrados al hacer las capturas de la memoria con el stack local (Docke
 | **PDF** | Regenerado con F-8 y F-9: 46 páginas; cuerpo p3–p38 = 36 (el enunciado pide 20–40 sin portada, índice ni anexos), anexos p39–p46; 12 figuras, 33 tablas. Generado dentro de la imagen `rosetta-app` (WeasyPrint necesita pango; en Windows falta GTK). |
 | **Commit** | este commit |
 
-## Bloque G · Congelación del código en `a7d1abd` (2026-10-14)
+## Bloque G · Congelación del código (2026-10-14)
 
-Desde `a7d1abd` solo cambian `docs/`, `eval/reports/` y el README. El tag
+Primero en `a7d1abd`; desde `9ce6942` (pie del login sin el dominio retirado,
+G-7) solo cambian `docs/`, `eval/reports/` y el README. El tag
 `v1.0-practica3` irá sobre el último commit de documentación, tras grabar el
-vídeo, comprobando antes que `git diff a7d1abd..HEAD` sobre `src/`, `Dockerfile`,
+vídeo, comprobando antes que `git diff 9ce6942..HEAD` sobre `src/`, `Dockerfile`,
 `docker-compose.yml`, `pyproject.toml`, `uv.lock`, `scripts/`, `lab/` y `corpus/`
 está vacío.
 
@@ -494,3 +495,12 @@ está vacío.
 | **Límites** | Plan gratuito: 8.000 tokens/min y 1.000 peticiones/día. Seguidas, 6 de 16 traducciones fallaron (429 → 500) y entraron al repetirlas tras 60 s. |
 | **Seed** | No termina: 2 traducciones, la 3.ª da 500 por el límite y la API cierra la conexión; el seed se interrumpe a los 8 s. Requeriría pausas o reintentos en `seed_demo.py` (código congelado). |
 | **Documentos** | README (paso 3: Groq probado con resultados; Claude sigue sin verificar), memoria (10.1, 8.5, 12 y Anexo A). |
+
+### G-7 · Pie del login sin el dominio retirado · nuevo punto de congelación
+
+| | |
+|---|---|
+| **Qué** | El pie del login del dashboard mostraba el dominio del despliegue retirado (G-5). Pasa a «API protegida con JWT · ROSETTA · Práctica 3». Único cambio de código autorizado tras `a7d1abd`: una línea de `src/rosetta/api/dashboard.py`. |
+| **Capturas** | Ninguna figura de la memoria muestra el pie: está dentro del overlay de login y las 11 capturas (figuras 2 a 12) se hicieron con la sesión iniciada. No se rehacen. |
+| **Congelación** | `9ce6942` es el nuevo punto: el tag comprobará que el código no cambia respecto a él. |
+| **Commit** | `9ce6942` |
