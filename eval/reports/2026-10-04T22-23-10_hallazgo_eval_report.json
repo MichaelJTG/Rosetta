@@ -1,0 +1,793 @@
+{
+  "run_id": "2026-10-04T22-23-10",
+  "timestamp": "2026-10-04T22:25:24.712914+00:00",
+  "mode": "hallazgo",
+  "marco": "ens",
+  "total_cases": 16,
+  "evaluated": 16,
+  "errors": 0,
+  "overall_precision": 0.3125,
+  "overall_recall": 0.2812,
+  "overall_f1": 0.2813,
+  "hallucination_rate": 0.7568,
+  "alucinacion_rate": 0.0,
+  "discrepancia_rate": 0.7568,
+  "per_family": [
+    {
+      "familia": "Continuidad del servicio",
+      "n_cases": 1,
+      "avg_precision": 1.0,
+      "avg_recall": 0.5,
+      "avg_f1": 0.6667,
+      "hallucination_rate": 0.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.0
+    },
+    {
+      "familia": "Control de acceso",
+      "n_cases": 1,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    },
+    {
+      "familia": "Explotación",
+      "n_cases": 1,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    },
+    {
+      "familia": "Gestión del personal",
+      "n_cases": 1,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    },
+    {
+      "familia": "Marco organizativo",
+      "n_cases": 1,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    },
+    {
+      "familia": "Monitorización del sistema",
+      "n_cases": 1,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    },
+    {
+      "familia": "Planificación",
+      "n_cases": 1,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    },
+    {
+      "familia": "Protección de la información",
+      "n_cases": 1,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    },
+    {
+      "familia": "Protección de las aplicaciones informáticas",
+      "n_cases": 1,
+      "avg_precision": 1.0,
+      "avg_recall": 0.5,
+      "avg_f1": 0.6667,
+      "hallucination_rate": 0.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.0
+    },
+    {
+      "familia": "Protección de las comunicaciones",
+      "n_cases": 1,
+      "avg_precision": 0.5,
+      "avg_recall": 0.5,
+      "avg_f1": 0.5,
+      "hallucination_rate": 0.5,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.5
+    },
+    {
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "n_cases": 1,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    },
+    {
+      "familia": "Protección de los equipos",
+      "n_cases": 1,
+      "avg_precision": 1.0,
+      "avg_recall": 1.0,
+      "avg_f1": 1.0,
+      "hallucination_rate": 0.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.0
+    },
+    {
+      "familia": "Protección de los servicios",
+      "n_cases": 1,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    },
+    {
+      "familia": "Protección de los soportes de información",
+      "n_cases": 1,
+      "avg_precision": 0.5,
+      "avg_recall": 1.0,
+      "avg_f1": 0.6667,
+      "hallucination_rate": 0.5,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.5
+    },
+    {
+      "familia": "Recursos externos",
+      "n_cases": 1,
+      "avg_precision": 1.0,
+      "avg_recall": 1.0,
+      "avg_f1": 1.0,
+      "hallucination_rate": 0.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.0
+    },
+    {
+      "familia": "Servicios en la nube",
+      "n_cases": 1,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    }
+  ],
+  "cases": [
+    {
+      "ens_code": "HT-01",
+      "ens_name": "Sin prueba de restauración de copia de seguridad en 12 meses",
+      "familia": "Continuidad del servicio",
+      "nivel_exigido": "media",
+      "gt_iso_ids": [
+        "5.29",
+        "5.30"
+      ],
+      "predicted_iso_ids": [
+        "5.29"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica que no se han realizado pruebas de restauración de copias de seguridad desde hace más de un año, lo que podría comprometer la capacidad de recuperación en caso de interrupción. Este escenario viola el control A.5.29 ya que no se garantiza que las copias de seguridad sean funcionales y seguras para restablecer los sistemas en caso de interrupción.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.30"
+      ],
+      "error": null,
+      "latency_s": 5.51,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-02",
+      "ens_name": "Cuenta de administrador sin segundo factor de autenticación (MFA)",
+      "familia": "Control de acceso",
+      "nivel_exigido": "alta",
+      "gt_iso_ids": [
+        "8.2",
+        "5.17"
+      ],
+      "predicted_iso_ids": [
+        "8.5"
+      ],
+      "predicted_iso_raw": "El hallazgo indica que el inicio de sesión en el portal de la red VPN se puede realizar sin MFA, lo que contraviene la disposición de A.8.5 de implementar autenticación segura, incluyendo MFA, para prevenir accesos no autorizados.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "8.5"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "8.5"
+      ],
+      "missed_ids": [
+        "5.17",
+        "8.2"
+      ],
+      "error": null,
+      "latency_s": 5.74,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-03",
+      "ens_name": "Servidor web con CVE-2024-21338 sin parchear (escalada de privilegios local)",
+      "familia": "Explotación",
+      "nivel_exigido": "media",
+      "gt_iso_ids": [
+        "8.8"
+      ],
+      "predicted_iso_ids": [
+        "8.21",
+        "5.15",
+        "8.2"
+      ],
+      "predicted_iso_raw": "El hallazgo indica que el servidor Windows Server 2022 Build 20348 está vulnerable a la explotación de la CVE-2024-21338, lo que permite una escalada de privilegios local para cualquier usuario con sesión en el servidor. Esto incumple A.8.21, A.5.15 y A.8.2 ya que no se han implementado medidas adecuadas para proteger los servicios de red, controlar el acceso y gestionar los derechos de acceso privilegiados.",
+      "true_positives": 0,
+      "false_positives": 3,
+      "false_negatives": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.15",
+        "8.2",
+        "8.21"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.15",
+        "8.2",
+        "8.21"
+      ],
+      "missed_ids": [
+        "8.8"
+      ],
+      "error": null,
+      "latency_s": 7.63,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-04",
+      "ens_name": "Cuenta de empleado dado de baja sigue activa en Active Directory",
+      "familia": "Gestión del personal",
+      "nivel_exigido": "baja",
+      "gt_iso_ids": [
+        "6.5",
+        "5.11"
+      ],
+      "predicted_iso_ids": [
+        "8.10",
+        "5.21"
+      ],
+      "predicted_iso_raw": "El hallazgo indica que un usuario que ya no es un empleado activo tiene acceso a sistemas y datos confidenciales. Esto viola A.8.10 ya que la cuenta no ha sido eliminada o desactivada una vez que la cuenta ya no era necesaria. Además, viola A.5.21 en cuanto a la gestión de riesgos de seguridad de la información, ya que un ex-empleado puede acceder a datos confidenciales que podrían dar lugar a una fuga de información o sabotaje.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.21",
+        "8.10"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.21",
+        "8.10"
+      ],
+      "missed_ids": [
+        "5.11",
+        "6.5"
+      ],
+      "error": null,
+      "latency_s": 8.06,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-05",
+      "ens_name": "Sin política de seguridad de la información documentada ni aprobada por dirección",
+      "familia": "Marco organizativo",
+      "nivel_exigido": "baja",
+      "gt_iso_ids": [
+        "5.1",
+        "5.36"
+      ],
+      "predicted_iso_ids": [
+        "5.20",
+        "5.19",
+        "5.35",
+        "6.2"
+      ],
+      "predicted_iso_raw": "La ausencia de un documento de política de seguridad aprobado por la dirección implica que no se han establecido los términos y condiciones de empleo que incluyan responsabilidades de seguridad, ni se han revisado las relaciones con los proveedores y los acuerdos contractuales en relación a la seguridad de la información. Esto compromete la capacidad de la organización para garantizar la integridad y la seguridad en todas las relaciones con los proveedores y los empleados.",
+      "true_positives": 0,
+      "false_positives": 4,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.19",
+        "5.20",
+        "5.35",
+        "6.2"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.19",
+        "5.20",
+        "5.35",
+        "6.2"
+      ],
+      "missed_ids": [
+        "5.1",
+        "5.36"
+      ],
+      "error": null,
+      "latency_s": 11.29,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-06",
+      "ens_name": "Sin sistema de logs centralizado; intentos de login fallidos no alertan",
+      "familia": "Monitorización del sistema",
+      "nivel_exigido": "media",
+      "gt_iso_ids": [
+        "8.15",
+        "8.16"
+      ],
+      "predicted_iso_ids": [
+        "6.8"
+      ],
+      "predicted_iso_raw": "El hallazgo indica que no existe un sistema SIEM ni alerta configurada para detectar más de 5 intentos de autenticación fallidos en un minuto. Sin esta configuración, los empleados no pueden informar rápidamente sobre posibles eventos de seguridad como intentos de ataque por fuerza bruta.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "6.8"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "6.8"
+      ],
+      "missed_ids": [
+        "8.15",
+        "8.16"
+      ],
+      "error": null,
+      "latency_s": 4.69,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-07",
+      "ens_name": "Sin registro de riesgos actualizado ni plan de tratamiento documentado",
+      "familia": "Planificación",
+      "nivel_exigido": "baja",
+      "gt_iso_ids": [
+        "5.7",
+        "5.8"
+      ],
+      "predicted_iso_ids": [
+        "5.21",
+        "5.25",
+        "5.35"
+      ],
+      "predicted_iso_raw": "El hallazgo indica que no se ha registrado ningún riesgo de seguridad desde 2022, lo que resulta en la falta de evaluaciones de riesgos, seguimientos y decisiones basadas en un análisis de riesgos actualizado. Los controles A.5.21, A.5.25 y A.5.35 de la ISO 27001 requieren evaluaciones de riesgos y registros actualizados para garantizar la seguridad de la información.",
+      "true_positives": 0,
+      "false_positives": 3,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.21",
+        "5.25",
+        "5.35"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.21",
+        "5.25",
+        "5.35"
+      ],
+      "missed_ids": [
+        "5.7",
+        "5.8"
+      ],
+      "error": null,
+      "latency_s": 6.65,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-08",
+      "ens_name": "PII de clientes visible en logs de aplicación sin enmascarar",
+      "familia": "Protección de la información",
+      "nivel_exigido": "baja",
+      "gt_iso_ids": [
+        "8.11",
+        "5.34"
+      ],
+      "predicted_iso_ids": [
+        "5.33",
+        "8.10",
+        "8.12"
+      ],
+      "predicted_iso_raw": "Los datos personales de clientes (NIF, teléfono y email) se almacenan en los logs en texto plano, lo que no cumple con los controles A.5.33, A.8.10 y A.8.12. La falta de protección adecuada en los registros de logs de acceso puede conducir a una fuga de datos en caso de un acceso no autorizado o pérdida de información.",
+      "true_positives": 0,
+      "false_positives": 3,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.33",
+        "8.10",
+        "8.12"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.33",
+        "8.10",
+        "8.12"
+      ],
+      "missed_ids": [
+        "5.34",
+        "8.11"
+      ],
+      "error": null,
+      "latency_s": 7.38,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-09",
+      "ens_name": "Inyección SQL confirmada en portal de proveedores",
+      "familia": "Protección de las aplicaciones informáticas",
+      "nivel_exigido": "alta",
+      "gt_iso_ids": [
+        "8.28",
+        "8.25"
+      ],
+      "predicted_iso_ids": [
+        "8.28"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico revela la presencia de una vulnerabilidad de inyección SQL, la cual indica que el código fuente ha sido codificado de manera insegura, permitiendo la inyección de comandos SQL y potencialmente la extracción completa de la base de datos. Esto incumple con la práctica de codificación segura que requiere minimizar vulnerabilidades en el software desarrollado, como las descritas en A.8.28.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "8.25"
+      ],
+      "error": null,
+      "latency_s": 5.6,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-10",
+      "ens_name": "Telnet habilitado en switch de core (comunicación en texto plano)",
+      "familia": "Protección de las comunicaciones",
+      "nivel_exigido": "media",
+      "gt_iso_ids": [
+        "8.20",
+        "8.26"
+      ],
+      "predicted_iso_ids": [
+        "8.21",
+        "8.20"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica la detección de Telnet en el puerto 23/tcp sin cifrado, lo que compromete la seguridad de la red y el servicio de red. La transmisión de credenciales en texto plano viola la confidencialidad y la integridad requerida por A.8.21 y A.8.20, respectivamente.",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 1,
+      "precision": 0.5,
+      "recall": 0.5,
+      "f1": 0.5,
+      "hallucinated_ids": [
+        "8.21"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "8.21"
+      ],
+      "missed_ids": [
+        "8.26"
+      ],
+      "error": null,
+      "latency_s": 7.18,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-11",
+      "ens_name": "Acceso a sala de servidores sin control de entrada ni registro de visitas",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "nivel_exigido": "media",
+      "gt_iso_ids": [
+        "7.2",
+        "7.4"
+      ],
+      "predicted_iso_ids": [
+        "8.3",
+        "7.10",
+        "8.2",
+        "5.15"
+      ],
+      "predicted_iso_raw": "La falta de un sistema de registro y control de acceso físico en la sala de servidores (llave mecánica común) permite un acceso no autorizado y no auditado, en desacuerdo con los controles A.8.3, A.7.10, A.8.2 y A.5.15 que requieren medidas para restringir el acceso a información confidencial, proteger los medios de almacenamiento y garantizar un control cuidadoso de los derechos de acceso privilegiado. No existe registro de quién accedió ni cuándo, lo que impide la revisión periódica necesaria ",
+      "true_positives": 0,
+      "false_positives": 4,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.15",
+        "7.10",
+        "8.2",
+        "8.3"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.15",
+        "7.10",
+        "8.2",
+        "8.3"
+      ],
+      "missed_ids": [
+        "7.2",
+        "7.4"
+      ],
+      "error": null,
+      "latency_s": 8.72,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-12",
+      "ens_name": "Portátil corporativo sin cifrado de disco y sin política de bloqueo de pantalla",
+      "familia": "Protección de los equipos",
+      "nivel_exigido": "baja",
+      "gt_iso_ids": [
+        "8.1",
+        "7.7"
+      ],
+      "predicted_iso_ids": [
+        "7.7",
+        "8.1"
+      ],
+      "predicted_iso_raw": "El hallazgo indica que el portátil de RRHH no tiene activada la función BitLocker y la configuración de la pantalla de bloqueo está deshabilitada, lo que permite que la información confidencial quede expuesta y no haya barrera de autenticación adicional si el portátil es robado o extraviado. Esto incumple con A.7.7 y A.8.1 ya que no se implementan las políticas de escritorio y pantalla claras y no se protege adecuadamente el dispositivo de punto final.",
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [],
+      "error": null,
+      "latency_s": 7.37,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-13",
+      "ens_name": "API REST pública sin control de tasa (rate limiting) ni autenticación",
+      "familia": "Protección de los servicios",
+      "nivel_exigido": "baja",
+      "gt_iso_ids": [
+        "8.21",
+        "5.14"
+      ],
+      "predicted_iso_ids": [
+        "8.5",
+        "5.26"
+      ],
+      "predicted_iso_raw": "El hallazgo indica la existencia de un endpoint sin autenticación, lo cual viola la implementación de autenticación segura (A.8.5). Además, la falta de respuesta a incidentes de seguridad (A.5.26) puede ser un problema ya que no se han establecido protocolos para manejar la situación de un endpoint expuesto.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.26",
+        "8.5"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.26",
+        "8.5"
+      ],
+      "missed_ids": [
+        "5.14",
+        "8.21"
+      ],
+      "error": null,
+      "latency_s": 6.02,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-14",
+      "ens_name": "Pen drive con datos de clientes encontrado en zona de recepción sin propietario identificado",
+      "familia": "Protección de los soportes de información",
+      "nivel_exigido": "baja",
+      "gt_iso_ids": [
+        "7.10",
+        "7.14"
+      ],
+      "predicted_iso_ids": [
+        "7.10",
+        "7.14",
+        "5.21",
+        "8.12"
+      ],
+      "predicted_iso_raw": "El hallazgo indica la presencia de un USB sin cifrado y sin etiqueta en la recepción, conteniendo datos personales sin protección. Esto viola A.7.10 al no proteger el medio de almacenamiento contra el acceso no autorizado. A.7.14 también está incumplido al no tener un proceso para la eliminación o reutilización segura del equipo. A.5.21 se incumple porque no se ha gestionado el riesgo de seguridad en la cadena de suministro que llevó a la entrada de este medio de almacenamiento no seguro. Finalm",
+      "true_positives": 2,
+      "false_positives": 2,
+      "false_negatives": 0,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6667,
+      "hallucinated_ids": [
+        "5.21",
+        "8.12"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.21",
+        "8.12"
+      ],
+      "missed_ids": [],
+      "error": null,
+      "latency_s": 9.25,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-15",
+      "ens_name": "Proveedor externo con acceso a sistemas de producción sin acuerdo de seguridad firmado",
+      "familia": "Recursos externos",
+      "nivel_exigido": "media",
+      "gt_iso_ids": [
+        "5.19",
+        "5.20"
+      ],
+      "predicted_iso_ids": [
+        "5.20",
+        "5.19"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica que la empresa externa tiene acceso a la red de producción sin cláusulas de seguridad en el contrato y sin evidencia de evaluación de riesgos. Esto viola A.5.20 ya que no se han abordado los requisitos de seguridad de la información en los acuerdos con el proveedor, y viola A.5.19 ya que no se ha llevado a cabo la diligencia debida en la relación con el proveedor, lo que podría implicar que no se ha realizado una evaluación de riesgos adecuada del proveedor.",
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [],
+      "error": null,
+      "latency_s": 9.84,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "HT-16",
+      "ens_name": "Bucket S3 de AWS con datos de contratos accesible públicamente",
+      "familia": "Servicios en la nube",
+      "nivel_exigido": "baja",
+      "gt_iso_ids": [
+        "5.23"
+      ],
+      "predicted_iso_ids": [
+        "5.20",
+        "6.6"
+      ],
+      "predicted_iso_raw": "El hallazgo indica que los contratos comerciales confidenciales se encuentran expuestos públicamente en un bucket S3 con ACL public-read, lo que viola los controles de seguridad de información en acuerdos con proveedores (A.5.20) y los acuerdos de confidencialidad (A.6.6). El acceso público a dicha información podría conducir a violaciones de confidencialidad y obligaciones contractuales.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.20",
+        "6.6"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.20",
+        "6.6"
+      ],
+      "missed_ids": [
+        "5.23"
+      ],
+      "error": null,
+      "latency_s": 8.69,
+      "validacion_valida": null,
+      "validacion_confianza": null,
+      "validacion_problemas": [],
+      "validacion_error": null
+    }
+  ],
+  "validador_stats": null
+}

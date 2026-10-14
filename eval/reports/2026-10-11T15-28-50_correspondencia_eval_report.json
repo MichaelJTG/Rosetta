@@ -1,0 +1,3095 @@
+{
+  "run_id": "2026-10-11T15-28-50",
+  "timestamp": "2026-10-11T15:49:57.836861+00:00",
+  "mode": "correspondencia",
+  "marco": "ens",
+  "total_cases": 73,
+  "evaluated": 73,
+  "errors": 0,
+  "overall_precision": 0.4068,
+  "overall_recall": 0.2205,
+  "overall_f1": 0.2726,
+  "hallucination_rate": 0.6349,
+  "alucinacion_rate": 0.0,
+  "discrepancia_rate": 0.6349,
+  "per_family": [
+    {
+      "familia": "Continuidad del servicio",
+      "n_cases": 4,
+      "avg_precision": 0.25,
+      "avg_recall": 0.125,
+      "avg_f1": 0.1667,
+      "hallucination_rate": 0.875,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.875
+    },
+    {
+      "familia": "Control de acceso",
+      "n_cases": 6,
+      "avg_precision": 0.75,
+      "avg_recall": 0.4861,
+      "avg_f1": 0.5778,
+      "hallucination_rate": 0.1818,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.1818
+    },
+    {
+      "familia": "Explotación",
+      "n_cases": 10,
+      "avg_precision": 0.5833,
+      "avg_recall": 0.3,
+      "avg_f1": 0.3867,
+      "hallucination_rate": 0.5,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.5
+    },
+    {
+      "familia": "Gestión del personal",
+      "n_cases": 4,
+      "avg_precision": 0.125,
+      "avg_recall": 0.0833,
+      "avg_f1": 0.1,
+      "hallucination_rate": 0.8571,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.8571
+    },
+    {
+      "familia": "Marco organizativo",
+      "n_cases": 4,
+      "avg_precision": 0.375,
+      "avg_recall": 0.125,
+      "avg_f1": 0.1833,
+      "hallucination_rate": 0.6667,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.6667
+    },
+    {
+      "familia": "Monitorización del sistema",
+      "n_cases": 3,
+      "avg_precision": 0.6667,
+      "avg_recall": 0.2222,
+      "avg_f1": 0.3333,
+      "hallucination_rate": 0.3333,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.3333
+    },
+    {
+      "familia": "Planificación",
+      "n_cases": 5,
+      "avg_precision": 0.44,
+      "avg_recall": 0.2067,
+      "avg_f1": 0.25,
+      "hallucination_rate": 0.7,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.7
+    },
+    {
+      "familia": "Protección de la información",
+      "n_cases": 6,
+      "avg_precision": 0.25,
+      "avg_recall": 0.2222,
+      "avg_f1": 0.2333,
+      "hallucination_rate": 0.7,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.7
+    },
+    {
+      "familia": "Protección de las aplicaciones informáticas",
+      "n_cases": 2,
+      "avg_precision": 0.75,
+      "avg_recall": 0.2083,
+      "avg_f1": 0.325,
+      "hallucination_rate": 0.3333,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.3333
+    },
+    {
+      "familia": "Protección de las comunicaciones",
+      "n_cases": 4,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    },
+    {
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "n_cases": 7,
+      "avg_precision": 0.4524,
+      "avg_recall": 0.4143,
+      "avg_f1": 0.4286,
+      "hallucination_rate": 0.5,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.5
+    },
+    {
+      "familia": "Protección de los equipos",
+      "n_cases": 4,
+      "avg_precision": 0.25,
+      "avg_recall": 0.1458,
+      "avg_f1": 0.1833,
+      "hallucination_rate": 0.7143,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.7143
+    },
+    {
+      "familia": "Protección de los servicios",
+      "n_cases": 4,
+      "avg_precision": 0.5,
+      "avg_recall": 0.1458,
+      "avg_f1": 0.225,
+      "hallucination_rate": 0.5,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.5
+    },
+    {
+      "familia": "Protección de los soportes de información",
+      "n_cases": 5,
+      "avg_precision": 0.0,
+      "avg_recall": 0.0,
+      "avg_f1": 0.0,
+      "hallucination_rate": 1.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 1.0
+    },
+    {
+      "familia": "Recursos externos",
+      "n_cases": 4,
+      "avg_precision": 0.5,
+      "avg_recall": 0.2083,
+      "avg_f1": 0.2917,
+      "hallucination_rate": 0.625,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.625
+    },
+    {
+      "familia": "Servicios en la nube",
+      "n_cases": 1,
+      "avg_precision": 1.0,
+      "avg_recall": 0.5,
+      "avg_f1": 0.6667,
+      "hallucination_rate": 0.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.0
+    }
+  ],
+  "cases": [
+    {
+      "ens_code": "org.2",
+      "ens_name": "Normativa de seguridad",
+      "familia": "Marco organizativo",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.1",
+        "5.10",
+        "5.36",
+        "6.7",
+        "7.7",
+        "8.1"
+      ],
+      "predicted_iso_ids": [
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS org.2 'Normativa de seguridad', lo que implica que no existe un procedimiento documentado de seguridad. Según A.5.37, es necesario mantener procedimientos operativos documentados para garantizar la coherencia en las prácticas de seguridad.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 6,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "5.1",
+        "5.10",
+        "5.36",
+        "6.7",
+        "7.7",
+        "8.1"
+      ],
+      "error": null,
+      "latency_s": 6.43,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Justificación sin mapeo claro del hallazgo a la norma ISO 27001:2022."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "org.3",
+      "ens_name": "Procedimientos de seguridad",
+      "familia": "Marco organizativo",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.37",
+        "5.5",
+        "5.14",
+        "5.24"
+      ],
+      "predicted_iso_ids": [
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS org.3 'Procedimientos de seguridad', que es equivalente al control A.5.37 de la ISO 27001:2022 que requiere la documentación y mantenimiento de procedimientos operativos para coherencia en prácticas de seguridad.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 3,
+      "precision": 1.0,
+      "recall": 0.25,
+      "f1": 0.4,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.14",
+        "5.24",
+        "5.5"
+      ],
+      "error": null,
+      "latency_s": 5.18,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Control A.5.37 no existe en la ISO 27001:2022",
+        "Justificación basada en control inexistente"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "org.4",
+      "ens_name": "Proceso de autorización",
+      "familia": "Marco organizativo",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.2",
+        "8.19",
+        "8.20",
+        "8.32",
+        "5.10"
+      ],
+      "predicted_iso_ids": [
+        "5.37",
+        "5.31"
+      ],
+      "predicted_iso_raw": "El hallazgo señala un incumplimiento de la medida ENS org.4 'Proceso de autorización'. Esto sugiere que no se ha implementado ni documentado un procedimiento operativo formal para la autorización de procesos, lo cual viola A.5.37 de ISO 27001:2022. Además, la falta de un proceso documentado de autorización puede ser una falta de cumplimiento con los requisitos legales, específicamente RD 311/2022, lo que incumple A.5.31.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.31",
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.31",
+        "5.37"
+      ],
+      "missed_ids": [
+        "5.10",
+        "5.2",
+        "8.19",
+        "8.20",
+        "8.32"
+      ],
+      "error": null,
+      "latency_s": 8.1,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.pl.3",
+      "ens_name": "Adquisición de nuevos componentes",
+      "familia": "Planificación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.8",
+        "5.19",
+        "8.29"
+      ],
+      "predicted_iso_ids": [
+        "5.37",
+        "8.16",
+        "8.29",
+        "5.35",
+        "5.22"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS op.pl.3 'Adquisición de nuevos componentes'. Esto puede afectar a los controles A.5.37, A.8.16, A.8.29, A.5.35 y A.5.22, ya que la falta de seguimiento y documentación adecuada de la adquisición de nuevos componentes puede comprometer la coherencia en las prácticas de seguridad, la supervisión continua de las actividades del sistema, las pruebas de seguridad en desarrollo y aceptación, la revisión independiente de la seguridad de la i",
+      "true_positives": 1,
+      "false_positives": 4,
+      "false_negatives": 2,
+      "precision": 0.2,
+      "recall": 0.3333,
+      "f1": 0.25,
+      "hallucinated_ids": [
+        "5.22",
+        "5.35",
+        "5.37",
+        "8.16"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.22",
+        "5.35",
+        "5.37",
+        "8.16"
+      ],
+      "missed_ids": [
+        "5.19",
+        "5.8"
+      ],
+      "error": null,
+      "latency_s": 12.17,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.acc.3",
+      "ens_name": "Segregación de funciones y tareas",
+      "familia": "Control de acceso",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.3",
+        "8.2"
+      ],
+      "predicted_iso_ids": [
+        "5.3"
+      ],
+      "predicted_iso_raw": "El hallazgo indica que hay un incumplimiento en la medida ENS op.acc.3 'Segregación de funciones y tareas'. Esto se correlaciona directamente con el control A.5.3 de la ISO 27001:2022, que especifica la necesidad de segregación de funciones para mitigar riesgos de seguridad.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "8.2"
+      ],
+      "error": null,
+      "latency_s": 5.58,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.acc.4",
+      "ens_name": "Proceso de gestión de derechos de acceso",
+      "familia": "Control de acceso",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.18",
+        "8.2",
+        "5.15"
+      ],
+      "predicted_iso_ids": [
+        "5.18",
+        "5.15",
+        "8.2"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico revela un incumplimiento de la medida ENS op.acc.4 'Proceso de gestión de derechos de acceso', lo cual se alinea con los controles A.5.18, A.5.15 y A.8.2 de la ISO 27001:2022, que requieren la revisión y administración periódica de los derechos de acceso, la implementación de mecanismos de control de acceso y la administración cuidadosa de los derechos de acceso privilegiado.",
+      "true_positives": 3,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [],
+      "error": null,
+      "latency_s": 8.01,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.exp.1",
+      "ens_name": "Inventario de activos",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.9",
+        "5.12"
+      ],
+      "predicted_iso_ids": [
+        "5.9"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS op.exp.1 'Inventario de activos', que es directamente correlacionado con el control A.5.9 de la ISO 27001:2022 que requiere mantener un inventario preciso de la información y los activos asociados.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.12"
+      ],
+      "error": null,
+      "latency_s": 5.21,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.exp.2",
+      "ens_name": "Configuración de seguridad",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.9",
+        "8.19",
+        "8.12"
+      ],
+      "predicted_iso_ids": [
+        "5.37",
+        "8.29",
+        "5.35",
+        "8.16",
+        "8.26"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida de configuración de seguridad (ENS op.exp.2). Este incumplimiento tiene implicaciones directas en varios controles ISO 27001:2022, ya que afecta a la documentación de procedimientos operativos (A.5.37), la realización de pruebas de seguridad en desarrollo y aceptación (A.8.29), la realización de revisiones independientes de la seguridad de la información (A.5.35), el seguimiento de las actividades (A.8.16) y los requisitos de seguridad de las apl",
+      "true_positives": 0,
+      "false_positives": 5,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.35",
+        "5.37",
+        "8.16",
+        "8.26",
+        "8.29"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.35",
+        "5.37",
+        "8.16",
+        "8.26",
+        "8.29"
+      ],
+      "missed_ids": [
+        "8.12",
+        "8.19",
+        "8.9"
+      ],
+      "error": null,
+      "latency_s": 14.67,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.exp.5",
+      "ens_name": "Gestión de cambios",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.32",
+        "8.29",
+        "8.31"
+      ],
+      "predicted_iso_ids": [
+        "8.32",
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento en la medida ENS 'op.exp.5 Gestión de cambios', lo cual se relaciona directamente con el control A.8.32 de ISO 27001 que exige una gestión segura de los cambios en los sistemas. Además, la implementación de procedimientos operativos documentados para la gestión de cambios (A.5.37) también está ausente.",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.5,
+      "recall": 0.3333,
+      "f1": 0.4,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "8.29",
+        "8.31"
+      ],
+      "error": null,
+      "latency_s": 7.1,
+      "validacion_valida": false,
+      "validacion_confianza": 0.5,
+      "validacion_problemas": [
+        "Justificación no especifica correctamente cómo A.8.32 y A.5.37 se relacionan directamente con la medida ENS 'op.exp.5'.",
+        "Justificación requiere un análisis más detallado de cómo los procedimientos operativos específicos están ausentes y cómo impactan la medida ENS 'op.exp.5'."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.exp.9",
+      "ens_name": "Registro de la gestión de incidentes",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.26",
+        "5.27",
+        "5.28"
+      ],
+      "predicted_iso_ids": [
+        "5.24",
+        "5.25",
+        "5.26"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS op.exp.9 'Registro de la gestión de incidentes'. Esto se correlaciona con los controles ISO 27001 A.5.24, A.5.25 y A.5.26, que se refieren a la planificación, evaluación y respuesta a incidentes de seguridad, respectivamente. El registro de incidentes es un componente clave de estos controles, y su falta afecta directamente la capacidad para responder y gestionar incidentes de manera efectiva.",
+      "true_positives": 1,
+      "false_positives": 2,
+      "false_negatives": 2,
+      "precision": 0.3333,
+      "recall": 0.3333,
+      "f1": 0.3333,
+      "hallucinated_ids": [
+        "5.24",
+        "5.25"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.24",
+        "5.25"
+      ],
+      "missed_ids": [
+        "5.27",
+        "5.28"
+      ],
+      "error": null,
+      "latency_s": 7.1,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Justificación circunstancial que no proporciona una conexión clara entre la medida ENS y los controles ISO 27001."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.ext.1",
+      "ens_name": "Contratación y acuerdos de nivel de servicio",
+      "familia": "Recursos externos",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.19",
+        "5.20",
+        "6.6",
+        "5.14"
+      ],
+      "predicted_iso_ids": [
+        "5.20",
+        "5.19"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida op.ext.1 'Contratación y acuerdos de nivel de servicio' del RD 311/2022. Esta medida es equivalente al control A.5.20 de la ISO 27001:2022, que requiere que los acuerdos contractuales con proveedores incluyan cláusulas de seguridad explícitas y auditorías de cumplimiento. Asimismo, el control A.5.19 también se ve afectado, ya que exige la integración de la seguridad en las relaciones y procesos con los proveedores.",
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 2,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.14",
+        "6.6"
+      ],
+      "error": null,
+      "latency_s": 8.02,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.ext.2",
+      "ens_name": "Gestión diaria",
+      "familia": "Recursos externos",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.22"
+      ],
+      "predicted_iso_ids": [
+        "5.37",
+        "8.16"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida operativa externa 2 (op.ext.2) relacionada con la gestión diaria, lo que está directamente vinculado al control A.5.37 para la documentación de procedimientos operativos y al control A.8.16 para la supervisión continua de actividades de seguridad. La falta de gestión diaria y documentación detallada implica un riesgo medio en la coherencia y respuesta a amenazas, según el hallazgo.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.37",
+        "8.16"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37",
+        "8.16"
+      ],
+      "missed_ids": [
+        "5.22"
+      ],
+      "error": null,
+      "latency_s": 6.41,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.cont.2",
+      "ens_name": "Plan de continuidad",
+      "familia": "Continuidad del servicio",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.29",
+        "5.30"
+      ],
+      "predicted_iso_ids": [
+        "5.29"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico revela un incumplimiento de la medida ENS op.cont.2 'Plan de continuidad'. Este aspecto está directamente relacionado con la necesidad de mantener la seguridad de la información durante las interrupciones, lo que se cubre bajo el control A.5.29 de ISO 27001:2022.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.30"
+      ],
+      "error": null,
+      "latency_s": 5.15,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Cita normativa errónea: control A.5.29 no existe en ISO 27001:2022.",
+        "Justificación basada en un control que no existe."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.cont.3",
+      "ens_name": "Pruebas periódicas",
+      "familia": "Continuidad del servicio",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.30",
+        "8.14"
+      ],
+      "predicted_iso_ids": [
+        "5.36",
+        "8.16"
+      ],
+      "predicted_iso_raw": "El hallazgo indica que no se están realizando las pruebas periódicas requeridas por la medida ENS op.cont.3. Esto incumple con los controles ISO 27001 A.5.36 y A.8.16, ya que la falta de pruebas periódicas no garantiza el cumplimiento de las políticas de seguridad y no permite la detección continua de amenazas.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.36",
+        "8.16"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.36",
+        "8.16"
+      ],
+      "missed_ids": [
+        "5.30",
+        "8.14"
+      ],
+      "error": null,
+      "latency_s": 7.23,
+      "validacion_valida": true,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Justificación excesivamente amplia"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.cont.4",
+      "ens_name": "Medios alternativos",
+      "familia": "Continuidad del servicio",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.14",
+        "5.30"
+      ],
+      "predicted_iso_ids": [
+        "5.37",
+        "5.35",
+        "5.22",
+        "5.36"
+      ],
+      "predicted_iso_raw": "El hallazgo evidencia un incumplimiento de la medida ENS op.cont.4 'Medios alternativos'. Esta medida no está documentada conforme a A.5.37, no hay revisiones independientes que la evalúen conforme a A.5.35, no se supervisa y ajusta conforme a A.5.22, y no se garantiza el cumplimiento de las políticas de seguridad conforme a A.5.36.",
+      "true_positives": 0,
+      "false_positives": 4,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.22",
+        "5.35",
+        "5.36",
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.22",
+        "5.35",
+        "5.36",
+        "5.37"
+      ],
+      "missed_ids": [
+        "5.30",
+        "8.14"
+      ],
+      "error": null,
+      "latency_s": 9.1,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Justificación no establece una conexión clara entre la medida especificada y los controles seleccionados.",
+        "Justificación asume cumplimiento implícito sin proporcionar detalles."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.if.1",
+      "ens_name": "Áreas separadas y con control de acceso",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.1",
+        "7.2",
+        "7.3",
+        "7.4",
+        "7.6"
+      ],
+      "predicted_iso_ids": [
+        "7.6",
+        "5.15",
+        "7.1"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS 'Áreas separadas y con control de acceso', lo que implica que no se están tomando medidas adecuadas para administrar las áreas seguras, controlar el acceso y establecer perímetros físicos de seguridad. Esto está en línea con los controles de ISO 27001 A.7.6, A.5.15 y A.7.1 que requieren medidas similares para garantizar la seguridad de las áreas críticas y el acceso controlado.",
+      "true_positives": 2,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.6667,
+      "recall": 0.4,
+      "f1": 0.5,
+      "hallucinated_ids": [
+        "5.15"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.15"
+      ],
+      "missed_ids": [
+        "7.2",
+        "7.3",
+        "7.4"
+      ],
+      "error": null,
+      "latency_s": 8.38,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.if.2",
+      "ens_name": "Identificación de las personas",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.2",
+        "7.4"
+      ],
+      "predicted_iso_ids": [
+        "5.16"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico señala un incumplimiento del control ENS mp.if.2 que es equivalente a la verificación de identidad y gestión de identidades en ISO 27001. A.5.16 establece que es necesario gestionar de forma segura las identidades para garantizar un acceso preciso y fiable, lo cual incluye la verificación de identidad y el aprovisionamiento de acceso. El incumplimiento de mp.if.2 implica que no se ha verificado adecuadamente la identidad de las personas, lo que incumple A.5.16.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.16"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.16"
+      ],
+      "missed_ids": [
+        "7.2",
+        "7.4"
+      ],
+      "error": null,
+      "latency_s": 7.33,
+      "validacion_valida": true,
+      "validacion_confianza": 0.9,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.if.3",
+      "ens_name": "Acondicionamiento de los locales",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.5",
+        "7.8",
+        "7.12"
+      ],
+      "predicted_iso_ids": [
+        "7.6"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico se refiere a la medida ENS mp.if.3 'Acondicionamiento de los locales', que es esencialmente el control A.7.6 de la ISO 27001:2022 que se ocupa de la administración de áreas seguras para permitir solo el acceso autorizado. El incumplimiento de esta medida significa que las áreas no están adecuadamente acondicionadas para garantizar la seguridad y el control de acceso.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "7.6"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "7.6"
+      ],
+      "missed_ids": [
+        "7.12",
+        "7.5",
+        "7.8"
+      ],
+      "error": null,
+      "latency_s": 5.5,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Controles no existentes en la norma ISO 27001:2022.",
+        "Justificación basada en un control que no existe en la norma."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.if.5",
+      "ens_name": "Protección frente a incendios",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.5"
+      ],
+      "predicted_iso_ids": [
+        "7.5"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico revela un incumplimiento de la medida ENS mp.if.5 'Protección frente a incendios'. Dado que esta medida es una protección contra amenazas físicas y ambientales, se correlaciona directamente con el control A.7.5 de ISO 27001:2022, que requiere la implementación de sistemas de extinción de incendios y otras medidas de protección contra amenazas físicas y ambientales.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [],
+      "error": null,
+      "latency_s": 6.89,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Mapeo incorrecto del control A.7.5",
+        "Justificación no refleja la realidad de la norma ISO 27001:2022"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.if.7",
+      "ens_name": "Registro de entrada y salida de equipamiento",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.2",
+        "7.9",
+        "7.10"
+      ],
+      "predicted_iso_ids": [
+        "8.16"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS mp.if.7 'Registro de entrada y salida de equipamiento'. En el contexto de ISO 27001, esto se relaciona con la necesidad de supervisar las actividades para detectar y responder a amenazas según el control A.8.16, que incluye el seguimiento de acciones que podrían ser peligrosas para la seguridad, como el movimiento de equipo.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "8.16"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "8.16"
+      ],
+      "missed_ids": [
+        "7.10",
+        "7.2",
+        "7.9"
+      ],
+      "error": null,
+      "latency_s": 5.49,
+      "validacion_valida": false,
+      "validacion_confianza": 0.6,
+      "validacion_problemas": [
+        "Mapeo incorrecto entre el hallazgo ENS mp.if.7 y el control A.8.16 de ISO 27001:2022. El control A.8.16 se refiere a la supervisión de actividades de seguridad, no al registro específico de entrada y salida de equipo."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.per.1",
+      "ens_name": "Caracterización del puesto de trabajo",
+      "familia": "Gestión del personal",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "6.1",
+        "6.2",
+        "5.2"
+      ],
+      "predicted_iso_ids": [
+        "6.2",
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo 'mp.per.1 Caracterización del puesto de trabajo' no cumple con el control A.6.2 de ISO 27001:2022, ya que no se especifican las responsabilidades de seguridad del empleado. Además, no se encuentran documentados los procedimientos operativos necesarios para la caracterización del puesto de trabajo, incumpliendo con A.5.37.",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.5,
+      "recall": 0.3333,
+      "f1": 0.4,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "5.2",
+        "6.1"
+      ],
+      "error": null,
+      "latency_s": 7.45,
+      "validacion_valida": true,
+      "validacion_confianza": 0.9,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.per.3",
+      "ens_name": "Concienciación",
+      "familia": "Gestión del personal",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "6.3"
+      ],
+      "predicted_iso_ids": [
+        "5.36"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS mp.per.3 'Concienciación', que tiene un paralelismo directo con el control A.5.36 de la ISO 27001:2022 ya que ambos requieren la capacitación y la concienciación de los empleados sobre la seguridad de la información.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.36"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.36"
+      ],
+      "missed_ids": [
+        "6.3"
+      ],
+      "error": null,
+      "latency_s": 6.57,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Controles inventados que no existen en el marco normativo real.",
+        "Mapeos incorrectos donde el control no se aplica al hallazgo."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.per.4",
+      "ens_name": "Formación",
+      "familia": "Gestión del personal",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "6.3"
+      ],
+      "predicted_iso_ids": [
+        "5.36"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico identifica un incumplimiento de la medida de formación ENS mp.per.4, lo cual es esencial para el cumplimiento de políticas, reglas y estándares de seguridad de la información según el control A.5.36 de ISO 27001:2022. La capacitación es una medida clave para garantizar que los empleados estén familiarizados con las políticas y reglas de seguridad pertinentes.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.36"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.36"
+      ],
+      "missed_ids": [
+        "6.3"
+      ],
+      "error": null,
+      "latency_s": 5.94,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Control no existe en el marco normativo ISO 27001:2022.",
+        "Mapeo incorrecto del control con respecto al hallazgo técnico."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.com.1",
+      "ens_name": "Perímetro seguro",
+      "familia": "Protección de las comunicaciones",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.20",
+        "8.21",
+        "8.22"
+      ],
+      "predicted_iso_ids": [
+        "7.1",
+        "7.4"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS mp.com.1 'Perímetro seguro'. Dado que esta medida se relaciona con la protección del acceso a áreas críticas, se aplican los controles A.7.1 y A.7.4 de ISO 27001 para establecer y monitorear los perímetros de seguridad física.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "7.1",
+        "7.4"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "7.1",
+        "7.4"
+      ],
+      "missed_ids": [
+        "8.20",
+        "8.21",
+        "8.22"
+      ],
+      "error": null,
+      "latency_s": 9.56,
+      "validacion_valida": true,
+      "validacion_confianza": 0.9,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.si.3",
+      "ens_name": "Custodia",
+      "familia": "Protección de los soportes de información",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.10",
+        "5.9",
+        "5.10"
+      ],
+      "predicted_iso_ids": [
+        "5.36"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico señala un incumplimiento de la medida ENS mp.si.3 'Custodia', que es una regla de seguridad de la información. El control A.5.36 de ISO 27001:2022 requiere el cumplimiento de todas las políticas, reglas y estándares de seguridad de la información. Por lo tanto, el incumplimiento de la medida ENS mp.si.3 'Custodia' es un incumplimiento de A.5.36.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.36"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.36"
+      ],
+      "missed_ids": [
+        "5.10",
+        "5.9",
+        "7.10"
+      ],
+      "error": null,
+      "latency_s": 6.19,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Mapeo incorrecto: el control A.5.36 de ISO 27001:2022 no abarca específicamente la custodia, y la justificación es circular o insuficiente."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.si.4",
+      "ens_name": "Transporte",
+      "familia": "Protección de los soportes de información",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.10",
+        "7.9",
+        "5.14"
+      ],
+      "predicted_iso_ids": [
+        "5.37",
+        "5.36"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS mp.si.4 'Transporte'. Dado que el control A.5.37 requiere la documentación de procedimientos operativos para garantizar la coherencia en prácticas de seguridad, la falta de cumplimiento con la medida ENS implica la falta de procedimientos operativos documentados. Además, la medida ENS 'Transporte' es una política de seguridad que debe ser cumplida, lo que incumple el control A.5.36.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.36",
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.36",
+        "5.37"
+      ],
+      "missed_ids": [
+        "5.14",
+        "7.10",
+        "7.9"
+      ],
+      "error": null,
+      "latency_s": 8.08,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.info.1",
+      "ens_name": "Datos personales",
+      "familia": "Protección de la información",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.34",
+        "5.31",
+        "8.11"
+      ],
+      "predicted_iso_ids": [
+        "8.15",
+        "5.13"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento en la medida 'Datos personales' del ENS, específicamente en el control ENS mp.info.1. Dado que la medida implica la gestión adecuada de datos personales, los controles A.8.15 y A.5.13 de la ISO 27001:2022 son relevantes ya que A.8.15 requiere registro de actividades para monitoreo y detección de incidentes relacionados con la información, mientras que A.5.13 asegura que la información esté etiquetada de manera consistente para reflejar sus clasificaciones y m",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.13",
+        "8.15"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.13",
+        "8.15"
+      ],
+      "missed_ids": [
+        "5.31",
+        "5.34",
+        "8.11"
+      ],
+      "error": null,
+      "latency_s": 8.85,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.s.1",
+      "ens_name": "Protección del correo electrónico",
+      "familia": "Protección de los servicios",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.14",
+        "8.7",
+        "8.24",
+        "8.23"
+      ],
+      "predicted_iso_ids": [
+        "8.12"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico menciona un incumplimiento de la medida ENS mp.s.1 'Protección del correo electrónico', lo que sugiere que no se están implementando mecanismos adecuados para prevenir la fuga de datos a través de correo electrónico, lo cual está directamente relacionado con el control A.8.12 de ISO 27001:2022.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 4,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "8.12"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "8.12"
+      ],
+      "missed_ids": [
+        "5.14",
+        "8.23",
+        "8.24",
+        "8.7"
+      ],
+      "error": null,
+      "latency_s": 5.57,
+      "validacion_valida": false,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [
+        "El control A.8.12 no existe en ISO 27001:2022.",
+        "La justificación se basa en un control que no existe."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.acc.5",
+      "ens_name": "Mecanismo de autenticación (usuarios externos)",
+      "familia": "Control de acceso",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.17",
+        "8.5",
+        "5.16"
+      ],
+      "predicted_iso_ids": [
+        "8.5",
+        "5.17"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida RD 311/2022 Anexo II medida op.acc.5, que requiere un mecanismo de autenticación (usuarios externos). Esto está en línea con los controles ISO 27001:2022 A.8.5 y A.5.17, que exigen autenticación segura y protección de la información de autenticación respectivamente. La falta de implementación de estos controles vulnera la seguridad y permite un acceso no autorizado.",
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.6667,
+      "f1": 0.8,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.16"
+      ],
+      "error": null,
+      "latency_s": 6.88,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.com.4",
+      "ens_name": "Separación de flujos de información en la red",
+      "familia": "Protección de las comunicaciones",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.22",
+        "8.20"
+      ],
+      "predicted_iso_ids": [
+        "5.14",
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS mp.com.4 'Separación de flujos de información en la red'. Esto está relacionado con la transferencia segura de información (A.5.14) y la necesidad de documentar procedimientos para garantizar la separación de flujos de información (A.5.37) para cumplir con los estándares de seguridad de la información.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.14",
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.14",
+        "5.37"
+      ],
+      "missed_ids": [
+        "8.20",
+        "8.22"
+      ],
+      "error": null,
+      "latency_s": 7.45,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Controles con ID incorrectos en fragmentos usados.",
+        "Justificación no proporciona vínculo claro entre la medida de la ENS y los controles de ISO 27001."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.acc.6",
+      "ens_name": "Mecanismo de autenticación (usuarios de la organización)",
+      "familia": "Control de acceso",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.5",
+        "5.17",
+        "6.7",
+        "8.1"
+      ],
+      "predicted_iso_ids": [
+        "8.5",
+        "5.17"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS op.acc.6, que se relaciona con la implementación de un mecanismo de autenticación para usuarios de la organización. Esto está directamente vinculado con los controles A.8.5 y A.5.17 de ISO 27001:2022, los cuales son responsables de la implementación de autenticación segura y la protección de la información de autenticación.",
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 2,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "6.7",
+        "8.1"
+      ],
+      "error": null,
+      "latency_s": 6.68,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.ext.3",
+      "ens_name": "Protección de la cadena de suministro",
+      "familia": "Recursos externos",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.21",
+        "5.29",
+        "5.30"
+      ],
+      "predicted_iso_ids": [
+        "5.21"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS op.ext.3 'Protección de la cadena de suministro', que es equivalente al control ISO 27001:2022 A.5.21 'Gestión de la seguridad de la información en la cadena de suministro de las TIC'. Este control aborda directamente los riesgos asociados con la cadena de suministro en el contexto de TIC, lo que incluye evaluaciones de riesgos, evaluaciones de proveedores y protocolos de respuesta a incidentes.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 2,
+      "precision": 1.0,
+      "recall": 0.3333,
+      "f1": 0.5,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.29",
+        "5.30"
+      ],
+      "error": null,
+      "latency_s": 5.94,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.eq.2",
+      "ens_name": "Bloqueo de puesto de trabajo",
+      "familia": "Protección de los equipos",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.7",
+        "8.1"
+      ],
+      "predicted_iso_ids": [
+        "6.2",
+        "8.16"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida 'Bloqueo de puesto de trabajo' requerida por la RD 311/2022. Esto implica que no se han establecido claramente las responsabilidades de seguridad en los términos y condiciones de empleo (A.6.2) y que no se está realizando el seguimiento necesario de las actividades para asegurar que estas responsabilidades se cumplan (A.8.16).",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "6.2",
+        "8.16"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "6.2",
+        "8.16"
+      ],
+      "missed_ids": [
+        "7.7",
+        "8.1"
+      ],
+      "error": null,
+      "latency_s": 6.71,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Mapeo incorrecto de controles a hallazgo.",
+        "Justificación sin razonamiento real."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.si.1",
+      "ens_name": "Marcado de soportes",
+      "familia": "Protección de los soportes de información",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.13",
+        "7.10"
+      ],
+      "predicted_iso_ids": [
+        "5.35"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento en el marcado de soportes (ENS mp.si.1). Sin un marcado de soportes adecuado, no se puede garantizar que las revisiones de seguridad independientes (A.5.35) aborden todos los elementos necesarios para evaluar la eficacia y el cumplimiento de la seguridad de la información.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.35"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.35"
+      ],
+      "missed_ids": [
+        "5.13",
+        "7.10"
+      ],
+      "error": null,
+      "latency_s": 4.93,
+      "validacion_valida": false,
+      "validacion_confianza": 0.2,
+      "validacion_problemas": [
+        "Justificación circular o vacía sin razonamiento real.",
+        "Mapeo no claro entre el control ISO 27001 y la medida ENS mp.si.1."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.info.2",
+      "ens_name": "Calificación de la información",
+      "familia": "Protección de la información",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.12",
+        "5.13"
+      ],
+      "predicted_iso_ids": [
+        "5.12",
+        "5.13"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS mp.info.2 'Calificación de la información'. Esto se traduce directamente al control ISO 27001:2022 A.5.12 sobre la clasificación de la información y A.5.13 sobre el etiquetado de la información, que aseguran que la información esté clasificada y etiquetada de manera coherente para reflejar sus requisitos de manejo y clasificación.",
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [],
+      "error": null,
+      "latency_s": 6.91,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.info.5",
+      "ens_name": "Limpieza de documentos",
+      "familia": "Protección de la información",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.14",
+        "8.10"
+      ],
+      "predicted_iso_ids": [
+        "5.31"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS mp.info.5 'Limpieza de documentos', lo cual está vinculado con el cumplimiento de los requisitos reglamentarios según la normativa RD 311/2022. Dado que A.5.31 establece que se debe garantizar el cumplimiento de los requisitos legales y reglamentarios, este hallazgo evidencia un incumplimiento de la norma.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.31"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.31"
+      ],
+      "missed_ids": [
+        "5.14",
+        "8.10"
+      ],
+      "error": null,
+      "latency_s": 7.6,
+      "validacion_valida": false,
+      "validacion_confianza": 0.3,
+      "validacion_problemas": [
+        "Justificación circular o vacía sin razonamiento real."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.eq.4",
+      "ens_name": "Otros dispositivos conectados a la red",
+      "familia": "Protección de los equipos",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.1",
+        "8.20",
+        "5.9"
+      ],
+      "predicted_iso_ids": [
+        "8.1",
+        "5.15"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS mp.eq.4 'Otros dispositivos conectados a la red'. Esto se refiere a la necesidad de proteger los dispositivos conectados a la red de la organización, lo que implica la necesidad de proteger los dispositivos de punto final (A.8.1) y asegurar que los accesos no son inapropiados (A.5.15).",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.5,
+      "recall": 0.3333,
+      "f1": 0.4,
+      "hallucinated_ids": [
+        "5.15"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.15"
+      ],
+      "missed_ids": [
+        "5.9",
+        "8.20"
+      ],
+      "error": null,
+      "latency_s": 6.82,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.si.5",
+      "ens_name": "Borrado y destrucción",
+      "familia": "Protección de los soportes de información",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.10",
+        "7.14",
+        "8.10"
+      ],
+      "predicted_iso_ids": [
+        "5.37",
+        "8.32"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS 'Borrado y destrucción', lo cual requiere procedimientos operativos documentados y una gestión del cambio adecuada para garantizar la coherencia y seguridad en prácticas relacionadas con el borrado y destrucción de datos. Esto se vincula con A.5.37 que exige documentación de procedimientos y A.8.32 que se refiere a la gestión segura de cambios en los sistemas.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.37",
+        "8.32"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37",
+        "8.32"
+      ],
+      "missed_ids": [
+        "7.10",
+        "7.14",
+        "8.10"
+      ],
+      "error": null,
+      "latency_s": 5.47,
+      "validacion_valida": true,
+      "validacion_confianza": 0.95,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.cont.1",
+      "ens_name": "Análisis de impacto",
+      "familia": "Continuidad del servicio",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.29",
+        "5.30"
+      ],
+      "predicted_iso_ids": [
+        "8.29"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico menciona un incumplimiento de la medida 'Análisis de impacto' de la RD 311/2022. El Análisis de impacto es una parte fundamental de las buenas prácticas de seguridad y está estrechamente relacionado con las pruebas de seguridad en el ciclo de vida de desarrollo y aceptación de software. El control A.8.29 de ISO 27001:2022 establece la importancia de realizar pruebas de seguridad durante estas fases para identificar posibles vulnerabilidades. La falta de análisis de impacto pu",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "8.29"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "8.29"
+      ],
+      "missed_ids": [
+        "5.29",
+        "5.30"
+      ],
+      "error": null,
+      "latency_s": 6.59,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Control A.8.29 no es equivalente a la medida ENS op.cont.1 'Análisis de impacto'.",
+        "Justificación circular y sin razonamiento real."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.pl.4",
+      "ens_name": "Dimensionamiento/gestión de la capacidad",
+      "familia": "Planificación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.6",
+        "8.14"
+      ],
+      "predicted_iso_ids": [
+        "8.6"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida de ENS 'Dimensionamiento/gestión de la capacidad' (op.pl.4), que es directamente relacionada con la gestión de la capacidad de sistemas y recursos. La norma ISO 27001 A.8.6 cubre la gestión de la capacidad del sistema para garantizar un rendimiento adecuado, y sin acciones correctivas, puede haber interrupciones no previstas.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "8.14"
+      ],
+      "error": null,
+      "latency_s": 6.0,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.if.4",
+      "ens_name": "Energía eléctrica",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.11",
+        "7.5"
+      ],
+      "predicted_iso_ids": [
+        "7.5",
+        "7.4"
+      ],
+      "predicted_iso_raw": "El hallazgo evidencia un incumplimiento de la medida ENS mp.if.4 'Energía eléctrica', lo que implica un riesgo para la seguridad física de los sistemas y recursos. Esto afecta directamente a los controles A.7.5 y A.7.4 de la ISO 27001:2022, ya que ambos controles requieren medidas específicas para proteger contra amenazas físicas y garantizar la supervisión de la seguridad física.",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 1,
+      "precision": 0.5,
+      "recall": 0.5,
+      "f1": 0.5,
+      "hallucinated_ids": [
+        "7.4"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "7.4"
+      ],
+      "missed_ids": [
+        "7.11"
+      ],
+      "error": null,
+      "latency_s": 7.45,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.s.4",
+      "ens_name": "Protección frente a denegación de servicio",
+      "familia": "Protección de los servicios",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.6",
+        "8.16",
+        "8.14",
+        "5.30"
+      ],
+      "predicted_iso_ids": [
+        "8.21"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico señala la falta de protección frente a denegación de servicio (DoS), un tipo de ataque que directamente amenaza la disponibilidad del servicio de red. A.8.21 establece la necesidad de proteger los servicios de red para mantener la disponibilidad, por lo que la ausencia de medidas contra DoS constituye un incumplimiento de esta norma.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 4,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "8.21"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "8.21"
+      ],
+      "missed_ids": [
+        "5.30",
+        "8.14",
+        "8.16",
+        "8.6"
+      ],
+      "error": null,
+      "latency_s": 6.43,
+      "validacion_valida": true,
+      "validacion_confianza": 0.9,
+      "validacion_problemas": [
+        "Justificación debil o circular"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.info.6",
+      "ens_name": "Copias de seguridad",
+      "familia": "Protección de la información",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.13",
+        "8.14"
+      ],
+      "predicted_iso_ids": [
+        "5.35",
+        "8.26"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS mp.info.6 'Copias de seguridad', lo cual puede afectar la efectividad de las revisiones independientes de la seguridad de la información y la aplicación de los requisitos de seguridad de las aplicaciones. Sin copias de seguridad, no se puede garantizar la integridad y la disponibilidad de la información crítica para las revisiones y la aplicación de seguridad.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.35",
+        "8.26"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.35",
+        "8.26"
+      ],
+      "missed_ids": [
+        "8.13",
+        "8.14"
+      ],
+      "error": null,
+      "latency_s": 7.92,
+      "validacion_valida": true,
+      "validacion_confianza": 0.9,
+      "validacion_problemas": [
+        "La justificación es general y podría ser más específica para vincular directamente la falta de copias de seguridad con los controles A.5.35 y A.8.26."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.exp.8",
+      "ens_name": "Registro de la actividad",
+      "familia": "Explotación",
+      "nivel_exigido": "MEDIO",
+      "gt_iso_ids": [
+        "8.15",
+        "8.17",
+        "8.16"
+      ],
+      "predicted_iso_ids": [
+        "8.15"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida de la Ley Orgánica de Protección de Datos y Garantía de los Derechos Digitales (LOPDGDD) RD 311/2022 Anexo II medida op.exp.8 'Registro de la actividad'. Este hallazgo se traduce directamente al control A.8.15 de ISO 27001, que requiere el registro de actividades dentro de los sistemas para respaldar monitoreo, detección de incidentes y forense.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 2,
+      "precision": 1.0,
+      "recall": 0.3333,
+      "f1": 0.5,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "8.16",
+        "8.17"
+      ],
+      "error": null,
+      "latency_s": 5.57,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.info.3",
+      "ens_name": "Firma electrónica",
+      "familia": "Protección de la información",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.24",
+        "8.26",
+        "5.31"
+      ],
+      "predicted_iso_ids": [
+        "5.35"
+      ],
+      "predicted_iso_raw": "El hallazgo indica que existe un incumplimiento de la medida ENS mp.info.3 'Firma electrónica'. Este hallazgo no especifica directamente un control de ISO 27001, pero el control A.5.35 de ISO 27001 aborda la necesidad de revisiones independientes para evaluar la eficacia de los controles de seguridad implementados, incluyendo la firma electrónica. Por lo tanto, el incumplimiento de mp.info.3 'Firma electrónica' puede implicar un incumplimiento de A.5.35 ya que la firma electrónica es un control ",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.35"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.35"
+      ],
+      "missed_ids": [
+        "5.31",
+        "8.24",
+        "8.26"
+      ],
+      "error": null,
+      "latency_s": 6.49,
+      "validacion_valida": false,
+      "validacion_confianza": 0.95,
+      "validacion_problemas": [
+        "El control A.5.35 no existe en ISO 27001:2022.",
+        "La justificación es circular y no mapea directamente a un control real."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.acc.1",
+      "ens_name": "Identificación",
+      "familia": "Control de acceso",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.16",
+        "5.17",
+        "8.15"
+      ],
+      "predicted_iso_ids": [
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS op.acc.1 'Identificación'. Esta medida no está directamente mapeada en la ISO 27001:2022, pero puede interpretarse que la falta de identificación adecuada puede indicar que no se han desarrollado los procedimientos operativos documentados necesarios para garantizar la coherencia en las prácticas de seguridad, especialmente en el contexto de la identificación de los elementos de seguridad.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "5.16",
+        "5.17",
+        "8.15"
+      ],
+      "error": null,
+      "latency_s": 6.68,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "justificacion_circular",
+        "cita_normativa_erronea"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.info.4",
+      "ens_name": "Sellos de tiempo",
+      "familia": "Protección de la información",
+      "nivel_exigido": "MEDIO",
+      "gt_iso_ids": [
+        "8.24",
+        "8.17",
+        "8.26"
+      ],
+      "predicted_iso_ids": [
+        "8.17",
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo indica que no se cumplen los sellos de tiempo (mp.info.4) según la RD 311/2022. Esto está relacionado con la sincronización de relojes (A.8.17) y con la necesidad de procedimientos operativos documentados (A.5.37) para garantizar la coherencia en la implementación y monitoreo de los sellos de tiempo.",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.5,
+      "recall": 0.3333,
+      "f1": 0.4,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "8.24",
+        "8.26"
+      ],
+      "error": null,
+      "latency_s": 6.92,
+      "validacion_valida": true,
+      "validacion_confianza": 0.9,
+      "validacion_problemas": [
+        "A.5.37 no es directamente aplicable a la falta de sellos de tiempo"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.exp.10",
+      "ens_name": "Protección de claves criptográficas",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.24",
+        "5.17"
+      ],
+      "predicted_iso_ids": [
+        "8.24"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS op.exp.10 'Protección de claves criptográficas'. Esta medida se relaciona directamente con el control A.8.24 de la ISO 27001:2022, que requiere el uso de técnicas criptográficas para proteger la confidencialidad, integridad y autenticidad de los datos. En particular, la protección de claves criptográficas es una parte crucial de este control.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.17"
+      ],
+      "error": null,
+      "latency_s": 5.81,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "La justificación es inexacta ya que la protección de las claves criptográficas no es el foco principal del control A.8.24 de la ISO 27001:2022."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.ext.4",
+      "ens_name": "Interconexión de sistemas",
+      "familia": "Recursos externos",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.20",
+        "8.21",
+        "8.22",
+        "5.14"
+      ],
+      "predicted_iso_ids": [
+        "5.19",
+        "5.22",
+        "5.36"
+      ],
+      "predicted_iso_raw": "El hallazgo señala un incumplimiento de la medida ENS 'op.ext.4 Interconexión de sistemas'. Esto implica problemas en las relaciones con proveedores y la supervisión de sus servicios, así como la falta de cumplimiento de políticas de seguridad. Los controles A.5.19, A.5.22 y A.5.36 se relacionan con estas áreas y son aplicables.",
+      "true_positives": 0,
+      "false_positives": 3,
+      "false_negatives": 4,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.19",
+        "5.22",
+        "5.36"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.19",
+        "5.22",
+        "5.36"
+      ],
+      "missed_ids": [
+        "5.14",
+        "8.20",
+        "8.21",
+        "8.22"
+      ],
+      "error": null,
+      "latency_s": 8.52,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Los controles A.5.19 y A.5.22 no se relacionan directamente con la medida ENS 'op.ext.4 Interconexión de sistemas'. A.5.36 es demasiado amplio para ser específicamente relevante.",
+        "La justificación no proporciona una conexión clara entre la medida ENS y los controles ISO 27001:2022."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.per.2",
+      "ens_name": "Deberes y obligaciones",
+      "familia": "Gestión del personal",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "6.2",
+        "6.4",
+        "6.5",
+        "6.6",
+        "5.11"
+      ],
+      "predicted_iso_ids": [
+        "5.31",
+        "5.36",
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS mp.per.2 'Deberes y obligaciones', que puede relacionarse con los controles ISO 27001:2022 A.5.31 (cumplimiento de requisitos legales y reglamentarios), A.5.36 (cumplimiento de políticas de seguridad) y A.5.37 (documentación de procedimientos operativos). Estos controles son necesarios para garantizar que las prácticas de seguridad estén en conformidad con la normativa legal y las políticas internas.",
+      "true_positives": 0,
+      "false_positives": 3,
+      "false_negatives": 5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.31",
+        "5.36",
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.31",
+        "5.36",
+        "5.37"
+      ],
+      "missed_ids": [
+        "5.11",
+        "6.2",
+        "6.4",
+        "6.5",
+        "6.6"
+      ],
+      "error": null,
+      "latency_s": 8.57,
+      "validacion_valida": true,
+      "validacion_confianza": 0.9,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.eq.1",
+      "ens_name": "Puesto de trabajo despejado",
+      "familia": "Protección de los equipos",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.7"
+      ],
+      "predicted_iso_ids": [
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento del requerimiento de despejar el puesto de trabajo, lo cual es una medida de seguridad física. El control A.5.37 de ISO 27001 aborda la necesidad de documentar y mantener procedimientos operativos para garantizar la coherencia en las prácticas de seguridad. La falta de un procedimiento documentado y mantenido para el despeje del puesto de trabajo es un indicador claro de un incumplimiento de A.5.37.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "7.7"
+      ],
+      "error": null,
+      "latency_s": 5.96,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Mapeo incorrecto del control A.5.37 a la medida de seguridad física del RD 311/2022.",
+        "Justificación circular e inapropiada."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.sw.2",
+      "ens_name": "Aceptación y puesta en servicio",
+      "familia": "Protección de las aplicaciones informáticas",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.29",
+        "8.31",
+        "8.33",
+        "8.11"
+      ],
+      "predicted_iso_ids": [
+        "8.29"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS mp.sw.2 'Aceptación y puesta en servicio', lo cual se refiere a la necesidad de realizar pruebas de seguridad en el proceso de aceptación. El control A.8.29 de ISO 27001 es directamente relevante ya que establece que las pruebas de seguridad deben realizarse durante las fases de desarrollo y aceptación para detectar vulnerabilidades, asegurando así la integridad del sistema.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 3,
+      "precision": 1.0,
+      "recall": 0.25,
+      "f1": 0.4,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "8.11",
+        "8.31",
+        "8.33"
+      ],
+      "error": null,
+      "latency_s": 5.98,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.s.3",
+      "ens_name": "Protección de la navegación web",
+      "familia": "Protección de los servicios",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.23",
+        "8.7",
+        "8.16"
+      ],
+      "predicted_iso_ids": [
+        "8.23"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida de la RD 311/2022 Anexo II, medida mp.s.3 que se relaciona directamente con la protección de la navegación web. En el contexto de ISO 27001:2022, esto se traduce en un incumplimiento del control A.8.23, ya que este control especifica la necesidad de usar herramientas de filtrado web para proteger el acceso a contenido no autorizado o dañino.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 2,
+      "precision": 1.0,
+      "recall": 0.3333,
+      "f1": 0.5,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "8.16",
+        "8.7"
+      ],
+      "error": null,
+      "latency_s": 6.8,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "El control A.8.23 no existe en ISO 27001:2013"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.acc.2",
+      "ens_name": "Requisitos de acceso",
+      "familia": "Control de acceso",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.15",
+        "8.3",
+        "8.18",
+        "8.4"
+      ],
+      "predicted_iso_ids": [
+        "5.15",
+        "5.18"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida de seguridad RD 311/2022 Anexo II op.acc.2 'Requisitos de acceso'. Esto es relevante para los controles ISO 27001:2022 A.5.15 (Control de acceso) y A.5.18 (Derechos de acceso) que gestionan y revisan periódicamente los mecanismos de control de acceso y los derechos de acceso respectivamente.",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.5,
+      "recall": 0.25,
+      "f1": 0.3333,
+      "hallucinated_ids": [
+        "5.18"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.18"
+      ],
+      "missed_ids": [
+        "8.18",
+        "8.3",
+        "8.4"
+      ],
+      "error": null,
+      "latency_s": 9.07,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.si.2",
+      "ens_name": "Criptografía",
+      "familia": "Protección de los soportes de información",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.24",
+        "7.10",
+        "8.12"
+      ],
+      "predicted_iso_ids": [
+        "8.29"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS mp.si.2 'Criptografía', lo que sugiere una falta de pruebas de seguridad adecuadas durante las fases de desarrollo y aceptación. Esto se traduce en un incumplimiento del control A.8.29 de la norma ISO 27001:2022, que requiere la realización de pruebas de seguridad para identificar los puntos débiles.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "8.29"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "8.29"
+      ],
+      "missed_ids": [
+        "7.10",
+        "8.12",
+        "8.24"
+      ],
+      "error": null,
+      "latency_s": 6.8,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Controles inventados en la norma ISO 27001:2022",
+        "Justificación circunstancial sin razonamiento",
+        "Cita normativa errónea (no existe A.8.29)"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.exp.4",
+      "ens_name": "Mantenimiento y actualizaciones de seguridad",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.8",
+        "7.13",
+        "8.31"
+      ],
+      "predicted_iso_ids": [
+        "8.32"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS 'op.exp.4', que se relaciona directamente con el control ISO 27001 A.8.32, ya que la gestión de cambios incluye mantenimiento y actualizaciones de seguridad.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "8.32"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "8.32"
+      ],
+      "missed_ids": [
+        "7.13",
+        "8.31",
+        "8.8"
+      ],
+      "error": null,
+      "latency_s": 4.8,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "El control A.8.32 no existe en ISO 27001:2022",
+        "Justificación basada en un control inválido"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.nub.1",
+      "ens_name": "Protección de servicios en la nube",
+      "familia": "Servicios en la nube",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.23",
+        "5.19"
+      ],
+      "predicted_iso_ids": [
+        "5.23"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida RD 311/2022 Anexo II medida op.nub.1 'Proteccion de servicios en la nube'. Esta medida tiene un equivalente en el control A.5.23 de la ISO 27001:2022, que requiere medidas de seguridad para el uso seguro de servicios en la nube, incluyendo cifrado de datos, controles de acceso y revisiones de cumplimiento de proveedores. La falta de protección de servicios en la nube implica una vulnerabilidad potencial en la seguridad de los datos y la infraestr",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.19"
+      ],
+      "error": null,
+      "latency_s": 7.15,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Mapeo incorrecto del control ISO 27001:2022 A.5.23",
+        "Justificación vacía sin razonamiento detallado"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.mon.1",
+      "ens_name": "Detección de intrusión",
+      "familia": "Monitorización del sistema",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.16",
+        "8.20",
+        "8.15"
+      ],
+      "predicted_iso_ids": [
+        "8.16"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico identifica un incumplimiento de la medida RD 311/2022 Anexo II, medida op.mon.1 'Detección de intrusión'. Este requisito se alinea con el control A.8.16 de la ISO 27001:2022 que requiere la supervisión continua de actividades del sistema para detectar amenazas. La falta de detección de intrusión implica que no se está supervisando adecuadamente las actividades del sistema para identificar y responder a amenazas, lo que incumple A.8.16.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 2,
+      "precision": 1.0,
+      "recall": 0.3333,
+      "f1": 0.5,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "8.15",
+        "8.20"
+      ],
+      "error": null,
+      "latency_s": 5.92,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "El control A.8.16 no existe en la ISO 27001:2022",
+        "Justificación incorrecta ya que mapea un control inexistente"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.mon.2",
+      "ens_name": "Sistema de métricas",
+      "familia": "Monitorización del sistema",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.36"
+      ],
+      "predicted_iso_ids": [
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS op.mon.2 'Sistema de métricas', que es equivalente a la documentación de procedimientos operativos bajo ISO 27001:2022 para la gestión de la seguridad de la información. La falta de un sistema de métricas es una omisión en la documentación de procedimientos operativos, lo que afecta la coherencia en las prácticas de seguridad.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "5.36"
+      ],
+      "error": null,
+      "latency_s": 6.23,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "El control 'A.5.37' no existe en ISO 27001:2022.",
+        "La justificación presenta un mapeo incorrecto y vacío.",
+        "La cita normativa es errónea."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.eq.3",
+      "ens_name": "Protección de dispositivos portátiles",
+      "familia": "Protección de los equipos",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.1",
+        "7.9",
+        "6.7",
+        "8.24"
+      ],
+      "predicted_iso_ids": [
+        "8.1",
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico identifica un incumplimiento de la medida ENS mp.eq.3 'Protección de dispositivos portátiles'. Esto se traduce al control ISO 27001 A.8.1 que aborda la protección de dispositivos de punto final, incluyendo dispositivos portátiles. Además, dado que no hay evidencia de que existan procedimientos operativos documentados para la protección de dichos dispositivos, se incumple también A.5.37.",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.5,
+      "recall": 0.25,
+      "f1": 0.3333,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "6.7",
+        "7.9",
+        "8.24"
+      ],
+      "error": null,
+      "latency_s": 7.74,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.exp.3",
+      "ens_name": "Gestión de la configuración de seguridad",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.9",
+        "8.32",
+        "8.13"
+      ],
+      "predicted_iso_ids": [
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS op.exp.3 'Gestión de la configuración de seguridad'. Dado que este control es una medida de seguridad operativa, se puede relacionar con el control A.5.37 de ISO 27001 que requiere la documentación de procedimientos operativos para garantizar la coherencia en las prácticas de seguridad. Sin documentación adecuada de los procedimientos de gestión de configuración de seguridad, se compromete la coherencia en las prácticas de seguridad del siste",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "8.13",
+        "8.32",
+        "8.9"
+      ],
+      "error": null,
+      "latency_s": 7.18,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "El control A.5.37 no existe en ISO 27001:2022.",
+        "La justificación no es sólida y contiene una mala asignación de controles.",
+        "La cita normativa proporcionada no existe en ISO 27001:2022."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.exp.7",
+      "ens_name": "Gestión de incidentes",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.24",
+        "5.25",
+        "5.26",
+        "5.27",
+        "5.28",
+        "6.8"
+      ],
+      "predicted_iso_ids": [
+        "5.24",
+        "5.26",
+        "5.25",
+        "6.8"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS op.exp.7 'Gestión de incidentes', que se corresponde con los controles A.5.24, A.5.26, A.5.25 y A.6.8 de la ISO 27001:2022. Estos controles aseguran la planificación, respuesta, evaluación y notificación de incidentes de seguridad, respectivamente. El incumplimiento puede comprometer la capacidad de la organización para manejar y mitigar incidentes de seguridad eficazmente.",
+      "true_positives": 4,
+      "false_positives": 0,
+      "false_negatives": 2,
+      "precision": 1.0,
+      "recall": 0.6667,
+      "f1": 0.8,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.27",
+        "5.28"
+      ],
+      "error": null,
+      "latency_s": 7.3,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.com.2",
+      "ens_name": "Protección de la confidencialidad",
+      "familia": "Protección de las comunicaciones",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.24",
+        "8.20",
+        "5.14"
+      ],
+      "predicted_iso_ids": [
+        "8.3",
+        "5.34"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida de protección de la confidencialidad que es directamente relacionada con la restricción de acceso a la información (A.8.3) y la privacidad y protección de la información personal (A.5.34). Estos controles se basan en el principio de necesidad de conocer para limitar el acceso a la información confidencial y garantizar el manejo seguro de la información personal, incluyendo medidas de anonimización y cifrado.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.34",
+        "8.3"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.34",
+        "8.3"
+      ],
+      "missed_ids": [
+        "5.14",
+        "8.20",
+        "8.24"
+      ],
+      "error": null,
+      "latency_s": 8.04,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Control A.5.34 no existe en ISO 27001:2022"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.pl.2",
+      "ens_name": "Arquitectura de Seguridad",
+      "familia": "Planificación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.9",
+        "8.20",
+        "8.22",
+        "8.27",
+        "8.26"
+      ],
+      "predicted_iso_ids": [
+        "8.27"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS 'Arquitectura de Seguridad' (op.pl.2), lo que sugiere que los principios de diseño seguro no se han implementado correctamente en la arquitectura de sistemas. Esto es directamente relevante para A.8.27 de ISO 27001:2022, que requiere la adopción de dichos principios.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 4,
+      "precision": 1.0,
+      "recall": 0.2,
+      "f1": 0.3333,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.9",
+        "8.20",
+        "8.22",
+        "8.26"
+      ],
+      "error": null,
+      "latency_s": 5.86,
+      "validacion_valida": false,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [
+        "Mapeo incorrecto del control en ISO 27001:2022",
+        "Justificación basada en un control que no existe"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.exp.6",
+      "ens_name": "Protección frente a código dañino",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.7",
+        "8.19",
+        "8.16"
+      ],
+      "predicted_iso_ids": [
+        "8.7"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS 'op.exp.6 Protección frente a código dañino'. En el contexto de la norma ISO 27001:2022, esto se traduce directamente al control A.8.7 Protección contra malware, que requiere la implementación de medidas de seguridad para proteger contra malware y ataques maliciosos.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 2,
+      "precision": 1.0,
+      "recall": 0.3333,
+      "f1": 0.5,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "8.16",
+        "8.19"
+      ],
+      "error": null,
+      "latency_s": 5.1,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.sw.1",
+      "ens_name": "Desarrollo de aplicaciones",
+      "familia": "Protección de las aplicaciones informáticas",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.25",
+        "8.26",
+        "8.27",
+        "8.28",
+        "8.30",
+        "8.4"
+      ],
+      "predicted_iso_ids": [
+        "8.26",
+        "8.29"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento del control ENS mp.sw.1 'Desarrollo de aplicaciones', que es directamente relacionado con los controles ISO 27001 A.8.26 y A.8.29. A.8.26 requiere la definición y aplicación de requisitos de seguridad para las aplicaciones, mientras que A.8.29 asegura que se realicen pruebas de seguridad durante el desarrollo y aceptación para identificar vulnerabilidades. Sin estas medidas, las aplicaciones pueden ser vulnerables a amenazas de seguridad no identifica",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 5,
+      "precision": 0.5,
+      "recall": 0.1667,
+      "f1": 0.25,
+      "hallucinated_ids": [
+        "8.29"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "8.29"
+      ],
+      "missed_ids": [
+        "8.25",
+        "8.27",
+        "8.28",
+        "8.30",
+        "8.4"
+      ],
+      "error": null,
+      "latency_s": 8.13,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.pl.1",
+      "ens_name": "Análisis de riesgos",
+      "familia": "Planificación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.7"
+      ],
+      "predicted_iso_ids": [
+        "5.25",
+        "5.35"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico identifica un incumplimiento en la medida ENS op.pl.1 'Análisis de riesgos', que es un elemento crítico de la evaluación de riesgos. Esto incide directamente en los controles A.5.25 y A.5.35 de ISO 27001:2022, ya que ambos controles requieren una evaluación y revisión independiente de riesgos para garantizar la eficacia de los procesos de seguridad. El incumplimiento del análisis de riesgos puede llevar a una falta de comprensión de los riesgos de seguridad, lo que a su vez p",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.25",
+        "5.35"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.25",
+        "5.35"
+      ],
+      "missed_ids": [
+        "5.7"
+      ],
+      "error": null,
+      "latency_s": 8.31,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.s.2",
+      "ens_name": "Protección de servicios y aplicaciones web",
+      "familia": "Protección de los servicios",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.26",
+        "8.29",
+        "8.8",
+        "8.25"
+      ],
+      "predicted_iso_ids": [
+        "8.26"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS mp.s.2 'Protección de servicios y aplicaciones web'. Este requisito está directamente alineado con el control A.8.26 de ISO 27001:2022, que se enfoca en los requisitos de seguridad para las aplicaciones para protegerlas contra amenazas y vulnerabilidades, incluyendo la protección de servicios y aplicaciones web.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 3,
+      "precision": 1.0,
+      "recall": 0.25,
+      "f1": 0.4,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "8.25",
+        "8.29",
+        "8.8"
+      ],
+      "error": null,
+      "latency_s": 5.65,
+      "validacion_valida": true,
+      "validacion_confianza": 0.95,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.com.3",
+      "ens_name": "Protección de la integridad y de la autenticidad",
+      "familia": "Protección de las comunicaciones",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.24",
+        "8.20",
+        "6.7"
+      ],
+      "predicted_iso_ids": [
+        "5.35",
+        "8.5",
+        "8.26",
+        "5.37",
+        "8.4"
+      ],
+      "predicted_iso_raw": "El incumplimiento de la medida ENS mp.com.3 que protege la integridad y autenticidad del sistema puede verse afectado por la falta de implementación de controles de autenticación seguros (A.8.5), requisitos de seguridad de las aplicaciones (A.8.26), procedimientos operativos documentados (A.5.37), control de acceso al código fuente (A.8.4) y la ausencia de revisiones independientes de seguridad (A.5.35) para garantizar la protección integral y prevenir amenazas de modificación no autorizada.",
+      "true_positives": 0,
+      "false_positives": 5,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.35",
+        "5.37",
+        "8.26",
+        "8.4",
+        "8.5"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.35",
+        "5.37",
+        "8.26",
+        "8.4",
+        "8.5"
+      ],
+      "missed_ids": [
+        "6.7",
+        "8.20",
+        "8.24"
+      ],
+      "error": null,
+      "latency_s": 11.54,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.mon.3",
+      "ens_name": "Vigilancia",
+      "familia": "Monitorización del sistema",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.7",
+        "8.16",
+        "8.8"
+      ],
+      "predicted_iso_ids": [
+        "8.16"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS op.mon.3 'Vigilancia', la cual se relaciona directamente con el control A.8.16 de ISO 27001:2022 sobre el seguimiento de actividades del sistema. Es crucial para la detección y respuesta a amenazas de seguridad.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 2,
+      "precision": 1.0,
+      "recall": 0.3333,
+      "f1": 0.5,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.7",
+        "8.8"
+      ],
+      "error": null,
+      "latency_s": 4.84,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "org.1",
+      "ens_name": "Política de seguridad",
+      "familia": "Marco organizativo",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.1",
+        "5.2",
+        "5.4",
+        "5.31"
+      ],
+      "predicted_iso_ids": [
+        "5.1",
+        "5.36"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS org.1 'Política de seguridad', lo cual se traduce directamente al control A.5.1 de ISO 27001 que requiere establecer y mantener políticas de seguridad alineadas con los objetivos de la organización. Además, A.5.36 requiere garantizar el cumplimiento de todas las políticas de seguridad, lo cual está siendo comprometido por la falta de implementación de la medida mencionada.",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.5,
+      "recall": 0.25,
+      "f1": 0.3333,
+      "hallucinated_ids": [
+        "5.36"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.36"
+      ],
+      "missed_ids": [
+        "5.2",
+        "5.31",
+        "5.4"
+      ],
+      "error": null,
+      "latency_s": 6.91,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Controles inventados y mapeo incorrecto"
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "op.pl.5",
+      "ens_name": "Componentes certificados",
+      "familia": "Planificación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.21",
+        "8.9"
+      ],
+      "predicted_iso_ids": [
+        "5.36"
+      ],
+      "predicted_iso_raw": "El hallazgo identifica un incumplimiento de la medida ENS op.pl.5 'Componentes certificados', la cual es una política o estándar de seguridad de la información. El control A.5.36 de ISO 27001:2022 requiere el cumplimiento de dichas políticas y estándares, por lo que su incumplimiento implica un riesgo conforme a este control.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.36"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.36"
+      ],
+      "missed_ids": [
+        "5.21",
+        "8.9"
+      ],
+      "error": null,
+      "latency_s": 6.66,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "El control A.5.36 de ISO 27001:2022 no se aplica a la medida ENS op.pl.5 'Componentes certificados'. La justificación es circular ya que asume que este control abarca la certificación de componentes, lo cual no está especificado en A.5.36."
+      ],
+      "validacion_error": null
+    },
+    {
+      "ens_code": "mp.if.6",
+      "ens_name": "Protección frente a inundaciones",
+      "familia": "Protección de las instalaciones e infraestructuras",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "7.5"
+      ],
+      "predicted_iso_ids": [
+        "7.5"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida ENS mp.if.6 'Protección frente a inundaciones', la cual es equivalente al control A.7.5 de la norma ISO 27001:2022 que requiere medidas de protección contra amenazas físicas y ambientales, incluyendo barreras de prevención de inundaciones.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [],
+      "error": null,
+      "latency_s": 5.34,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": null
+    }
+  ],
+  "validador_stats": {
+    "cases_with_validacion": 73,
+    "cases_approved": 39,
+    "cases_rejected": 34,
+    "approved_avg_f1": 0.3615,
+    "rejected_avg_f1": 0.1706,
+    "rejection_precision_at_f1_05": 0.8235,
+    "note": "rejection_precision_at_f1_05: fracción de casos rechazados por el Validador cuyo F1 real es < 0.5 (el Validador acertó al rechazar)."
+  }
+}

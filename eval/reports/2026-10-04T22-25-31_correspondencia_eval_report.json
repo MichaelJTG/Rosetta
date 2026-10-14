@@ -1,0 +1,483 @@
+{
+  "run_id": "2026-10-04T22-25-31",
+  "timestamp": "2026-10-04T22:28:41.381461+00:00",
+  "mode": "correspondencia",
+  "marco": "ens",
+  "total_cases": 10,
+  "evaluated": 10,
+  "errors": 0,
+  "overall_precision": 0.44,
+  "overall_recall": 0.2917,
+  "overall_f1": 0.3267,
+  "hallucination_rate": 0.6522,
+  "alucinacion_rate": 0.0,
+  "discrepancia_rate": 0.6522,
+  "per_family": [
+    {
+      "familia": "Control de acceso",
+      "n_cases": 2,
+      "avg_precision": 1.0,
+      "avg_recall": 0.5834,
+      "avg_f1": 0.7333,
+      "hallucination_rate": 0.0,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.0
+    },
+    {
+      "familia": "Explotación",
+      "n_cases": 4,
+      "avg_precision": 0.3,
+      "avg_recall": 0.2916,
+      "avg_f1": 0.2875,
+      "hallucination_rate": 0.7,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.7
+    },
+    {
+      "familia": "Marco organizativo",
+      "n_cases": 3,
+      "avg_precision": 0.3333,
+      "avg_recall": 0.0833,
+      "avg_f1": 0.1333,
+      "hallucination_rate": 0.8,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.8
+    },
+    {
+      "familia": "Planificación",
+      "n_cases": 1,
+      "avg_precision": 0.2,
+      "avg_recall": 0.3333,
+      "avg_f1": 0.25,
+      "hallucination_rate": 0.8,
+      "alucinacion_rate": 0.0,
+      "discrepancia_rate": 0.8
+    }
+  ],
+  "cases": [
+    {
+      "ens_code": "org.2",
+      "ens_name": "Normativa de seguridad",
+      "familia": "Marco organizativo",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.1",
+        "5.10",
+        "5.36",
+        "6.7",
+        "7.7",
+        "8.1"
+      ],
+      "predicted_iso_ids": [
+        "5.35",
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS org.2 'Normativa de seguridad', que se relaciona con la necesidad de mantener y revisar los procedimientos operativos y la seguridad de la información. A.5.35 y A.5.37 son los controles más cercanos que tratan sobre la revisión y documentación de procedimientos de seguridad.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 6,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.35",
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.35",
+        "5.37"
+      ],
+      "missed_ids": [
+        "5.1",
+        "5.10",
+        "5.36",
+        "6.7",
+        "7.7",
+        "8.1"
+      ],
+      "error": null,
+      "latency_s": 5.75,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": "'charmap' codec can't encode character '\\u2713' in position 13: character maps to <undefined>"
+    },
+    {
+      "ens_code": "org.3",
+      "ens_name": "Procedimientos de seguridad",
+      "familia": "Marco organizativo",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.37",
+        "5.5",
+        "5.14",
+        "5.24"
+      ],
+      "predicted_iso_ids": [
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento del procedimiento de seguridad en la medida org.3 de la RD 311/2022, Anexo II, lo cual es equivalente al control A.5.37 de ISO 27001:2022, que requiere la existencia de procedimientos operativos documentados.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 3,
+      "precision": 1.0,
+      "recall": 0.25,
+      "f1": 0.4,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "5.14",
+        "5.24",
+        "5.5"
+      ],
+      "error": null,
+      "latency_s": 5.36,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Referencia incorrecta en fragmentos_usados: debe ser A.5.37.",
+        "No se verifica la existencia real del control A.5.37 en ISO 27001:2022."
+      ],
+      "validacion_error": "'charmap' codec can't encode character '\\u2717' in position 13: character maps to <undefined>"
+    },
+    {
+      "ens_code": "org.4",
+      "ens_name": "Proceso de autorización",
+      "familia": "Marco organizativo",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.2",
+        "8.19",
+        "8.20",
+        "8.32",
+        "5.10"
+      ],
+      "predicted_iso_ids": [
+        "5.37",
+        "5.31"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico señala un incumplimiento de la medida ENS 'Proceso de autorización', que es un requerimiento legal que debe ser documentado y manejado según la normativa ISO 27001:2022. Los controles A.5.37 y A.5.31 están directamente relacionados con la necesidad de documentar y gestionar los requisitos legales, incluyendo el proceso de autorización. Como el proceso de autorización no está documentado o gestionado de acuerdo a estos controles, se considera un incumplimiento.",
+      "true_positives": 0,
+      "false_positives": 2,
+      "false_negatives": 5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.31",
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.31",
+        "5.37"
+      ],
+      "missed_ids": [
+        "5.10",
+        "5.2",
+        "8.19",
+        "8.20",
+        "8.32"
+      ],
+      "error": null,
+      "latency_s": 7.82,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": "'charmap' codec can't encode character '\\u2713' in position 13: character maps to <undefined>"
+    },
+    {
+      "ens_code": "op.pl.3",
+      "ens_name": "Adquisición de nuevos componentes",
+      "familia": "Planificación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.8",
+        "5.19",
+        "8.29"
+      ],
+      "predicted_iso_ids": [
+        "5.37",
+        "8.16",
+        "8.29",
+        "5.35",
+        "5.22"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida RD 311/2022 Anexo II para la adquisición de nuevos componentes. Esto afecta a A.5.37 ya que no se han documentado los procedimientos operativos para la adquisición de componentes. Asimismo, los controles A.8.16, A.8.29, A.5.35 y A.5.22 son indirectamente afectados ya que la falta de documentación y seguimiento puede llevar a una gestión inadecuada del cambio y pruebas de seguridad no realizadas.",
+      "true_positives": 1,
+      "false_positives": 4,
+      "false_negatives": 2,
+      "precision": 0.2,
+      "recall": 0.3333,
+      "f1": 0.25,
+      "hallucinated_ids": [
+        "5.22",
+        "5.35",
+        "5.37",
+        "8.16"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.22",
+        "5.35",
+        "5.37",
+        "8.16"
+      ],
+      "missed_ids": [
+        "5.19",
+        "5.8"
+      ],
+      "error": null,
+      "latency_s": 7.3,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": "'charmap' codec can't encode character '\\u2713' in position 13: character maps to <undefined>"
+    },
+    {
+      "ens_code": "op.acc.3",
+      "ens_name": "Segregación de funciones y tareas",
+      "familia": "Control de acceso",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.3",
+        "8.2"
+      ],
+      "predicted_iso_ids": [
+        "5.3"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico indica un incumplimiento de la medida RD 311/2022 Anexo II medida op.acc.3, que es equivalente a la norma ISO 27001:2022 A.5.3 sobre la segregación de funciones. El control A.5.3 establece la necesidad de separar roles y limitar el acceso para prevenir actividades no autorizadas, lo que se correlaciona directamente con la segregación de funciones mencionada en el hallazgo.",
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "8.2"
+      ],
+      "error": null,
+      "latency_s": 6.12,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": "'charmap' codec can't encode character '\\u2713' in position 13: character maps to <undefined>"
+    },
+    {
+      "ens_code": "op.acc.4",
+      "ens_name": "Proceso de gestión de derechos de acceso",
+      "familia": "Control de acceso",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.18",
+        "8.2",
+        "5.15"
+      ],
+      "predicted_iso_ids": [
+        "5.18",
+        "5.15"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico identifica un incumplimiento de la medida ENS op.acc.4 'Proceso de gestión de derechos de acceso', que es equivalente a los controles A.5.18 y A.5.15 de ISO 27001:2022 que requieren una gestión periódica de derechos de acceso y el control de acceso para autorizados.",
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 1.0,
+      "recall": 0.6667,
+      "f1": 0.8,
+      "hallucinated_ids": [],
+      "alucinados": [],
+      "discrepancias": [],
+      "missed_ids": [
+        "8.2"
+      ],
+      "error": null,
+      "latency_s": 7.34,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": "'charmap' codec can't encode character '\\u2713' in position 13: character maps to <undefined>"
+    },
+    {
+      "ens_code": "op.exp.1",
+      "ens_name": "Inventario de activos",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.9",
+        "5.12"
+      ],
+      "predicted_iso_ids": [
+        "5.9",
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo evidencia un incumplimiento de la medida ENS op.exp.1 'Inventario de activos', que es directamente relacionado con el control ISO 27001:2022 A.5.9, que requiere un inventario preciso de los activos. Además, la falta de un inventario adecuado implica una debilidad en la implementación de procedimientos operativos documentados (A.5.37).",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 1,
+      "precision": 0.5,
+      "recall": 0.5,
+      "f1": 0.5,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "5.12"
+      ],
+      "error": null,
+      "latency_s": 5.77,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": "'charmap' codec can't encode character '\\u2713' in position 13: character maps to <undefined>"
+    },
+    {
+      "ens_code": "op.exp.2",
+      "ens_name": "Configuración de seguridad",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.9",
+        "8.19",
+        "8.12"
+      ],
+      "predicted_iso_ids": [
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida ENS op.exp.2 'Configuración de seguridad'. A.5.37 requiere que se documenten los procedimientos operativos para garantizar la coherencia en las prácticas de seguridad, incluyendo la configuración. El incumplimiento de la medida ENS op.exp.2 significa que no se ha documentado adecuadamente la configuración de seguridad, lo que es una falta de cumplimiento del control A.5.37 de ISO 27001:2022.",
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 3,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "8.12",
+        "8.19",
+        "8.9"
+      ],
+      "error": null,
+      "latency_s": 6.04,
+      "validacion_valida": false,
+      "validacion_confianza": 0.0,
+      "validacion_problemas": [
+        "Control mapeado (A.5.37) no es claramente equivalente al hallazgo de ENS op.exp.2 'Configuración de seguridad'. La justificación es circular y vacía ya que asume que la configuración de seguridad es lo mismo que la documentación de procedimientos operativos.",
+        "Falta de análisis detallado sobre cómo ENS op.exp.2 se relaciona específicamente con ISO 27001 A.5.37"
+      ],
+      "validacion_error": "'charmap' codec can't encode character '\\u2717' in position 13: character maps to <undefined>"
+    },
+    {
+      "ens_code": "op.exp.5",
+      "ens_name": "Gestión de cambios",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "8.32",
+        "8.29",
+        "8.31"
+      ],
+      "predicted_iso_ids": [
+        "8.32",
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo técnico identifica un incumplimiento de la medida RD 311/2022 Anexo II op.exp.5 'Gestión de cambios', que es equivalente a los controles A.8.32 y A.5.37 de ISO 27001:2022.",
+      "true_positives": 1,
+      "false_positives": 1,
+      "false_negatives": 2,
+      "precision": 0.5,
+      "recall": 0.3333,
+      "f1": 0.4,
+      "hallucinated_ids": [
+        "5.37"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.37"
+      ],
+      "missed_ids": [
+        "8.29",
+        "8.31"
+      ],
+      "error": null,
+      "latency_s": 5.95,
+      "validacion_valida": false,
+      "validacion_confianza": 0.9,
+      "validacion_problemas": [
+        "Control A.5.37 no es apropiado para el hallazgo de 'Gestión de cambios'."
+      ],
+      "validacion_error": "'charmap' codec can't encode character '\\u2717' in position 13: character maps to <undefined>"
+    },
+    {
+      "ens_code": "op.exp.9",
+      "ens_name": "Registro de la gestión de incidentes",
+      "familia": "Explotación",
+      "nivel_exigido": "ALTO",
+      "gt_iso_ids": [
+        "5.26",
+        "5.27",
+        "5.28"
+      ],
+      "predicted_iso_ids": [
+        "5.24",
+        "5.25",
+        "5.26",
+        "6.8",
+        "5.37"
+      ],
+      "predicted_iso_raw": "El hallazgo indica un incumplimiento de la medida RD 311/2022 Anexo II, medida op.exp.9 'Registro de la gestión de incidentes'. Esto implica la falta de una adecuada planificación y preparación para la gestión de incidentes (A.5.24), evaluación y decisión sobre eventos de seguridad (A.5.25), respuesta a incidentes de seguridad (A.5.26), informes de eventos de seguridad (A.6.8) y procedimientos operativos documentados (A.5.37) en conformidad con las normas ISO 27001:2022.",
+      "true_positives": 1,
+      "false_positives": 4,
+      "false_negatives": 2,
+      "precision": 0.2,
+      "recall": 0.3333,
+      "f1": 0.25,
+      "hallucinated_ids": [
+        "5.24",
+        "5.25",
+        "5.37",
+        "6.8"
+      ],
+      "alucinados": [],
+      "discrepancias": [
+        "5.24",
+        "5.25",
+        "5.37",
+        "6.8"
+      ],
+      "missed_ids": [
+        "5.27",
+        "5.28"
+      ],
+      "error": null,
+      "latency_s": 10.47,
+      "validacion_valida": true,
+      "validacion_confianza": 1.0,
+      "validacion_problemas": [],
+      "validacion_error": "'charmap' codec can't encode character '\\u2713' in position 13: character maps to <undefined>"
+    }
+  ],
+  "validador_stats": {
+    "cases_with_validacion": 10,
+    "cases_approved": 7,
+    "cases_rejected": 3,
+    "approved_avg_f1": 0.3524,
+    "rejected_avg_f1": 0.2667,
+    "rejection_precision_at_f1_05": 1.0,
+    "note": "rejection_precision_at_f1_05: fracción de casos rechazados por el Validador cuyo F1 real es < 0.5 (el Validador acertó al rechazar)."
+  }
+}

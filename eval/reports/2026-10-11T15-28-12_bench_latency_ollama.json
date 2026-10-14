@@ -1,0 +1,339 @@
+{
+  "timestamp": "2026-10-11T15:28:12.663328+00:00",
+  "proveedor": "ollama",
+  "modelo": "qwen2.5:14b",
+  "num_ctx": 16384,
+  "marcos": [
+    "iso_27001_2022"
+  ],
+  "n": 20,
+  "errores": 0,
+  "p50_s": 6.95,
+  "p95_s": 11.02,
+  "max_s": 59.88,
+  "media_s": 9.95,
+  "sobre_umbral": 1,
+  "umbral_s": 30.0,
+  "calls": [
+    {
+      "i": 1,
+      "hallazgo_id": "HT-01",
+      "error": null,
+      "latency_s": 59.88,
+      "load_s": 32.93,
+      "prompt_tokens": 1284,
+      "prompt_eval_s": 20.2,
+      "output_tokens": 242,
+      "eval_s": 6.19,
+      "llm_total_s": 59.33,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 2,
+      "hallazgo_id": "HT-02",
+      "error": null,
+      "latency_s": 5.67,
+      "load_s": 0.01,
+      "prompt_tokens": 1208,
+      "prompt_eval_s": 0.18,
+      "output_tokens": 287,
+      "eval_s": 4.83,
+      "llm_total_s": 5.14,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 3,
+      "hallazgo_id": "HT-03",
+      "error": null,
+      "latency_s": 10.04,
+      "load_s": 0.01,
+      "prompt_tokens": 1284,
+      "prompt_eval_s": 0.2,
+      "output_tokens": 537,
+      "eval_s": 9.14,
+      "llm_total_s": 9.47,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 4,
+      "hallazgo_id": "HT-04",
+      "error": null,
+      "latency_s": 8.91,
+      "load_s": 0.01,
+      "prompt_tokens": 1284,
+      "prompt_eval_s": 0.19,
+      "output_tokens": 471,
+      "eval_s": 7.99,
+      "llm_total_s": 8.38,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 5,
+      "hallazgo_id": "HT-05",
+      "error": null,
+      "latency_s": 5.81,
+      "load_s": 0.01,
+      "prompt_tokens": 1378,
+      "prompt_eval_s": 0.22,
+      "output_tokens": 290,
+      "eval_s": 4.91,
+      "llm_total_s": 5.25,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 6,
+      "hallazgo_id": "HT-06",
+      "error": null,
+      "latency_s": 5.29,
+      "load_s": 0.01,
+      "prompt_tokens": 1312,
+      "prompt_eval_s": 0.2,
+      "output_tokens": 261,
+      "eval_s": 4.42,
+      "llm_total_s": 4.75,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 7,
+      "hallazgo_id": "HT-07",
+      "error": null,
+      "latency_s": 5.18,
+      "load_s": 0.01,
+      "prompt_tokens": 1350,
+      "prompt_eval_s": 0.22,
+      "output_tokens": 254,
+      "eval_s": 4.3,
+      "llm_total_s": 4.64,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 8,
+      "hallazgo_id": "HT-08",
+      "error": null,
+      "latency_s": 10.76,
+      "load_s": 0.01,
+      "prompt_tokens": 1232,
+      "prompt_eval_s": 0.18,
+      "output_tokens": 583,
+      "eval_s": 9.89,
+      "llm_total_s": 10.2,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 9,
+      "hallazgo_id": "HT-09",
+      "error": null,
+      "latency_s": 4.92,
+      "load_s": 0.01,
+      "prompt_tokens": 1288,
+      "prompt_eval_s": 0.19,
+      "output_tokens": 236,
+      "eval_s": 3.98,
+      "llm_total_s": 4.37,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 10,
+      "hallazgo_id": "HT-10",
+      "error": null,
+      "latency_s": 7.38,
+      "load_s": 0.01,
+      "prompt_tokens": 1210,
+      "prompt_eval_s": 0.18,
+      "output_tokens": 388,
+      "eval_s": 6.53,
+      "llm_total_s": 6.84,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 11,
+      "hallazgo_id": "HT-11",
+      "error": null,
+      "latency_s": 8.02,
+      "load_s": 0.01,
+      "prompt_tokens": 1273,
+      "prompt_eval_s": 0.19,
+      "output_tokens": 420,
+      "eval_s": 7.12,
+      "llm_total_s": 7.5,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 12,
+      "hallazgo_id": "HT-12",
+      "error": null,
+      "latency_s": 11.02,
+      "load_s": 0.01,
+      "prompt_tokens": 1270,
+      "prompt_eval_s": 0.19,
+      "output_tokens": 601,
+      "eval_s": 10.21,
+      "llm_total_s": 10.51,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 13,
+      "hallazgo_id": "HT-13",
+      "error": null,
+      "latency_s": 6.37,
+      "load_s": 0.01,
+      "prompt_tokens": 1243,
+      "prompt_eval_s": 0.19,
+      "output_tokens": 320,
+      "eval_s": 5.41,
+      "llm_total_s": 5.84,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 14,
+      "hallazgo_id": "HT-14",
+      "error": null,
+      "latency_s": 9.09,
+      "load_s": 0.01,
+      "prompt_tokens": 1315,
+      "prompt_eval_s": 0.22,
+      "output_tokens": 485,
+      "eval_s": 8.22,
+      "llm_total_s": 8.57,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 15,
+      "hallazgo_id": "HT-15",
+      "error": null,
+      "latency_s": 8.66,
+      "load_s": 0.01,
+      "prompt_tokens": 1267,
+      "prompt_eval_s": 0.19,
+      "output_tokens": 455,
+      "eval_s": 7.73,
+      "llm_total_s": 8.12,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 16,
+      "hallazgo_id": "HT-16",
+      "error": null,
+      "latency_s": 7.53,
+      "load_s": 0.01,
+      "prompt_tokens": 1314,
+      "prompt_eval_s": 0.21,
+      "output_tokens": 395,
+      "eval_s": 6.69,
+      "llm_total_s": 7.02,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 17,
+      "hallazgo_id": "SEED-01",
+      "error": null,
+      "latency_s": 5.94,
+      "load_s": 0.01,
+      "prompt_tokens": 1315,
+      "prompt_eval_s": 0.2,
+      "output_tokens": 297,
+      "eval_s": 5.01,
+      "llm_total_s": 5.41,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 18,
+      "hallazgo_id": "SEED-02",
+      "error": null,
+      "latency_s": 6.52,
+      "load_s": 0.01,
+      "prompt_tokens": 1219,
+      "prompt_eval_s": 0.18,
+      "output_tokens": 335,
+      "eval_s": 5.65,
+      "llm_total_s": 5.96,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 19,
+      "hallazgo_id": "SEED-03",
+      "error": null,
+      "latency_s": 6.5,
+      "load_s": 0.01,
+      "prompt_tokens": 1218,
+      "prompt_eval_s": 0.18,
+      "output_tokens": 335,
+      "eval_s": 5.65,
+      "llm_total_s": 5.96,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    },
+    {
+      "i": 20,
+      "hallazgo_id": "SEED-04",
+      "error": null,
+      "latency_s": 5.54,
+      "load_s": 0.01,
+      "prompt_tokens": 1236,
+      "prompt_eval_s": 0.18,
+      "output_tokens": 275,
+      "eval_s": 4.64,
+      "llm_total_s": 5.02,
+      "marcos_aplicables_raw": [
+        "iso_27001_2022"
+      ],
+      "marco_desconocido": []
+    }
+  ]
+}
