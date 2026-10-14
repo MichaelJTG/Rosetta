@@ -2092,7 +2092,7 @@ HTML_DASHBOARD: str = """<!DOCTYPE html>
         </div>
         <button type="submit" class="btn login-submit" id="login-btn">Entrar</button>
       </form>
-      <div class="login-foot">API protegida con JWT · rosetta.aegiscores.com</div>
+      <div class="login-foot">API protegida con JWT · ROSETTA · Práctica 3</div>
     </div>
   </div>
 
