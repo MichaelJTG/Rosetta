@@ -674,7 +674,7 @@ De las 38 pruebas definidas (tabla completa en Anexo E):
 
 **Metodología:**
 
-El harness `eval/run_eval.py` envía cada caso al Traductor vía la API, compara los controles ISO 27001:2022 devueltos con el ground truth del profesor (SoA TechServ, `eval/ground_truth/ens_iso.json`) y calcula Precision, Recall y F1 por caso y por familia ENS.
+El harness `eval/run_eval.py` pasa cada caso al Traductor llamando directamente a `TraductorSimbiotico.traducir()` (el mismo código que atiende `POST /translate`, sin HTTP), compara los controles ISO 27001:2022 devueltos con el ground truth del profesor (SoA TechServ, `eval/ground_truth/ens_iso.json`) y calcula Precision, Recall y F1 por caso y por familia ENS.
 
 **Distinción alucinación vs. discrepancia:**
 - **Alucinación:** el modelo devuelve un identificador de control que no existe en el estándar ISO 27001:2022. Cualitativamente peor que la discrepancia.
@@ -882,7 +882,7 @@ curl http://localhost:8000/health
 **Problemas encontrados durante la instalación limpia (2026-10-04):**
 
 1. **Reinicio tras `load-corpus`:** tras indexar el corpus desde `docker compose exec`, la API no ve los fragmentos sin reiniciar. Solución: `docker compose restart app`.
-2. **Memoria para Ollama:** el modelo `qwen2.5:14b` ocupa 11,9 GB de RAM o VRAM con la ventana que pide ROSETTA (`OLLAMA_NUM_CTX=16384`); con 4096 baja a 9,5 GB, pero Ollama recorta los prompts largos. Solución: usar `qwen2.5:7b` con `OLLAMA_MODEL=qwen2.5:7b` en `.env` (mayor tasa de discrepancia en el eval).
+2. **Memoria para Ollama:** el modelo `qwen2.5:14b` ocupa 11,9 GB de RAM o VRAM con la ventana que pide ROSETTA (`OLLAMA_NUM_CTX=16384`); con 4096 baja a 9,5 GB, pero Ollama recorta los prompts largos. Solución: sin esa memoria libre, usar Claude (`LLM_PROVIDER=claude` y `ANTHROPIC_API_KEY`). Un modelo menor no sirve: con `qwen2.5:7b` (5,6 GB), en 8 hallazgos por `POST /translate` (2026-10-14), ningún control ISO coincidió con el ground truth (`qwen2.5:14b`: F1 0,17 en los mismos 8) y, con 3 marcos, 21 de sus 55 controles no estaban en el corpus.
 3. **Neo4j en modo degradado sin advertencia:** si Neo4j no arranca, la app arranca igualmente y el grafo funciona en modo memoria. Verificar con `docker compose ps`.
 
 ---

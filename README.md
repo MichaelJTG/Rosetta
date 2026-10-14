@@ -71,14 +71,22 @@ python -c "import pathlib,re,secrets; p=pathlib.Path('.env'); p.write_text(re.su
 Si no tienes Python, genera el valor con `openssl rand -hex 32` y pégalo a mano
 en `ROSETTA_JWT_SECRET=`.
 
-### 3. Elegir el LLM
+### 3. Elegir el LLM según la memoria del equipo
 
-- **Sin API key, opción por defecto (Ollama):** descarga el modelo una vez con
-  `ollama pull qwen2.5:14b` y deja Ollama abierto. El `.env` ya apunta a
-  `http://host.docker.internal:11434`. En **Linux**, arranca Ollama escuchando
-  en todas las interfaces (`OLLAMA_HOST=0.0.0.0 ollama serve`) para que el
-  contenedor llegue a él.
-- **Con Claude:** en `.env`, pon `LLM_PROVIDER=claude` y tu `ANTHROPIC_API_KEY`.
+| Memoria libre en el equipo | Configuración |
+|---|---|
+| **12 GB de VRAM o más**, o **16 GB de RAM o más** sin GPU | Ollama con `qwen2.5:14b` (por defecto). Ocupa 11,9 GB con `OLLAMA_NUM_CTX=16384`. En una GPU de 16 GB: 6,95 s por traducción (mediana de 20). En CPU no se ha medido. |
+| Menos | Claude: en `.env`, `LLM_PROVIDER=claude` y tu `ANTHROPIC_API_KEY`. No usa memoria local; cada traducción es una llamada de pago a la API de Anthropic. |
+
+- **Ollama:** descarga el modelo una vez con `ollama pull qwen2.5:14b` y deja
+  Ollama abierto. El `.env` ya apunta a `http://host.docker.internal:11434`. En
+  **Linux**, arranca Ollama escuchando en todas las interfaces
+  (`OLLAMA_HOST=0.0.0.0 ollama serve`) para que el contenedor llegue a él.
+- **No ahorres memoria con un modelo menor ni bajando `OLLAMA_NUM_CTX`.**
+  `qwen2.5:7b` cabe en 5,6 GB, pero en una prueba con 8 hallazgos no acertó
+  ningún control ISO del ground truth (el 14b: F1 0,17) y, con 3 marcos, 21 de
+  sus 55 controles no existen en el corpus. Con `OLLAMA_NUM_CTX=4096`, Ollama
+  recorta los prompts largos (Copilot, traducción contra varios marcos).
 
 ### 4. Construir y arrancar
 

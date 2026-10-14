@@ -424,3 +424,14 @@ Fallos encontrados al hacer las capturas de la memoria con el stack local (Docke
 | **Resultado RF-09** | 39 aprobadas (F1 medio 0,3615) y 34 rechazadas (0,1706); precisión de rechazo @F1<0,5 = 0,82 (28/34). Aprueba 23 de las 51 traducciones con F1 < 0,5. La precisión de 1,0 del piloto no se mantiene. Sigue 🟡. |
 | **Documentos** | Memoria (apdos. 2, 4.2, 4.3, 5.4, 6.7, 8, 9, 10 y Anexo E), `P3_REQUISITOS.md`, `P3_MATRIZ.md` y guion del vídeo. Datos: `eval/reports/2026-10-11T15-28-12_bench_latency_ollama.json` y `eval/reports/2026-10-11T15-28-50_correspondencia_eval_report.json`. |
 | **Commit** | este commit |
+
+### F-9 · Plan B: `qwen2.5:7b` en equipos con menos memoria · RNF-05
+
+| | |
+|---|---|
+| **Qué** | Comprobar si `qwen2.5:7b` sirve en equipos sin ~12 GB libres para `qwen2.5:14b`. API local, `POST /translate` con 8 hallazgos de `eval/ground_truth/ens_hallazgos_tecnicos.json`, con 1 marco (ISO 27001) y con 3 (ISO 27001, ENS, NIS2). Mismo script y mismos hallazgos con `qwen2.5:14b` para comparar. |
+| **Resultado** | 7b, 1 marco: 0 errores, mediana 3,6 s, F1 ISO frente al ground truth 0,00 (14b: 0,17); un control con numeración de ISO 2013 (`A.12.2.1`). 7b, 3 marcos: mediana 6,1 s, máx. 23,8 s, 21 de 55 controles fuera del corpus (14b: 3 de 20). Memoria con `OLLAMA_NUM_CTX=16384`: 7b 5,6 GB, 14b 11,9 GB (`/api/ps`: 11,08 GiB). Con 3 marcos, ninguno de los dos modelos cita controles de NIS2 en estos 8 hallazgos. |
+| **Decisión** | 7b no es fiable: no se documenta como configuración. README (paso 3) y memoria (Anexo A): requisito de memoria del 14b y, por debajo, Claude. Memoria (8.5): `run_eval.py` llama al Traductor directamente, no por la API. |
+| **Sin verificar** | Claude: la `ANTHROPIC_API_KEY` del `.env` local da 401 (`invalid x-api-key`). Ante ese error, `/translate` responde 500 genérico (sin detalles en el cuerpo); no se cambia en la congelación. |
+| **PDF** | Regenerado con F-8 y F-9: 46 páginas; cuerpo p3–p38 = 36 (el enunciado pide 20–40 sin portada, índice ni anexos), anexos p39–p46; 12 figuras, 33 tablas. Generado dentro de la imagen `rosetta-app` (WeasyPrint necesita pango; en Windows falta GTK). |
+| **Commit** | este commit |
