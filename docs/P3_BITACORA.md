@@ -414,3 +414,13 @@ Fallos encontrados al hacer las capturas de la memoria con el stack local (Docke
 | **Qué** | Datos de demo regenerados (volúmenes locales de Neo4j y SQLite vaciados y `seed_demo.py` repetido: 12 pasos, 0 errores) para que el grafo refleje F-4. Las 11 capturas rehechas: las figuras 2, 4 y 9 mostraban los textos fijos de F-6, la 5 los 0 hallazgos de F-3 y la 11 el filtro de F-4; la 7 (Copilot) y la 12 (Swagger UI) ya se pueden hacer. Memoria: los fallos pasan del apartado 10.1 a pruebas fallidas (8.3) con su commit; cifras al día. |
 | **Cifras** | 556 tests (+1 E2E fuera de la CI); cobertura 85 % global y 92 % en `core/` con el comando de la CI, así que RNF-02 pasa a ✅ (el 77 % era del 2026-10-04, con ~503 tests); 31 rutas REST (30 en OpenAPI) + 1 WebSocket. PDF: cuerpo de 35 páginas, 12 figuras, 32 tablas; gitleaks 0. |
 | **Commit** | este commit |
+
+### F-8 · Benchmark RNF-09 con 20 llamadas y Validador sobre los 73 casos · RNF-09, RF-09
+
+| | |
+|---|---|
+| **Qué** | Las cifras de D-2 (5 llamadas) y del piloto del Validador (10 casos, 3 rechazos) eran muestras demasiado pequeñas. Nuevo `eval/bench_latency.py`: 20 hallazgos distintos contra 1 marco, primera llamada en frío (`keep_alive=0`) y métricas de Ollama por llamada. Validador ejecutado con `eval/run_eval.py` sobre los 73 casos de correspondencia. |
+| **Resultado RNF-09** | Ollama `qwen2.5:14b`: p50 = 6,95 s · p95 = 11,02 s · máx. = 59,88 s; 19/20 bajo 30 s. La única por encima es la primera (32,9 s de carga del modelo + 20,2 s de la primera evaluación del prompt). En caliente, máx. 11,02 s. 0 avisos `marco_desconocido`: la explicación de D-2 no se sostiene. Sigue 🟡. |
+| **Resultado RF-09** | 39 aprobadas (F1 medio 0,3615) y 34 rechazadas (0,1706); precisión de rechazo @F1<0,5 = 0,82 (28/34). Aprueba 23 de las 51 traducciones con F1 < 0,5. La precisión de 1,0 del piloto no se mantiene. Sigue 🟡. |
+| **Documentos** | Memoria (apdos. 2, 4.2, 4.3, 5.4, 6.7, 8, 9, 10 y Anexo E), `P3_REQUISITOS.md`, `P3_MATRIZ.md` y guion del vídeo. Datos: `eval/reports/2026-10-11T15-28-12_bench_latency_ollama.json` y `eval/reports/2026-10-11T15-28-50_correspondencia_eval_report.json`. |
+| **Commit** | este commit |

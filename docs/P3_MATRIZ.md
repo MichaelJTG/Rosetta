@@ -28,7 +28,7 @@
 | RF-06 | Modo Auditoría Red Team (Nmap, Nuclei) + WebSocket | `419b737` | `tests/test_orchestrator.py` | `POST /audit/start` → `WS /audit/ws/{id}`. Nmap 7.95 + Nuclei 3.11.1 en imagen Docker. |
 | RF-07 | Ingesta de alertas Wazuh (JSON/CSV) | `b64dd2b` | `tests/test_wazuh.py` | `POST /blue/ingest` → alertas normalizadas a `DatosBlue`. |
 | RF-08 | Correlación Red↔Blue | `b64dd2b` | `tests/test_blue_enrichment.py` | `BlueEnrichment.enriquecer()` cruza hallazgos. 96 % cobertura. |
-| RF-09 | Arquitectura multi-agente (Soundwave + Validador) | `4ebeade` | `tests/test_agents.py` · `tests/test_security.py` (RF-09) | `RosettaOrchestrator` + `Validador` implementados. `POST /translate` con `"validar": true` en el cuerpo invoca Validador (por defecto `false`). Benchmark: rejection_precision@F1<0.5=1.0 (10 casos piloto). |
+| RF-09 | Arquitectura multi-agente (Soundwave + Validador) | `4ebeade` | `tests/test_agents.py` · `tests/test_security.py` (RF-09) | `RosettaOrchestrator` + `Validador` implementados. `POST /translate` con `"validar": true` en el cuerpo invoca Validador (por defecto `false`). Eval 2026-10-11, 73 casos: precisión de rechazo @F1<0.5 = 0.82; F1 medio 0.36 en aprobados frente a 0.17 en rechazados; aprueba 23 de 51 traducciones con F1 < 0.5. |
 | RF-10 | Copilot normativo con citas y confianza | `b64dd2b` | `tests/test_copilot.py` | `POST /copilot/ask` → respuesta con campo `confianza`. 94 % cobertura. |
 | RF-11 | Detección de procedure drift | `b64dd2b` | `tests/test_drift.py` | `POST /drift/analyze` → `drift_score`, diferencias detectadas. 95 % cobertura. |
 | RF-12 | Dashboard SPA 16 paneles | `92a5989` | `tests/test_security.py` (XSS) | `GET /dashboard` → HTML con los 16 paneles. Todos los `innerHTML` con `esc()`. |
@@ -60,7 +60,7 @@
 | RNF-06 | Cero secretos en el repositorio | `1ef7438`·`4aeef3b` | `gitleaks`, `detect-private-key` | INC-01: credenciales rotadas 2026-10-04 (dan 401). Historial limpiado 2026-10-06 (`git filter-repo`, `f50957f`→`4aeef3b`): 0 apariciones literal, gitleaks CI verde. Commit huérfano `e2819f0` en GitHub; purga pendiente. |
 | RNF-07 | Rate limiting en endpoints sensibles | `5cf5aac` | `tests/test_auth.py` | `slowapi` activo. `POST /auth/login` → 429 al exceder límite. |
 | RNF-08 | Validación alcance Modo Auditoría | `810812d` | `tests/test_orchestrator.py` | 11 tests: IPs privadas/localhost bloqueadas. DNS resolution + `is_global` + allowlist. |
-| RNF-09 | Tiempo Traductor < 30 s | benchmark D-2 | `eval/run_eval.py` (latency_s) | Benchmark 2026-10-04: p50=8.2s, avg=16.6s, max=41.3s (n=5, Ollama qwen2.5:14b). 4/5 bajo umbral. |
+| RNF-09 | Tiempo Traductor < 30 s | benchmark 2026-10-11 | `eval/bench_latency.py` | Benchmark 2026-10-11: p50=6.95 s, p95=11.02 s, max=59.88 s (n=20, Ollama qwen2.5:14b, 1 marco). 19/20 bajo umbral; la que lo supera es la primera, en frío (32.9 s de carga del modelo). `eval/reports/2026-10-11T15-28-12_bench_latency_ollama.json` |
 | RNF-10 | Build CI reproducible | `2e7792d` | CI workflow `.github/workflows/ci.yml` | CI run 37203612212 verde. `setup-uv v7.6.0`, `uv sync --locked`, matriz 3.11/3.12. |
 | RNF-11 | Cabeceras de seguridad HTTP | `c552729` | `tests/test_security.py` | `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, CSP. 3 tests. |
 | RNF-12 | Audit CVE dependencias en CI | `2e7792d`·`26e63e5` | CI job `dependency-audit` | Sobre `uv.lock`. 4 avisos chromadb sin parche → R-01. CVE-2026-104851 (fsspec) parchado en `26e63e5`. CI verde. |

@@ -189,28 +189,28 @@ Tasa discrepancia:   0.7568
 ### 5c · Comparativa Traductor solo vs Traductor + Validador
 
 ```bash
-cat eval/reports/2026-10-04T22-25-31_correspondencia_eval_report.md | grep -A 12 "Comparativa"
+cat eval/reports/2026-10-11T15-28-50_correspondencia_eval_report.md | grep -A 9 "Comparativa"
 ```
 
 ```
-Casos con validación:             10
-Aprobados por Validador:          7
-Rechazados por Validador:         3
-F1 medio aprobados:           0.352
-F1 medio rechazados:          0.267
-Precision rechazo @F1<0.5:      1.0
+Casos con validación:            73
+Aprobados por Validador:         39
+Rechazados por Validador:        34
+F1 medio aprobados:          0.3615
+F1 medio rechazados:         0.1706
+Precision rechazo @F1<0.5:   0.8235
 ```
 
 > «El Validador es un agente independiente que recibe la traducción y emite un
 > veredicto. La pregunta es: ¿rechaza traducciones que realmente están mal?
-> Si F1(rechazados) < F1(aprobados), el Validador discrimina correctamente.
-> Y así es: 0.267 < 0.352. Los 3 rechazos tenían F1 < 0.5 en todos los casos,
-> precision@F1<0.5 = 1.0. No hay falsos rechazos en esta muestra.»
+> Sobre los 73 casos, las aprobadas tienen un F1 medio de 0,36 y las
+> rechazadas de 0,17: discrimina. De cada 100 rechazos, 82 eran traducciones
+> malas.»
 
-> «La limitación es el tamaño muestral: 10 casos para el piloto del Validador.
-> Es suficiente para demostrar que el mecanismo funciona, no para certificar
-> que funciona siempre. Eso requeriría más ground truth, que está fuera del
-> alcance de esta práctica.»
+> «Pero no basta como filtro. Aprueba 23 de las 51 traducciones malas y
+> rechaza 6 de las 22 buenas. Quedarse solo con las aprobadas sube el F1 de
+> 0,27 a 0,36 a costa de descartar casi la mitad. Es una segunda opinión;
+> no sustituye la revisión del auditor.»
 
 ---
 
@@ -342,10 +342,11 @@ uv run pytest --cov=rosetta --cov-branch --cov-report=term-missing -q 2>&1 | tai
 
 > «Resumen:
 > - 26 RF: 24 ✅, 2 🟡.
-> - 12 RNF: 11 ✅, 1 🟡 (RNF-09: 1 de 5 traducciones supera 30 s).
+> - 12 RNF: 11 ✅, 1 🟡 (RNF-09: de 20 traducciones, solo la primera, con el modelo en frío, supera 30 s; p95 = 11 s).
 > - Bloque B: 10/11 bloques. B-9 implementado en esta entrega.
 > - Eval: 0% de controles inventados en 89 casos. El Validador discrimina
->   correctamente con precision@F1<0.5 = 1.0.
+>   (F1 0,36 en aprobadas frente a 0,17 en rechazadas; precisión de rechazo
+>   0,82), pero aprueba 23 de las 51 traducciones malas.
 > - El código está en GitHub, la CI está en verde, el corpus tiene 7 marcos.»
 
 ---

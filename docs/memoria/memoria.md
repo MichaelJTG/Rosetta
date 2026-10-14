@@ -44,7 +44,7 @@ ROSETTA es una plataforma de cumplimiento normativo continuo que recibe hallazgo
 
 **Destinatarios:** responsable de cumplimiento, CISO, auditor técnico que necesita transformar evidencia operativa en evidencia de auditoría sin trabajo manual.
 
-**Estado de entrega:** producto funcional en producción (Hetzner). Cumple 24 de 26 ítems RF (2 en 🟡 con condiciones: RF-06, RF-09) y 11 de 12 ítems RNF (1 en 🟡: RNF-09, con 1 caso que excede 30 s). Eval cuantitativa ejecutada: F1 = 0,2648 (correspondencia ENS→ISO, 73 casos, 0 % alucinación) y F1 = 0,2813 (hallazgos técnicos, 16 casos, 0 % alucinación). CI verde.
+**Estado de entrega:** producto funcional en producción (Hetzner). Cumple 24 de 26 ítems RF (2 en 🟡 con condiciones: RF-06, RF-09) y 11 de 12 ítems RNF (1 en 🟡: RNF-09, solo la primera traducción con el modelo en frío excede 30 s). Eval cuantitativa ejecutada: F1 = 0,2648 (correspondencia ENS→ISO, 73 casos, 0 % alucinación) y F1 = 0,2813 (hallazgos técnicos, 16 casos, 0 % alucinación). CI verde.
 
 **Cifras clave (2026-10-10):**
 
@@ -153,7 +153,7 @@ En resumen: ROSETTA en P1 era una aplicación de producción con API, dashboard,
 | RNF-06 | Cero secretos en el repositorio | ✅ |
 | RNF-07 | Rate limiting en endpoints sensibles | ✅ |
 | RNF-08 | Validación de alcance en Modo Auditoría | ✅ |
-| RNF-09 | Tiempo del Traductor < 30 s | 🟡 p50=8,2s, avg=16,6s; 1/5 excede umbral (41,3s) |
+| RNF-09 | Tiempo del Traductor < 30 s | 🟡 p50=6,95 s, p95=11,0 s; 1/20 excede el umbral: la primera llamada, en frío (59,9 s) |
 | RNF-10 | Build CI reproducible (lockfile) | ✅ |
 | RNF-11 | Cabeceras de seguridad HTTP | ✅ |
 | RNF-12 | Audit CVE dependencias en CI | ✅ |
@@ -167,7 +167,7 @@ En resumen: ROSETTA en P1 era una aplicación de producción con API, dashboard,
 | RF-20 | Un único ítem «panel avanzado» | Desglosado en RF-20a…RF-20f | Necesario para trazabilidad en matriz y vídeo |
 | RF-21 (P1) | Adaptadores Shodan/HIBP | Movido a trabajo futuro | Solo existe enum y mapa de controles; sin adaptador implementado |
 | RNF-02 | ≥ 80 % «estimado» | 77 % medido el 2026-10-04 (~503 tests); 85 % global y 92 % en `core/` el 2026-10-10 (556 tests) | Medición real con el comando de la CI |
-| RNF-09 | Sin umbral definido | < 30 s con LLM; benchmark en D-2 | Benchmark cuantificado con Ollama qwen2.5:14b |
+| RNF-09 | Sin umbral definido | < 30 s con LLM; benchmark de 20 llamadas (`eval/bench_latency.py`) | Benchmark cuantificado con Ollama qwen2.5:14b |
 | RNF-10 | `uv.lock` en `.gitignore` | Lockfile versionado | Build reproducible exigible por el enunciado |
 
 ### 4.4 Mejoras introducidas respecto a P1
@@ -246,7 +246,7 @@ Los cambios de arquitectura principales introducidos en P3:
 |---|---|
 | «FastAPI expone 15 endpoints REST y un WebSocket» | En la versión entregada (commit `992bf42`, 2026-05-20) había 18 rutas REST y 1 WebSocket. Hoy son 31 rutas REST (30 en OpenAPI, más `/dashboard`) y 1 WebSocket. |
 | Adaptadores Red Team: Nuclei, Nmap y Amass | Amass tiene adaptador (`adapters/red/amass.py`), pero no está instalado en la imagen ni conectado al orquestador. El Modo Auditoría solo usa Nmap y Nuclei. |
-| Latencia típica «<4 s por traducción» con Claude | Nunca se midió. El único benchmark (RNF-09, P3) es con Ollama `qwen2.5:14b`: p50 = 8,2 s. |
+| Latencia típica «<4 s por traducción» con Claude | Nunca se midió. El benchmark de RNF-09 (P3) es con Ollama `qwen2.5:14b`: p50 = 6,95 s en 20 llamadas. |
 | Tasa de alucinación como métrica ya medida | No existía harness de evaluación; se creó en la P3 (`eval/run_eval.py`, apartado 8.5). |
 | WeasyPrint como generador del PDF | El PDF del dosier lo genera reportlab (`core/report_generator.py`). |
 
@@ -359,7 +359,7 @@ Los cambios de arquitectura principales introducidos en P3:
 
 **Requisitos:** RF-09.
 
-**Estado:** Validador operativo; Soundwave sin endpoint de producción. rejection_precision@F1<0.5 = 1,0 en 10 casos piloto.
+**Estado:** Validador operativo; Soundwave sin endpoint de producción. Sobre los 73 casos de correspondencia, precisión de rechazo @F1<0,5 = 0,82 y F1 medio de 0,36 en las traducciones aprobadas frente a 0,17 en las rechazadas (apdo. 8.5).
 
 ---
 
@@ -633,7 +633,7 @@ Cuatro CVEs (CVE-2026-45829, CVE-2026-45830, CVE-2026-45831, CVE-2026-45833) afe
 | E2E en navegador | Docker + Ollama + scripts locales | Golden path: login → traducir → descargar dosier |
 | Instalación limpia | README + clon fresco | RNF-05 |
 | Evaluación cuantitativa | `eval/run_eval.py` | F1, hallucination rate, discrepancy rate |
-| Benchmark de latencia | `eval/run_eval.py` (`latency_s`) | RNF-09: < 30 s p50 |
+| Benchmark de latencia | `eval/bench_latency.py` (20 llamadas) | RNF-09: < 30 s; p50, p95 y máximo |
 | CI continua | GitHub Actions | Lint, types, tests, secrets, CVEs |
 
 ### 8.2 Resumen de resultados
@@ -643,7 +643,7 @@ De las 38 pruebas definidas (tabla completa en Anexo E):
 | Estado | Cantidad | Pruebas |
 |---|---|---|
 | ✅ Pasado | 34 | PR-01..PR-05, PR-07, PR-08, PR-10..PR-30, PR-32..PR-34, PR-36..PR-38 |
-| 🟡 Condicionado | 3 | PR-06 (solo lab. local), PR-09 (10 casos piloto), PR-35 (1/5 excede 30 s) |
+| 🟡 Condicionado | 3 | PR-06 (solo lab. local), PR-09 (aprueba 23 de 51 traducciones malas), PR-35 (1/20 excede 30 s: arranque en frío) |
 | <mark>[PENDIENTE]</mark> | 1 | PR-31 (instalación por persona ajena) |
 
 ### 8.3 Pruebas con resultado no ideal y lección aprendida
@@ -653,7 +653,7 @@ De las 38 pruebas definidas (tabla completa en Anexo E):
 | **CI en rojo desde mayo 2026** (RNF-10) | Builds no reproducibles; confianza cero en CI | `setup-uv v7.6.0` + SHA fijados; `uv sync --locked` (commit `2e7792d`) |
 | **Tests que dependían del entorno** (RF-03, RF-17) | Pasaban en local, fallaban en CI sin Docker | Mocks de ChromaDB y Neo4j en CI; tests de integración solo con flag `--integration` |
 | **140 vulnerabilidades en pip-audit** (RNF-12) | CI auditaba la herramienta, no el proyecto | 9 tandas de actualización; solo 4 CVEs de chromadb sin parche quedan como R-01 (commit `9a611d7`) |
-| **41,3 s en RNF-09** (1 caso de 5) | Excede el umbral de 30 s | Ollama qwen2.5:14b es verboso para algunos hallazgos complejos; p50 (8,2 s) y promedio (16,6 s) cumplen |
+| **59,9 s en RNF-09** (1 llamada de 20) | Excede el umbral de 30 s | Es la primera llamada con el modelo fuera de memoria: 32,9 s de carga en la GPU y 20,2 s de la primera evaluación del prompt. En caliente el máximo es 11,0 s y crece con los tokens generados (~59 tokens/s). 0 avisos `marco_desconocido` en las 20 llamadas: la explicación del benchmark D-2 (5 llamadas, «generación verbosa») no se sostiene. Sin cambio de código |
 | **B-4 proxies ampliados** | Rate limiting evitable desde red interna | Eliminados rangos `10.0.0.0/8` y `172.17.0.0/16` del default (commit `f06f726`) |
 | **Swagger UI en blanco** (RF-13), visto al capturar esta memoria | `/docs` sin interfaz: la CSP de B-3 bloqueaba cdn.jsdelivr.net | CSP propia para `/docs` y `/redoc`; test E2E con Playwright (`c78a0c7`) |
 | **Prompts recortados por Ollama** (RF-10, RF-01) | Con la ventana por defecto (4096), el Copilot (5099 tokens) y las traducciones contra los 7 marcos (5655) se recortaban a 2050: respuesta sobre XSS a una pregunta sobre MFA y traducciones sin llamada a la herramienta | `num_ctx` en cada llamada, `OLLAMA_NUM_CTX` = 16384 por defecto (`c56d54c`). El eval y el benchmark RNF-09 usan 1 marco (~1200 tokens) y no se recortaban: sus cifras siguen siendo válidas |
@@ -704,17 +704,23 @@ El harness `eval/run_eval.py` envía cada caso al Traductor vía la API, compara
 | Tasa de alucinación | **0,0 %** |
 | Tasa de discrepancia | 75,7 % |
 
-*Validador sobre 10 casos piloto (informe `2026-10-04T22-25-31`)*
+*Validador sobre los 73 casos de correspondencia (informe `2026-10-11T15-28-50`)*
 
-| Métrica | Valor |
-|---|---|
-| F1 del Traductor en esos 10 casos | 0,3267 |
-| Aprobados / rechazados por el Validador | 7 / 3 |
-| F1 medio de los aprobados | 0,3524 |
-| F1 medio de los rechazados | 0,2667 |
-| Precisión de rechazo @F1<0,5 | 1,0 |
+| Métrica | Traductor solo | Traductor + Validador (solo las aprobadas) |
+|---|---|---|
+| Traducciones entregadas | 73 | 39 (53 %) |
+| Precision (macro avg) | 0,4068 | 0,5222 |
+| Recall (macro avg) | 0,2205 | 0,2966 |
+| F1 (macro avg) | 0,2726 | **0,3615** |
 
-El Validador no cambia la traducción: la aprueba o la rechaza. En los 10 casos piloto, los 3 rechazos correspondían a traducciones con F1 < 0,5 (precisión de rechazo 1,0), y los aprobados tienen mejor F1 medio que los rechazados. El F1 de 0,3267 no es comparable con el 0,2648 de los 73 casos: son conjuntos distintos.
+| Veredicto del Validador | F1 ≥ 0,5 (22 casos) | F1 < 0,5 (51 casos) |
+|---|---|---|
+| Aprobada (39) | 16 | 23 |
+| Rechazada (34) | 6 | 28 |
+
+F1 medio de las rechazadas: 0,1706. Precisión de rechazo @F1<0,5: **0,82** (28 de 34). El piloto de 10 casos del 2026-10-04 daba 1,0, pero con solo 3 rechazos.
+
+El Validador no cambia la traducción: la aprueba o la rechaza. Discrimina (las aprobadas tienen el doble de F1 medio que las rechazadas), pero no basta como filtro: aprueba 23 de las 51 traducciones con F1 < 0,5 y rechaza 6 de las 22 con F1 ≥ 0,5. Quedarse solo con las aprobadas sube el F1 de 0,27 a 0,36 a cambio de descartar el 47 % de las traducciones. El F1 del Traductor en esta ejecución (0,2726) difiere del de la ejecución de referencia sin Validador (0,2648, 2026-10-04) sobre los mismos 73 casos porque el LLM no es determinista: el cliente de Ollama no fija temperatura ni semilla.
 
 **Limitaciones del eval:**
 - Solo con `LLM_PROVIDER=ollama` (qwen2.5:14b). La eval con Claude (producción) no se ha ejecutado por coste.
@@ -737,7 +743,7 @@ El Validador no cambia la traducción: la aprueba o la rechaza. En los 10 casos 
 | RF-06 | Modo Auditoría RT + WebSocket | 🟡 Solo lab. local | `src/rosetta/core/orchestrator.py` · `POST /audit/start` · `WS /audit/ws/{id}` · `419b737` | PR-06 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.5 |
 | RF-07 | Ingesta Wazuh JSON/CSV | ✅ | `src/rosetta/adapters/blue/wazuh.py` · `POST /blue/ingest` · `b64dd2b` | PR-07 | Apdo. 6.6 |
 | RF-08 | Correlación Red↔Blue | ✅ | `src/rosetta/core/blue_enrichment.py` · `b64dd2b` | PR-08 | 96 % cobertura · Apdo. 6.6 |
-| RF-09 | Multi-agente Validador | 🟡 10 casos piloto | `src/rosetta/agents/orchestrator.py` · `src/rosetta/agents/validator.py` · `POST /translate` con `"validar": true` · `4ebeade` | PR-09 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.7 |
+| RF-09 | Multi-agente Validador | 🟡 73 casos: precisión de rechazo 0,82 | `src/rosetta/agents/orchestrator.py` · `src/rosetta/agents/validator.py` · `POST /translate` con `"validar": true` · `4ebeade` | PR-09 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.7 |
 | RF-10 | Copilot normativo | ✅ | `src/rosetta/core/copilot.py` · `POST /copilot/ask` · `b64dd2b` | PR-10 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.8 |
 | RF-11 | Procedure drift | ✅ | `src/rosetta/core/drift.py` · `POST /drift/analyze` · `b64dd2b` | PR-11 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.9 |
 | RF-12 | Dashboard 10 pan. (base) · 16 (P3) | ✅ superado | `src/rosetta/api/dashboard.py` · `GET /dashboard` · `92a5989` | PR-12 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.10 |
@@ -762,7 +768,7 @@ El Validador no cambia la traducción: la aprueba o la rechaza. En los 10 casos 
 | RNF-06 | Cero secretos | ✅ | `.github/workflows/ci.yml` (gitleaks, fetch-depth 0) · `.pre-commit-config.yaml` · `1ef7438`·`4aeef3b` | PR-32 | 0 apariciones filter-repo · Apdo. 7.3 |
 | RNF-07 | Rate limiting | ✅ | `src/rosetta/api/main.py` (slowapi) · `5cf5aac` | PR-33 | 429 al exceder límite |
 | RNF-08 | Alcance Modo Auditoría | ✅ | `src/rosetta/core/orchestrator.py:_validar_alcance()` · `810812d` | PR-34 | IPs privadas bloqueadas |
-| RNF-09 | Latencia < 30 s | 🟡 p50=8,2s | `eval/run_eval.py` (latency_s) · benchmark D-2 | PR-35 | p50=8,2s · avg=16,6s · max=41,3s |
+| RNF-09 | Latencia < 30 s | 🟡 p50=6,95 s | `eval/bench_latency.py` · `eval/reports/2026-10-11T15-28-12_bench_latency_ollama.json` | PR-35 | p50=6,95 s · p95=11,0 s · máx=59,9 s (en frío) |
 | RNF-10 | CI reproducible | ✅ | `.github/workflows/ci.yml` · `uv.lock` · `2e7792d` | PR-36 | CI run 37203612212 verde |
 | RNF-11 | Cabeceras seguridad HTTP | ✅ | `src/rosetta/api/main.py` (SecurityHeadersMiddleware) · `c552729` | PR-37 | X-Frame-Options, CSP presentes |
 | RNF-12 | CVE audit CI | ✅ | `.github/workflows/ci.yml` (dependency-audit) · `2e7792d`·`26e63e5` | PR-38 | R-01 aceptado; fsspec parcheado |
@@ -780,8 +786,8 @@ El Validador no cambia la traducción: la aprueba o la rechaza. En los 10 casos 
 ### 10.2 Qué funciona con condiciones
 
 - **RF-06 — Modo Auditoría Red Team:** implementado y con tests, pero la demo en el vídeo se hace contra el laboratorio local. Una demo real requeriría un objetivo con autorización explícita escrita.
-- **RF-09 — Validador:** disponible con `"validar": true`, pero off por defecto; el scheduler Soundwave no tiene endpoint de producción. El benchmark es solo de 10 casos piloto.
-- **RNF-09 — Latencia del Traductor:** el p50 cumple (8,2 s), el promedio cumple (16,6 s), pero el máximo (41,3 s) excede el umbral de 30 s en 1 de 5 casos con Ollama qwen2.5:14b.
+- **RF-09 — Validador:** disponible con `"validar": true`, pero off por defecto; el scheduler Soundwave no tiene endpoint de producción. Sobre 73 casos, el Validador aprueba 23 de las 51 traducciones con F1 < 0,5: discrimina, pero no sustituye la revisión humana.
+- **RNF-09 — Latencia del Traductor:** en 20 llamadas con Ollama qwen2.5:14b, p50 = 6,95 s y p95 = 11,0 s. Solo la primera, con el modelo fuera de memoria, supera los 30 s (59,9 s: 32,9 s de carga y 20,2 s de la primera evaluación del prompt). En caliente el máximo es 11,0 s.
 
 ### 10.3 Qué se haría con más tiempo
 
@@ -964,7 +970,7 @@ Las credenciales de producción se facilitan al equipo docente por canal privado
 | PR-06 | RF-06 | `POST /audit/start` + `WS /audit/ws/{id}` contra laboratorio local | WebSocket emite progreso; hallazgos almacenados | Nmap y Nuclei ejecutan; progreso visible en dashboard; 18 hallazgos contra el laboratorio (2026-10-10) | 🟡 Solo laboratorio local |
 | PR-07 | RF-07 | `POST /blue/ingest` con JSON de alertas Wazuh | `DatosBlue` normalizado, 200 | Alertas normalizadas correctamente | ✅ |
 | PR-08 | RF-08 | `BlueEnrichment.enriquecer()` con hallazgos Red + alertas Blue | Hallazgos enriquecidos con correlación | Cruce correcto por activo; 96 % cobertura | ✅ |
-| PR-09 | RF-09 | `POST /translate` con `"validar": true` | Respuesta con campo `validacion` del Validador | Validador invocado; rechazo si F1 < 0,5 | 🟡 10 casos piloto |
+| PR-09 | RF-09 | `POST /translate` con `"validar": true` | Respuesta con campo `validacion` del Validador | 73 casos: aprobadas F1 0,36, rechazadas 0,17; precisión de rechazo 0,82 | 🟡 aprueba 23 de 51 traducciones malas |
 | PR-10 | RF-10 | `POST /copilot/ask` con pregunta sobre ENS | Respuesta con `confianza` ≥ 0 y citas del corpus | Cita de ENS `org.2` correcta; confianza 0,82 | ✅ |
 | PR-11 | RF-11 | `POST /drift/analyze` con procedimiento y hallazgos | `drift_score` y lista de diferencias | Score 0,45 con 2 diferencias detectadas | ✅ |
 | PR-12 | RF-12 | `GET /dashboard` | HTML con los 16 paneles | 200; los 16 paneles visibles en navegador | ✅ |
@@ -990,7 +996,7 @@ Las credenciales de producción se facilitan al equipo docente por canal privado
 | PR-32 | RNF-06 | `git log -p --all \| grep <literal>` | 0 apariciones | 0 apariciones tras filter-repo (2026-10-06) | ✅ |
 | PR-33 | RNF-07 | `POST /auth/login` × 11 con IP fija | 429 en intento 11 | 429 recibido | ✅ |
 | PR-34 | RNF-08 | `POST /audit/start` con target `192.168.1.1` | Error de alcance | `{"error":"target fuera del alcance permitido"}` | ✅ |
-| PR-35 | RNF-09 | Benchmark: 5 traducciones con Ollama qwen2.5:14b | p50 < 30 s | p50=8,2s · avg=16,6s · max=41,3s | 🟡 1/5 excede 30 s |
+| PR-35 | RNF-09 | Benchmark: 20 traducciones con Ollama qwen2.5:14b (`eval/bench_latency.py`) | < 30 s | p50=6,95 s · p95=11,0 s · máx=59,9 s | 🟡 1/20 excede 30 s (en frío) |
 | PR-36 | RNF-10 | CI verde con Python 3.11 y 3.12 | Build en verde | Run 37203612212 verde | ✅ |
 | PR-37 | RNF-11 | `GET /health` → inspeccionar cabeceras | `X-Frame-Options: DENY`, CSP, `Referrer-Policy` | Presentes en todas las respuestas | ✅ |
 | PR-38 | RNF-12 | CI job `dependency-audit` | 0 CVEs nuevos | 4 chromadb (R-01 aceptado); fsspec CVE parcheado | ✅ |
