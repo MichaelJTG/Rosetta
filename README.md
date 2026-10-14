@@ -42,7 +42,7 @@ En los paneles conviene distinguir el origen de cada dato:
 |---|---|
 | Ejecutar ROSETTA | **Git** y **Docker** con Compose v2 (Docker Desktop en Windows/macOS). Unos 8 GB de disco para la imagen y los volúmenes, y 4 GB de RAM para los contenedores. |
 | Usar IA **sin API key** | **[Ollama](https://ollama.com)** en el equipo con el modelo `qwen2.5:14b`: ~9 GB de disco y **~12 GB de RAM (o VRAM) libres** al traducir con la ventana de contexto por defecto de ROSETTA (`OLLAMA_NUM_CTX=16384`: 11,9 GB medidos). En CPU, mejor 16 GB de RAM o más; con GPU, 12 GB de VRAM o más. |
-| Usar un LLM en la nube (opcional, **no verificado**) | Tu propia API key de Anthropic (Claude) o de un proveedor compatible con OpenAI, como Groq |
+| Usar un LLM en la nube (opcional) | Tu propia API key de un proveedor compatible con OpenAI, como Groq (probado, con límites en el plan gratuito), o de Anthropic (Claude, **no verificado**) |
 | Desarrollar o pasar los tests (opcional) | Python 3.11+ y [uv](https://docs.astral.sh/uv/) |
 
 La imagen se construye para **amd64 y arm64** (el servidor propio de la P1 era ARM64).
@@ -77,23 +77,34 @@ en `ROSETTA_JWT_SECRET=`.
 |---|---|
 | **12 GB de VRAM o más** | Ollama con `qwen2.5:14b` (por defecto). Ocupa 11,9 GB con `OLLAMA_NUM_CTX=16384`. En una GPU de 16 GB: 6,95 s por traducción (mediana de 20 llamadas). |
 | **16 GB de RAM o más, sin tarjeta gráfica** | El mismo modelo en la CPU. Funciona, pero **cada traducción puede tardar mucho** (no se ha medido; en GPU son ~7 s) y el límite de 30 s de RNF-09 no está garantizado. |
-| Menos | Un LLM en la nube con tu propia clave (abajo). **No verificado.** |
+| Menos | Un LLM en la nube con tu propia clave (abajo). Groq: probado, pero el plan gratuito no basta para el seed. Claude: no verificado. |
 
 - **Ollama:** descarga el modelo una vez con `ollama pull qwen2.5:14b` y deja
   Ollama abierto. El `.env` ya apunta a `http://host.docker.internal:11434`. En
   **Linux**, arranca Ollama escuchando en todas las interfaces
   (`OLLAMA_HOST=0.0.0.0 ollama serve`) para que el contenedor llegue a él.
-- **LLM en la nube — no verificado.** Con tu propia clave, en `.env`:
-  - Claude: `LLM_PROVIDER=claude`, `ANTHROPIC_API_KEY` y, si quieres otro
-    modelo, `ANTHROPIC_MODEL`.
-  - Compatible con OpenAI, por ejemplo Groq: `LLM_PROVIDER=openai`,
-    `OPENAI_API_KEY`, `OPENAI_API_BASE=https://api.groq.com/openai/v1` y
-    `OPENAI_MODEL=llama-3.3-70b-versatile`.
+- **LLM en la nube.** Con tu propia clave en `.env` y la configuración del
+  proveedor:
+  - **Groq (compatible con OpenAI) — probado el 2026-10-14 con el plan
+    gratuito:** `LLM_PROVIDER=openai`, `OPENAI_API_KEY`,
+    `OPENAI_API_BASE=https://api.groq.com/openai/v1` y
+    `OPENAI_MODEL=openai/gpt-oss-120b`. `llama-3.3-70b-versatile`, el modelo
+    del despliegue de la P1, ya no existe en Groq; `openai/gpt-oss-120b` es el
+    equivalente más cercano de su catálogo.
+  - **Claude:** `LLM_PROVIDER=claude`, `ANTHROPIC_API_KEY` y, si quieres otro
+    modelo, `ANTHROPIC_MODEL`. **No verificado**: no había una clave válida.
 
-  A 2026-10-14 ninguna de las dos se ha probado con esta versión: no había
-  una clave válida (las disponibles devolvían 401). El despliegue de la P1
-  estaba configurado con Groq. No usa memoria local, pero cada traducción es
-  una llamada de pago (o con límite de uso) y el hallazgo sale del equipo.
+  Resultados con Groq (8 hallazgos de `eval/ground_truth/ens_hallazgos_tecnicos.json`,
+  los mismos de la prueba de `qwen2.5:14b` y `qwen2.5:7b`):
+
+  | Prueba | Resultado |
+  |---|---|
+  | `/translate`, 1 marco (ISO 27001) | 8 de 8. Mediana 2,8 s, máximo 4,1 s. F1 ISO frente al ground truth 0,15 (`qwen2.5:14b` local: 0,17). Ningún control fuera del corpus. |
+  | `/translate`, 3 marcos (ISO 27001, ENS, NIS2) | 8 de 8. Mediana 3,8 s, máximo 5,0 s. 11 de 41 controles fuera del corpus (`qwen2.5:14b`: 3 de 20). Cita NIS2 en los 8. |
+  | Límites del plan gratuito | 8.000 tokens por minuto y 1.000 peticiones al día. Seguidas, 6 de las 16 traducciones fallaron (Groq 429, la API responde 500); todas entraron al repetirlas tras 60 s. |
+  | `seed_demo.py` | **No termina.** Traduce 2 hallazgos; el 3.º supera el límite por minuto y el seed se interrumpe a los 8 s. Con el plan gratuito, puebla la demo con Ollama. |
+
+  No usa memoria local, pero el hallazgo sale del equipo hacia el proveedor.
 - **No ahorres memoria con un modelo menor ni bajando `OLLAMA_NUM_CTX`.**
   `qwen2.5:7b` cabe en 5,6 GB, pero en una prueba con 8 hallazgos no acertó
   ningún control ISO del ground truth (el 14b: F1 0,17) y, con 3 marcos, 21 de

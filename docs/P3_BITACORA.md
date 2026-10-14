@@ -484,3 +484,13 @@ está vacío.
 | **Servidor** | `docker compose stop` a las 05:56 UTC; no se ha borrado nada (`P3_SEGURIDAD.md`, apartado 7). |
 | **Fuera de alcance** | El pie del login del dashboard (`src/rosetta/api/dashboard.py`) aún muestra el dominio: es código congelado. El informe de la P1 (`docs/informe/`) se deja como se entregó. |
 | **Pendiente** | Probar un proveedor en la nube cuando haya una clave válida en el `.env` local (solo configuración). |
+
+### G-6 · Prueba con Groq en local (solo configuración)
+
+| | |
+|---|---|
+| **Configuración** | La de producción: `LLM_PROVIDER=openai`, `OPENAI_API_BASE=https://api.groq.com/openai/v1`. `llama-3.3-70b-versatile` ya no existe en Groq (404 `model_not_found`); del catálogo actual (`gpt-oss-120b`, `gpt-oss-20b`, `qwen3.8-27b`…), el equivalente más cercano es `openai/gpt-oss-120b`. Clave del autor solo en su `.env`; el resto, en un override de compose fuera del repo, con un proyecto aparte (`rosetta-groq`, puerto 8001) para no tocar el entorno de grabación. |
+| **`/translate`** | 8 hallazgos, el mismo script que F-9. 1 marco: 8/8, mediana 2,8 s, máx. 4,1 s, F1 ISO 0,15, 0 controles fuera del corpus. 3 marcos: 8/8, mediana 3,8 s, máx. 5,0 s, 11 de 41 fuera del corpus, NIS2 en los 8. |
+| **Límites** | Plan gratuito: 8.000 tokens/min y 1.000 peticiones/día. Seguidas, 6 de 16 traducciones fallaron (429 → 500) y entraron al repetirlas tras 60 s. |
+| **Seed** | No termina: 2 traducciones, la 3.ª da 500 por el límite y la API cierra la conexión; el seed se interrumpe a los 8 s. Requeriría pausas o reintentos en `seed_demo.py` (código congelado). |
+| **Documentos** | README (paso 3: Groq probado con resultados; Claude sigue sin verificar), memoria (10.1, 8.5, 12 y Anexo A). |

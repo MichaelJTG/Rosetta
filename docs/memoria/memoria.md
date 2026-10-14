@@ -730,7 +730,7 @@ F1 medio de las rechazadas: 0,1706. Precisión de rechazo @F1<0,5: **0,82** (28 
 El Validador no cambia la traducción: la aprueba o la rechaza. Discrimina (las aprobadas tienen el doble de F1 medio que las rechazadas), pero no basta como filtro: aprueba 23 de las 51 traducciones con F1 < 0,5 y rechaza 6 de las 22 con F1 ≥ 0,5. Quedarse solo con las aprobadas sube el F1 de 0,27 a 0,36 a cambio de descartar el 47 % de las traducciones. El F1 del Traductor en esta ejecución (0,2726) difiere del de la ejecución de referencia sin Validador (0,2648, 2026-10-04) sobre los mismos 73 casos porque el LLM no es determinista: el cliente de Ollama no fija temperatura ni semilla.
 
 **Limitaciones del eval:**
-- Solo con `LLM_PROVIDER=ollama` (qwen2.5:14b). Con proveedores en la nube (Claude o compatibles con OpenAI) no se ha ejecutado, por coste.
+- Solo con `LLM_PROVIDER=ollama` (qwen2.5:14b). Con proveedores en la nube (Claude o compatibles con OpenAI) no se ha ejecutado, por coste; solo hay una prueba de 8 hallazgos con Groq (README).
 - Los 16 casos de hallazgo fueron **diseñados por Claude Code** (decisión automatizada en bloque C); sus asignaciones de control ISO son provisionales. <mark>[PENDIENTE: revisados por el autor, sí o no]</mark>
 - Solo se evalúan ENS→ISO. Los otros cinco marcos (NIS2, DORA, RGPD, NIST CSF, PCI-DSS) no tienen ground truth disponible aún.
 
@@ -789,9 +789,9 @@ El Validador no cambia la traducción: la aprueba o la rechaza. Discrimina (las 
 ### 10.1 Qué no funciona
 
 - **Commit huérfano `e2819f0` accesible en GitHub:** el objeto persiste tras el filter-repo porque GitHub requiere una solicitud explícita de purga al soporte. Pendiente de respuesta.
-- **Error 500 genérico de `POST /translate` cuando falla la clave del proveedor LLM:** con una `ANTHROPIC_API_KEY` no válida, Anthropic responde 401 y la API devuelve «Internal Server Error», sin indicar que el fallo está en el proveedor (visto el 2026-10-14). El cuerpo no filtra datos, pero no ayuda a diagnosticar; lo adecuado sería un 502 o 503 con un mensaje claro. No se corrige: el código está congelado desde el 2026-10-14.
+- **Error 500 genérico de `POST /translate` cuando falla la clave del proveedor LLM:** con una `ANTHROPIC_API_KEY` no válida, Anthropic responde 401 y la API devuelve «Internal Server Error», sin indicar que el fallo está en el proveedor (visto el 2026-10-14). El cuerpo no filtra datos, pero no ayuda a diagnosticar; lo adecuado sería un 502 o 503 con un mensaje claro. Con el plan gratuito de Groq ocurre lo mismo al superar el límite de tokens por minuto (429); además, tras ese 500 la API cierra la conexión, y `seed_demo.py` se interrumpe en la tercera traducción. No se corrige: el código está congelado desde el 2026-10-14.
 - **Despliegue en servidor propio no operativo:** existe un despliegue en un servidor propio que a fecha de entrega no está operativo; la evaluación se hace en local con Docker siguiendo el README. La clave del proveedor LLM (Groq) ya no es válida y el dominio no está en DNS; los contenedores están parados desde el 2026-10-14 (apdo. 7.7).
-- **NIS2 en traducciones con varios marcos:** en las pruebas del 2026-10-14 con 3 marcos (ISO 27001, ENS y NIS2) sobre 8 hallazgos, ni `qwen2.5:14b` ni `qwen2.5:7b` citaron ningún control de NIS2. Pedir varios marcos no garantiza que la respuesta los cubra todos. La causa (recuperación del RAG o el propio LLM) no se ha investigado.
+- **NIS2 en traducciones con varios marcos:** en las pruebas del 2026-10-14 con 3 marcos (ISO 27001, ENS y NIS2) sobre 8 hallazgos, ni `qwen2.5:14b` ni `qwen2.5:7b` citaron ningún control de NIS2; con Groq (`openai/gpt-oss-120b`) sí aparecieron en los 8, pero con 11 de 41 controles fuera del corpus. Pedir varios marcos no garantiza que la respuesta los cubra todos. La causa (recuperación del RAG o el propio LLM) no se ha investigado.
 
 ### 10.2 Qué funciona con condiciones
 
@@ -839,7 +839,7 @@ Historial con un único autor (Michael Jordan Telleria Guadalajara). Cuenta de G
 | **Claude Code** | Asistente de programación principal en P1 (todas las fases, ciclo investigar→diseñar→implementar+tests→revisar→commit) y en P3 (bloques A–E de forma autónoma bajo dirección del autor; redacción de esta memoria a partir de los documentos `P3_*.md`). No se especifica el modelo de Claude Code; el autor no puede verificarlo en el contexto de las sesiones. |
 | **Claude (claude.ai)** | Auditoría del repositorio, planificación de bloques de trabajo, revisión de decisiones de arquitectura (ADR), revisión de esta memoria. |
 | **LLM del producto — Ollama qwen2.5:14b** | Proveedor LLM en desarrollo y benchmarks; seleccionado con `LLM_PROVIDER=ollama`. Todos los evals ejecutados con este modelo. |
-| **LLM del producto** | Intercambiable con `LLM_PROVIDER`: Ollama `qwen2.5:14b` en local (con él se hicieron la evaluación y el benchmark), Claude (Anthropic) o una API compatible con OpenAI. El despliegue de la P1 usaba Groq (`llama-3.3-70b-versatile`). Con proveedores en la nube no se ha ejecutado el eval cuantitativo. |
+| **LLM del producto** | Intercambiable con `LLM_PROVIDER`: Ollama `qwen2.5:14b` en local (con él se hicieron la evaluación y el benchmark), Claude (Anthropic) o una API compatible con OpenAI. El despliegue de la P1 usaba Groq (`llama-3.3-70b-versatile`). Con proveedores en la nube no se ha ejecutado el eval cuantitativo; solo una prueba de 8 hallazgos con Groq (`openai/gpt-oss-120b`, README). |
 | **Herramientas de IA en P1** | <mark>[PENDIENTE: detalle completo de herramientas IA usadas en P1]</mark> |
 
 **Ground truth del eval:** los 73 casos de correspondencia ENS→ISO tienen como ground truth el SoA TechServ facilitado por el equipo docente. **No fue generado por IA.** Los 16 casos de hallazgo técnico fueron **diseñados por Claude Code** (bloque C, decisión automatizada); sus asignaciones de control ISO son provisionales y <mark>[PENDIENTE: revisados por el autor, sí o no]</mark>.
@@ -869,8 +869,9 @@ cp .env.example .env
 # Editar .env: ROSETTA_USER, ROSETTA_PASSWORD (>=12 chars), ROSETTA_JWT_SECRET (>=32 chars)
 # Para usar Ollama local: LLM_PROVIDER=ollama
 # Para usar Claude (no verificado): LLM_PROVIDER=claude y ANTHROPIC_API_KEY=<tu clave>
-# Compatible con OpenAI, p. ej. Groq (no verificado): LLM_PROVIDER=openai,
-#   OPENAI_API_KEY, OPENAI_API_BASE=https://api.groq.com/openai/v1, OPENAI_MODEL
+# Groq, compatible con OpenAI (probado el 2026-10-14; resultados en el README):
+#   LLM_PROVIDER=openai, OPENAI_API_KEY, OPENAI_API_BASE=https://api.groq.com/openai/v1,
+#   OPENAI_MODEL=openai/gpt-oss-120b
 
 # 3. Construir e iniciar
 docker compose up -d --build
