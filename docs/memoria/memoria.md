@@ -15,7 +15,7 @@
 | Repositorio | <https://github.com/MichaelJTG/Rosetta> |
 | Tag de entrega | `v1.0-practica3` |
 | Vídeo | <mark>[PENDIENTE: enlace]</mark> |
-| Despliegue | Servidor de producción (Hetzner) — URL activa si el servidor sigue encendido |
+| Despliegue | Evaluación en local con Docker siguiendo el README. Existe un despliegue en un servidor propio que a fecha de entrega no está operativo (apdo. 10.1) |
 
 </section>
 
@@ -44,7 +44,7 @@ ROSETTA es una plataforma de cumplimiento normativo continuo que recibe hallazgo
 
 **Destinatarios:** responsable de cumplimiento, CISO, auditor técnico que necesita transformar evidencia operativa en evidencia de auditoría sin trabajo manual.
 
-**Estado de entrega:** producto funcional en producción (Hetzner). Cumple 24 de 26 ítems RF (2 en 🟡 con condiciones: RF-06, RF-09) y 11 de 12 ítems RNF (1 en 🟡: RNF-09, solo la primera traducción con el modelo en frío excede 30 s). Eval cuantitativa ejecutada: F1 = 0,2648 (correspondencia ENS→ISO, 73 casos, 0 % alucinación) y F1 = 0,2813 (hallazgos técnicos, 16 casos, 0 % alucinación). CI verde.
+**Estado de entrega:** producto funcional en local con Docker, que es como se evalúa (README y Anexo A); el despliegue en un servidor propio de la P1 no está operativo a fecha de entrega (apdo. 10.1). Cumple 24 de 26 ítems RF (2 en 🟡 con condiciones: RF-06, RF-09) y 11 de 12 ítems RNF (1 en 🟡: RNF-09, solo la primera traducción con el modelo en frío excede 30 s). Eval cuantitativa ejecutada: F1 = 0,2648 (correspondencia ENS→ISO, 73 casos, 0 % alucinación) y F1 = 0,2813 (hallazgos técnicos, 16 casos, 0 % alucinación). CI verde.
 
 **Cifras clave (2026-10-10):**
 
@@ -68,7 +68,7 @@ ROSETTA es una plataforma de cumplimiento normativo continuo que recibe hallazgo
 
 ### 3.1 Resumen de la Práctica 1
 
-ROSETTA en la Práctica 1 era ya una plataforma funcional desplegada en producción. El informe entregado el **25 de mayo de 2026** describía los siguientes componentes operativos (43 commits, entre 2026-04-18 y 2026-05-30):
+ROSETTA en la Práctica 1 era ya una plataforma funcional, desplegada en un servidor propio. El informe entregado el **25 de mayo de 2026** describía los siguientes componentes operativos (43 commits, entre 2026-04-18 y 2026-05-30):
 
 - **API REST + WebSocket:** FastAPI con 15 endpoints REST y 1 WebSocket de progreso en tiempo real para el Modo Auditoría.
 - **Dashboard SPA de 10 paneles:** servido desde el propio backend; los paneles Inicio, Traducir, Cumplimiento, Auditoría, PDF, Blue Team, Grafo, Drift, Copilot y Hallazgos estaban operativos.
@@ -81,13 +81,13 @@ ROSETTA en la Práctica 1 era ya una plataforma funcional desplegada en producci
 - **CLI Typer:** comandos `translate`, `load-corpus`, `version`, `dossier`, `scan`, `detect-drift`.
 - **Gate CI/CD:** `POST /analyze-diff` + GitHub Action para bloquear PRs que incumplen controles.
 - **Auth JWT + HTTP Basic + rate limiting** (slowapi): Bearer como método principal.
-- **Docker:** imagen de producción; despliegue activo en Hetzner (rosetta.aegiscores.com).
+- **Docker:** imagen y despliegue con Docker Compose en un servidor propio, detrás de nginx con HTTPS. Ese servidor usaba Groq (`llama-3.3-70b-versatile`) a través del proveedor compatible con OpenAI, no Claude (apdo. 5.4). A fecha de entrega de la P3 el despliegue no está operativo (apdo. 10.1).
 - **24 ficheros de test:** ruff + mypy --strict activos; CI configurada pero rota desde el 2026-05-20.
 - **Herramientas de IA en P1:** Claude Code como asistente de programación en todas las fases (ciclos investigar → diseñar → implementar + tests → revisar → commit). <mark>[PENDIENTE: detalle completo de herramientas IA usadas en P1]</mark>
 
 Varias de estas afirmaciones del informe de la P1 resultaron inexactas al revisarlas en la P3: Amass tenía adaptador pero no estaba instalado ni conectado al Modo Auditoría; la API tenía 18 rutas REST y no 15 (hoy son 31); y la latencia «<4 s» con Claude nunca se midió. El detalle está en el apartado 5.4 (Cambios respecto a la P1).
 
-En resumen: ROSETTA en P1 era una aplicación de producción con API, dashboard, RAG, multi-agente, Docker y 7 marcos normativos. La P3 no partió de cero; partió de una base funcional con bloqueos concretos documentados en la tabla del apartado 3.3.
+En resumen: ROSETTA en P1 era una aplicación completa y desplegada, con API, dashboard, RAG, multi-agente, Docker y 7 marcos normativos. La P3 no partió de cero; partió de una base funcional con bloqueos concretos documentados en la tabla del apartado 3.3.
 
 ### 3.2 Feedback recibido
 
@@ -187,7 +187,7 @@ En resumen: ROSETTA en P1 era una aplicación de producción con API, dashboard,
 
 <figure>
 <img class="diagrama" src="diagramas/componentes.svg" alt="Diagrama de componentes de ROSETTA">
-<figcaption>Figura 1. Diagrama de componentes de ROSETTA, comprobado contra los imports de <code>src/rosetta/</code> y los workflows de <code>.github/</code>: nginx con TLS delante de la app en 127.0.0.1:8000, núcleo, persistencia, proveedor LLM elegido con <code>LLM_PROVIDER</code> y CI. Fuente: <code>docs/memoria/diagramas/componentes.dot</code>. (RF-01, RF-02, RF-03)</figcaption>
+<figcaption>Figura 1. Diagrama de componentes de ROSETTA, comprobado contra los imports de <code>src/rosetta/</code> y los workflows de <code>.github/</code>: nginx con TLS delante de la app en 127.0.0.1:8000 (solo en el servidor propio de la P1; en local se accede directamente a 127.0.0.1:8000), núcleo, persistencia, proveedor LLM elegido con <code>LLM_PROVIDER</code> y CI. Fuente: <code>docs/memoria/diagramas/componentes.dot</code>. (RF-01, RF-02, RF-03)</figcaption>
 </figure>
 
 ### 5.2 Tecnologías y motivo de elección
@@ -200,7 +200,7 @@ En resumen: ROSETTA en P1 era una aplicación de producción con API, dashboard,
 | ChromaDB 1.5.9 | embedded | Vector store embebido; sin servidor extra; persistencia en volumen Docker |
 | Neo4j 5 | 5.x | Grafo de correlación activo↔control; degradación grácil cuando no disponible |
 | Ollama | 0.4.x | LLM local sin API key; desarrollo económico y soberanía de datos |
-| Claude API (Anthropic SDK) | ≥0.25 | LLM de producción; forzado de tool-use fiable |
+| Claude API (Anthropic SDK) | ≥0.25 | Proveedor en la nube opcional (`LLM_PROVIDER=claude`); forzado de tool-use fiable |
 | reportlab | ≥4.4 | PDF del dosier de auditoría (`core/report_generator.py`); puro Python, sin GTK |
 | WeasyPrint | ≥70 | Solo genera el PDF de esta memoria (`scripts/build_memoria.py`); no interviene en el producto |
 | Nmap 7.95 + Nuclei 3.11.1 | — | Herramientas MIT/Apache orquestadas por CLI (ADR-001) |
@@ -217,7 +217,7 @@ El escáner Red Team y el SIEM Blue Team se consumen vía CLI/API sin modificar 
 
 **ADR-002 — Abstracción del proveedor LLM detrás de `LLMClient` Protocol (2026-04-18, aprobado)**
 
-`TraductorSimbiótico` recibe el cliente LLM por inyección de dependencia. Tres implementaciones: `ClaudeClient` (producción), `OllamaClient` (desarrollo y on-premise), `OpenAIClient` (alternativa). Seleccionado por `LLM_PROVIDER`. Motivo: iteración local sin coste, soberanía de datos para clientes ENS/NIS2, testabilidad mediante mocks del Protocol. Consecuencia negativa: tres implementaciones que mantener.
+`TraductorSimbiótico` recibe el cliente LLM por inyección de dependencia. Tres implementaciones: `ClaudeClient` (API de Anthropic), `OllamaClient` (local y on-premise; el de la evaluación), `OpenAIClient` (cualquier API compatible con OpenAI; el despliegue de la P1 lo usaba con Groq). Seleccionado por `LLM_PROVIDER`. Motivo: iteración local sin coste, soberanía de datos para clientes ENS/NIS2, testabilidad mediante mocks del Protocol. Consecuencia negativa: tres implementaciones que mantener.
 
 **Tool-use forzado con esquema Pydantic.** El LLM no puede devolver texto libre: la llamada usa la función `traducir_hallazgo` con un `model_json_schema` derivado de `ResultadoTraduccion`. Si la respuesta no cumple el esquema, se rechaza con 422. Esto reduce alucinación de controles al 0 % en todos los evals ejecutados.
 
@@ -248,6 +248,7 @@ Los cambios de arquitectura principales introducidos en P3:
 | Adaptadores Red Team: Nuclei, Nmap y Amass | Amass tiene adaptador (`adapters/red/amass.py`), pero no está instalado en la imagen ni conectado al orquestador. El Modo Auditoría solo usa Nmap y Nuclei. |
 | Latencia típica «<4 s por traducción» con Claude | Nunca se midió. El benchmark de RNF-09 (P3) es con Ollama `qwen2.5:14b`: p50 = 6,95 s en 20 llamadas. |
 | Tasa de alucinación como métrica ya medida | No existía harness de evaluación; se creó en la P3 (`eval/run_eval.py`, apartado 8.5). |
+| LLM «Claude (producción)» | El servidor estaba configurado con Groq (`llama-3.3-70b-versatile`) a través del proveedor compatible con OpenAI (`LLM_PROVIDER=openai`; `.env` del servidor revisado el 2026-10-14). |
 | WeasyPrint como generador del PDF | El PDF del dosier lo genera reportlab (`core/report_generator.py`). |
 
 ---
@@ -613,11 +614,17 @@ Cuatro CVEs (CVE-2026-45829, CVE-2026-45830, CVE-2026-45831, CVE-2026-45833) afe
 |---|---|---|---|
 | Cuentas de usuario (usuario + hash bcrypt) | Autenticar acceso a la plataforma | Indefinida (mientras exista el `.env`) | `.env` con permisos 600; nunca versionado |
 | Hallazgos y activos detectados | Cumplimiento y trazabilidad normativa | Indefinida en SQLite (`session_store`) | Dentro del contenedor; acceso solo con auth |
-| Contenido de PDFs ingestados | Extraer hallazgos de informes existentes | No se almacena el PDF; solo los hallazgos extraídos | Transmisión por HTTPS; sin persistencia del PDF original |
+| Contenido de PDFs ingestados | Extraer hallazgos de informes existentes | No se almacena el PDF; solo los hallazgos extraídos | HTTPS en un despliegue tras nginx (en local, solo `localhost`); sin persistencia del PDF original |
 
-**Envío al LLM:** con `LLM_PROVIDER=claude`, el contenido del hallazgo y los fragmentos del corpus se envían a la API de Anthropic (HTTPS, fuera del servidor). Con `LLM_PROVIDER=ollama`, todo el procesamiento es local. Para clientes que exijan soberanía de datos completa (ENS, NIS2), la recomendación es `LLM_PROVIDER=ollama`.
+**Envío al LLM:** con `LLM_PROVIDER=claude` u `openai`, el contenido del hallazgo y los fragmentos del corpus se envían a la API del proveedor (Anthropic, Groq u otro compatible; HTTPS, fuera del equipo). Con `LLM_PROVIDER=ollama`, todo el procesamiento es local. Para clientes que exijan soberanía de datos completa (ENS, NIS2), la recomendación es `LLM_PROVIDER=ollama`.
 
 **Demos:** todas las demos y tests usan datos ficticios (empresa TechServ S.A., dominios `.example`, IPs de documentación RFC 5737). Ningún hallazgo real se incluye en el repositorio.
+
+### 7.7 Despliegue en servidor propio
+
+Existe un despliegue en un servidor propio, heredado de la P1, que a fecha de entrega no está operativo; la evaluación se hace en local con Docker siguiendo el README. Mientras funcionó exponía solo nginx (80 y 443, TLS con Certbot); la app escuchaba en `127.0.0.1:8000` y Neo4j, ChromaDB y SQLite no tenían puertos publicados (B-4: solo se confía en el proxy `172.18.0.1`).
+
+El 2026-10-14 se actualizó a `a7d1abd`, pero `/translate` responde 500 porque la clave del proveedor (Groq) ya no es válida, y el dominio no está en DNS. Para no dejar expuesto un servicio que no se usa, sus contenedores se pararon el mismo día con `docker compose stop`, sin borrar volúmenes, imágenes ni copias; nginx responde 502 para ese nombre. Detalle en `docs/P3_SEGURIDAD.md`, apartado 7.
 
 ---
 
@@ -723,7 +730,7 @@ F1 medio de las rechazadas: 0,1706. Precisión de rechazo @F1<0,5: **0,82** (28 
 El Validador no cambia la traducción: la aprueba o la rechaza. Discrimina (las aprobadas tienen el doble de F1 medio que las rechazadas), pero no basta como filtro: aprueba 23 de las 51 traducciones con F1 < 0,5 y rechaza 6 de las 22 con F1 ≥ 0,5. Quedarse solo con las aprobadas sube el F1 de 0,27 a 0,36 a cambio de descartar el 47 % de las traducciones. El F1 del Traductor en esta ejecución (0,2726) difiere del de la ejecución de referencia sin Validador (0,2648, 2026-10-04) sobre los mismos 73 casos porque el LLM no es determinista: el cliente de Ollama no fija temperatura ni semilla.
 
 **Limitaciones del eval:**
-- Solo con `LLM_PROVIDER=ollama` (qwen2.5:14b). La eval con Claude (producción) no se ha ejecutado por coste.
+- Solo con `LLM_PROVIDER=ollama` (qwen2.5:14b). Con proveedores en la nube (Claude o compatibles con OpenAI) no se ha ejecutado, por coste.
 - Los 16 casos de hallazgo fueron **diseñados por Claude Code** (decisión automatizada en bloque C); sus asignaciones de control ISO son provisionales. <mark>[PENDIENTE: revisados por el autor, sí o no]</mark>
 - Solo se evalúan ENS→ISO. Los otros cinco marcos (NIS2, DORA, RGPD, NIST CSF, PCI-DSS) no tienen ground truth disponible aún.
 
@@ -783,6 +790,7 @@ El Validador no cambia la traducción: la aprueba o la rechaza. Discrimina (las 
 
 - **Commit huérfano `e2819f0` accesible en GitHub:** el objeto persiste tras el filter-repo porque GitHub requiere una solicitud explícita de purga al soporte. Pendiente de respuesta.
 - **Error 500 genérico de `POST /translate` cuando falla la clave del proveedor LLM:** con una `ANTHROPIC_API_KEY` no válida, Anthropic responde 401 y la API devuelve «Internal Server Error», sin indicar que el fallo está en el proveedor (visto el 2026-10-14). El cuerpo no filtra datos, pero no ayuda a diagnosticar; lo adecuado sería un 502 o 503 con un mensaje claro. No se corrige: el código está congelado desde el 2026-10-14.
+- **Despliegue en servidor propio no operativo:** existe un despliegue en un servidor propio que a fecha de entrega no está operativo; la evaluación se hace en local con Docker siguiendo el README. La clave del proveedor LLM (Groq) ya no es válida y el dominio no está en DNS; los contenedores están parados desde el 2026-10-14 (apdo. 7.7).
 - **NIS2 en traducciones con varios marcos:** en las pruebas del 2026-10-14 con 3 marcos (ISO 27001, ENS y NIS2) sobre 8 hallazgos, ni `qwen2.5:14b` ni `qwen2.5:7b` citaron ningún control de NIS2. Pedir varios marcos no garantiza que la respuesta los cubra todos. La causa (recuperación del RAG o el propio LLM) no se ha investigado.
 
 ### 10.2 Qué funciona con condiciones
@@ -812,7 +820,7 @@ Historial con un único autor (Michael Jordan Telleria Guadalajara). Cuenta de G
 
 | Fase | Período real | Actividades principales |
 |---|---|---|
-| P1 (Práctica 1) | 2026-04-18 a 2026-05-25 (entrega); último commit 2026-05-30 | Diseño de arquitectura, 43 commits, producto completo en producción: API, dashboard 10 paneles, RAG 7 marcos, multi-agente, Docker, JWT. Claude Code como asistente de programación en todas las fases. |
+| P1 (Práctica 1) | 2026-04-18 a 2026-05-25 (entrega); último commit 2026-05-30 | Diseño de arquitectura, 43 commits, producto completo desplegado en un servidor propio: API, dashboard 10 paneles, RAG 7 marcos, multi-agente, Docker, JWT. Claude Code como asistente de programación en todas las fases. |
 | Fase 0 — auditoría y corrección CI | 2026-09-22 | Diagnóstico inicial: CI rota, bloqueos activos, estado de tests. Planificación de bloques A–E. |
 | Bloques A–E (P3) | 2026-10-04 a 2026-10-06 | Implementación de todos los bloques: seguridad B-1..B-11, corpus ENS, eval harness, Docker Nmap/Nuclei, fixes CI, CLI tests, Validador, compliance panels. Realizado mayoritariamente por Claude Code de forma autónoma en sesiones los días 4 a 6 de octubre; dirección y revisión por bloques a cargo del autor. |
 | Limpieza historial (INC-01) | 2026-10-06 | filter-repo, verificación gitleaks, force-push. Ejecutado por el autor. |
@@ -831,7 +839,7 @@ Historial con un único autor (Michael Jordan Telleria Guadalajara). Cuenta de G
 | **Claude Code** | Asistente de programación principal en P1 (todas las fases, ciclo investigar→diseñar→implementar+tests→revisar→commit) y en P3 (bloques A–E de forma autónoma bajo dirección del autor; redacción de esta memoria a partir de los documentos `P3_*.md`). No se especifica el modelo de Claude Code; el autor no puede verificarlo en el contexto de las sesiones. |
 | **Claude (claude.ai)** | Auditoría del repositorio, planificación de bloques de trabajo, revisión de decisiones de arquitectura (ADR), revisión de esta memoria. |
 | **LLM del producto — Ollama qwen2.5:14b** | Proveedor LLM en desarrollo y benchmarks; seleccionado con `LLM_PROVIDER=ollama`. Todos los evals ejecutados con este modelo. |
-| **LLM del producto — Claude (Anthropic)** | Proveedor LLM en producción; seleccionado con `LLM_PROVIDER=claude`. No se ha ejecutado el eval cuantitativo con este modelo por coste. |
+| **LLM del producto** | Intercambiable con `LLM_PROVIDER`: Ollama `qwen2.5:14b` en local (con él se hicieron la evaluación y el benchmark), Claude (Anthropic) o una API compatible con OpenAI. El despliegue de la P1 usaba Groq (`llama-3.3-70b-versatile`). Con proveedores en la nube no se ha ejecutado el eval cuantitativo. |
 | **Herramientas de IA en P1** | <mark>[PENDIENTE: detalle completo de herramientas IA usadas en P1]</mark> |
 
 **Ground truth del eval:** los 73 casos de correspondencia ENS→ISO tienen como ground truth el SoA TechServ facilitado por el equipo docente. **No fue generado por IA.** Los 16 casos de hallazgo técnico fueron **diseñados por Claude Code** (bloque C, decisión automatizada); sus asignaciones de control ISO son provisionales y <mark>[PENDIENTE: revisados por el autor, sí o no]</mark>.
@@ -860,7 +868,9 @@ cd Rosetta
 cp .env.example .env
 # Editar .env: ROSETTA_USER, ROSETTA_PASSWORD (>=12 chars), ROSETTA_JWT_SECRET (>=32 chars)
 # Para usar Ollama local: LLM_PROVIDER=ollama
-# Para usar Claude: LLM_PROVIDER=claude y ANTHROPIC_API_KEY=<tu clave>
+# Para usar Claude (no verificado): LLM_PROVIDER=claude y ANTHROPIC_API_KEY=<tu clave>
+# Compatible con OpenAI, p. ej. Groq (no verificado): LLM_PROVIDER=openai,
+#   OPENAI_API_KEY, OPENAI_API_BASE=https://api.groq.com/openai/v1, OPENAI_MODEL
 
 # 3. Construir e iniciar
 docker compose up -d --build
@@ -891,7 +901,7 @@ curl http://localhost:8000/health
 
 ### Anexo B — Credenciales de prueba (solo locales y ficticias)
 
-Las credenciales de producción se facilitan al equipo docente por canal privado y no se incluyen en este documento.
+No hay instancia desplegada operativa a fecha de entrega (apdo. 10.1): se evalúa en local, con las credenciales del `.env` de quien instala (Anexo A).
 
 **Credenciales de desarrollo local** (válidas solo para instalaciones desde `.env.example` sin modificar):
 

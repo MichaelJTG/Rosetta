@@ -279,6 +279,27 @@ actualización fluye de GitHub al servidor, nunca al revés.
   `vault/MOC_Roadmap.md`). Probablemente son claves ficticias de los tests del
   Gate CI/CD; si alguna fuera una clave real de un servicio externo, hay que
   revocarla en ese servicio.
-- El nombre `rosetta.aegiscores.com` no resuelve en DNS (NXDOMAIN, comprobado
-  el 2026-10-04 contra 1.1.1.1), aunque el servidor y nginx funcionan. Hay que
-  revisar el registro DNS del dominio.
+- El dominio del despliegue no resuelve en DNS (NXDOMAIN, comprobado el
+  2026-10-04 y el 2026-10-14 contra 1.1.1.1). El despliegue está parado desde
+  el 2026-10-14 (apartado 7); si se reactiva, hay que revisar el registro DNS
+  y renovar el certificado, que caduca el 2026-10-17.
+- La clave del proveedor LLM del servidor (Groq, vía el proveedor compatible
+  con OpenAI) devuelve 401. No se ha cambiado: rotarla o revocarla en Groq es
+  decisión del autor.
+
+---
+
+## 7. Parada del despliegue en servidor propio (2026-10-14)
+
+El despliegue heredado de la P1 no está operativo a fecha de entrega: la
+evaluación se hace en local con Docker siguiendo el README. Para no dejar
+expuesto un servicio que no se usa, se pararon sus contenedores.
+
+| | |
+|---|---|
+| **Estado previo** | Actualizado ese mismo día a `a7d1abd` (`docs/P3_BITACORA.md`, G-2). `/health`, `/docs` y `/dashboard` respondían 200 a través de nginx y TLS, pero `/translate` daba 500 (Groq devuelve 401) y el dominio no está en DNS. |
+| **Qué exponía** | Solo nginx (80 y 443, TLS con Certbot). La app escucha en `127.0.0.1:8000`; Neo4j, ChromaDB y SQLite no tienen puertos publicados. |
+| **Acción** | `docker compose stop` en el directorio del proyecto, a las 05:56 UTC: `app` y `neo4j` en `Exited (0)`. Con `restart: unless-stopped` no vuelven a arrancar si se reinicia el servidor. |
+| **Qué se conserva** | Los volúmenes (`neo4j_data`, `neo4j_logs`, `rosetta_chroma`, `rosetta_data`, `rosetta_reports`), las imágenes (`rosetta-app:latest` y `rosetta-app:pre-20261014`), el `.env` y la copia del despliegue en `/root/backups/rosetta-20261014/`. No se ha borrado nada. |
+| **Comprobación** | Tras la parada, nginx responde 502 para el nombre del despliegue; por IP, 404. Los contenedores de otros proyectos del mismo servidor no se tocaron. |
+| **Para reactivarlo** | `docker compose start`, con una clave de proveedor válida en el `.env`, el registro DNS corregido y el certificado renovado. |

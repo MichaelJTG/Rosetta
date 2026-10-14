@@ -19,10 +19,10 @@ digraph rosetta {
   }
 
   subgraph cluster_server {
-    label="Servidor de producción (Hetzner) · Docker Compose"; style="rounded"; color="#1e3a8a";
+    label="Docker Compose · local (evaluación) o servidor propio (P1, no operativo)"; style="rounded"; color="#1e3a8a";
     fontcolor="#1e3a8a";
 
-    nginx [label="nginx\nTLS :443", fillcolor="#dbeafe"];
+    nginx [label="nginx\nTLS :443\n(solo en el servidor propio)", fillcolor="#dbeafe"];
 
     subgraph cluster_app {
       label="Contenedor app · 127.0.0.1:8000"; style="rounded,filled"; fillcolor="#f8fafc";

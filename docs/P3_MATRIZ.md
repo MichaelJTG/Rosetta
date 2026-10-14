@@ -72,7 +72,7 @@
 | Bloque | Ítems | Commits | Estado |
 |--------|-------|---------|--------|
 | Bloque A (CI, infraestructura, demos) | A-0, A-1, A-3, A-4, A-5, A-6, A-7, A-8, A-9 | `2e7792d`…`419b737` | ✅ Completo |
-| Bloque B (seguridad) | B-1…B-10 (B-11 pendiente, fuera del alcance MVP) | `5ca3ca8`…`f06f726` | ✅ Completo (B-4: default loopback-only + verificado en producción `172.18.0.1/32`; B-9: magic bytes + límite 20 MB + tope páginas + 4 tests) |
+| Bloque B (seguridad) | B-1…B-10 (B-11 pendiente, fuera del alcance MVP) | `5ca3ca8`…`f06f726` | ✅ Completo (B-4: default loopback-only + verificado en el servidor propio el 2026-10-06 `172.18.0.1/32`; B-9: magic bytes + límite 20 MB + tope páginas + 4 tests) |
 | Bloque C (eval + corpus ENS) | C-1, C-2, C-3, C-4 | `92d4b83` · `86a5e91` | ✅ Completo |
 | Bloque D (cierre P3) | D-1, D-2, D-3, D-4, D-5 | `bb8fc2a` · `86a5e91` | ✅ Completo |
 | Bloque E (memoria de insumos) | `docs/P3_MEMORIA_INSUMOS.md` · atribución corpus/ground truth | este commit | ✅ Completo |

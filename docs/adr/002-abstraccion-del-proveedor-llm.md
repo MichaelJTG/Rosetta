@@ -64,3 +64,12 @@ Descartada en esta fase. LiteLLM unifica >100 proveedores y añade ~20 dependenc
 - Implementación: `src/rosetta/llm/` (base.py, claude.py, ollama.py, openai.py, factory.py)
 - Tests: `tests/test_llm.py`
 - Ollama API: https://github.com/ollama/ollama/blob/main/docs/api.md
+
+## Nota (2026-10-14)
+
+La decisión no cambia, pero el uso real fue otro: el despliegue en servidor
+propio de la P1 estaba configurado con `LLM_PROVIDER=openai` contra Groq
+(`llama-3.3-70b-versatile`), no con `ClaudeClient`. A fecha de entrega de la P3
+ese despliegue no está operativo (la clave de Groq devuelve 401) y sus
+contenedores están parados. La evaluación y el benchmark se hicieron con
+`OllamaClient` (`qwen2.5:14b`). Ver `docs/P3_SEGURIDAD.md`, apartado 7.

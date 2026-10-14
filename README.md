@@ -42,10 +42,10 @@ En los paneles conviene distinguir el origen de cada dato:
 |---|---|
 | Ejecutar ROSETTA | **Git** y **Docker** con Compose v2 (Docker Desktop en Windows/macOS). Unos 8 GB de disco para la imagen y los volúmenes, y 4 GB de RAM para los contenedores. |
 | Usar IA **sin API key** | **[Ollama](https://ollama.com)** en el equipo con el modelo `qwen2.5:14b`: ~9 GB de disco y **~12 GB de RAM (o VRAM) libres** al traducir con la ventana de contexto por defecto de ROSETTA (`OLLAMA_NUM_CTX=16384`: 11,9 GB medidos). En CPU, mejor 16 GB de RAM o más; con GPU, 12 GB de VRAM o más. |
-| Usar Claude (opcional) | Una API key de Anthropic |
+| Usar un LLM en la nube (opcional, **no verificado**) | Tu propia API key de Anthropic (Claude) o de un proveedor compatible con OpenAI, como Groq |
 | Desarrollar o pasar los tests (opcional) | Python 3.11+ y [uv](https://docs.astral.sh/uv/) |
 
-La imagen se construye para **amd64 y arm64**. Producción corre en ARM64.
+La imagen se construye para **amd64 y arm64** (el servidor propio de la P1 era ARM64).
 
 ---
 
@@ -75,13 +75,25 @@ en `ROSETTA_JWT_SECRET=`.
 
 | Memoria libre en el equipo | Configuración |
 |---|---|
-| **12 GB de VRAM o más**, o **16 GB de RAM o más** sin GPU | Ollama con `qwen2.5:14b` (por defecto). Ocupa 11,9 GB con `OLLAMA_NUM_CTX=16384`. En una GPU de 16 GB: 6,95 s por traducción (mediana de 20). En CPU no se ha medido. |
-| Menos | Claude: en `.env`, `LLM_PROVIDER=claude` y tu `ANTHROPIC_API_KEY`. No usa memoria local; cada traducción es una llamada de pago a la API de Anthropic. |
+| **12 GB de VRAM o más** | Ollama con `qwen2.5:14b` (por defecto). Ocupa 11,9 GB con `OLLAMA_NUM_CTX=16384`. En una GPU de 16 GB: 6,95 s por traducción (mediana de 20 llamadas). |
+| **16 GB de RAM o más, sin tarjeta gráfica** | El mismo modelo en la CPU. Funciona, pero **cada traducción puede tardar mucho** (no se ha medido; en GPU son ~7 s) y el límite de 30 s de RNF-09 no está garantizado. |
+| Menos | Un LLM en la nube con tu propia clave (abajo). **No verificado.** |
 
 - **Ollama:** descarga el modelo una vez con `ollama pull qwen2.5:14b` y deja
   Ollama abierto. El `.env` ya apunta a `http://host.docker.internal:11434`. En
   **Linux**, arranca Ollama escuchando en todas las interfaces
   (`OLLAMA_HOST=0.0.0.0 ollama serve`) para que el contenedor llegue a él.
+- **LLM en la nube — no verificado.** Con tu propia clave, en `.env`:
+  - Claude: `LLM_PROVIDER=claude`, `ANTHROPIC_API_KEY` y, si quieres otro
+    modelo, `ANTHROPIC_MODEL`.
+  - Compatible con OpenAI, por ejemplo Groq: `LLM_PROVIDER=openai`,
+    `OPENAI_API_KEY`, `OPENAI_API_BASE=https://api.groq.com/openai/v1` y
+    `OPENAI_MODEL=llama-3.3-70b-versatile`.
+
+  A 2026-10-14 ninguna de las dos se ha probado con esta versión: no había
+  una clave válida (las disponibles devolvían 401). El despliegue de la P1
+  estaba configurado con Groq. No usa memoria local, pero cada traducción es
+  una llamada de pago (o con límite de uso) y el hallazgo sale del equipo.
 - **No ahorres memoria con un modelo menor ni bajando `OLLAMA_NUM_CTX`.**
   `qwen2.5:7b` cabe en 5,6 GB, pero en una prueba con 8 hallazgos no acertó
   ningún control ISO del ground truth (el 14b: F1 0,17) y, con 3 marcos, 21 de
@@ -180,6 +192,7 @@ IP privadas y `localhost`.
 | `ROSETTA_NUCLEI_TAGS` / `ROSETTA_NUCLEI_SEVERITY` | Plantillas de Nuclei (por tag) y severidades del Modo Auditoría | `exposure,misconfig,tech` / todas |
 | `OLLAMA_NUM_CTX` | Ventana de contexto pedida a Ollama en cada llamada. Con `qwen2.5:14b`, 16384 ocupa 11,9 GB y 4096 ocupa 9,5 GB, pero con 4096 Ollama recorta el prompt del Copilot y las traducciones contra muchos marcos | `16384` |
 | `ANTHROPIC_API_KEY` | Solo con `LLM_PROVIDER=claude` | placeholder no válido |
+| `OPENAI_API_KEY` / `OPENAI_API_BASE` / `OPENAI_MODEL` | Solo con `LLM_PROVIDER=openai`: cualquier API compatible con OpenAI (Groq: `https://api.groq.com/openai/v1`) | placeholder no válido / `https://api.openai.com/v1` / `gpt-4o` |
 | `ROSETTA_MARCOS` | Marcos por defecto del Traductor | `iso_27001_2022,ens_2022` |
 | `ROSETTA_USER` / `ROSETTA_PASSWORD` | Cuenta del panel (contraseña de 12 caracteres o más) | credenciales de prueba ficticias |
 | `ROSETTA_USERS_EXTRA` | Cuentas adicionales `user:clave,user:clave` | vacío |
