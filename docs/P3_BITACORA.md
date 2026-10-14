@@ -435,3 +435,42 @@ Fallos encontrados al hacer las capturas de la memoria con el stack local (Docke
 | **Sin verificar** | Claude: la `ANTHROPIC_API_KEY` del `.env` local da 401 (`invalid x-api-key`). Ante ese error, `/translate` responde 500 genérico (sin detalles en el cuerpo); no se cambia en la congelación. |
 | **PDF** | Regenerado con F-8 y F-9: 46 páginas; cuerpo p3–p38 = 36 (el enunciado pide 20–40 sin portada, índice ni anexos), anexos p39–p46; 12 figuras, 33 tablas. Generado dentro de la imagen `rosetta-app` (WeasyPrint necesita pango; en Windows falta GTK). |
 | **Commit** | este commit |
+
+## Bloque G · Congelación del código en `a7d1abd` (2026-10-14)
+
+Desde `a7d1abd` solo cambian `docs/`, `eval/reports/` y el README. El tag
+`v1.0-practica3` irá sobre el último commit de documentación, tras grabar el
+vídeo, comprobando antes que `git diff a7d1abd..HEAD` sobre `src/`, `Dockerfile`,
+`docker-compose.yml`, `pyproject.toml`, `uv.lock`, `scripts/`, `lab/` y `corpus/`
+está vacío.
+
+### G-1 · Informes de eval versionados
+
+| | |
+|---|---|
+| **Qué** | `eval/reports/` está en `.gitignore`, pero la memoria, la matriz y los requisitos citan sus informes como evidencia. Añadidos con `git add -f` los de 2026-10-04 (correspondencia `22-14-23`, hallazgos `22-23-10`, piloto del Validador `22-25-31`) y 2026-10-11 (Validador `15-28-50`, benchmark `15-28-12`). Los hooks solo quitaron espacios finales (`git diff -w` vacío). |
+| **Commit** | `89d7ea6` |
+
+### G-2 · Despliegue de `a7d1abd` en producción
+
+| | |
+|---|---|
+| **Estado previo** | El servidor seguía en `e2819f0` (historial anterior al filter-repo) con una imagen de hace 4 meses. LLM: `LLM_PROVIDER=openai` contra Groq (`llama-3.3-70b-versatile`), no Claude. |
+| **Hecho** | Copia en `/root/backups/rosetta-20261014/` (`.env`, commit previo, imagen `rosetta-app:pre-20261014`, volúmenes de Neo4j, ChromaDB y datos). `git checkout a7d1abd`, build en el servidor (aarch64), `docker compose down -v` y `up -d`. El `load-corpus` dentro de la app murió por falta de memoria (OOM, 3,8 GB de RAM sin swap, compartidos con otro proyecto); repetido con la app parada en un contenedor de un solo uso (`compose run --rm`): 229 fragmentos en 35 s. |
+| **Comprobado** | `/health` 200, `/docs` 200 y `/dashboard` 200 a través de nginx y TLS; `/compliance/state/{marco}` 200; `/config/ui`: openai · `llama-3.3-70b-versatile`. |
+| **No funciona** | `/translate` responde 500: Groq devuelve 401, la clave del servidor ya no es válida (la misma con la versión anterior). Sin LLM, el seed falla en el primer paso: producción queda sin datos de demostración. `rosetta.aegiscores.com` sigue sin DNS (NXDOMAIN) y su certificado caduca el 2026-10-17; por IP, nginx responde 404. No se han cambiado claves. |
+
+### G-3 · Limitaciones añadidas a la memoria (apdo. 10.1)
+
+| | |
+|---|---|
+| **Qué** | El 500 genérico de `/translate` cuando falla la clave del proveedor LLM (visto con Claude en local y con Groq en producción) y que, con 3 marcos, ningún modelo citó controles de NIS2 en las pruebas de F-9. |
+
+### G-4 · Ensayo automático del guion del vídeo
+
+| | |
+|---|---|
+| **Qué** | Entorno local reiniciado (`down -v`, `up --build` 211 s, corpus 24 s, seed 118 s: 12 pasos, 0 errores) y ensayo con Playwright de cada paso de `P3_VIDEO_SCRIPT.md`, sin grabar. |
+| **Medido** | Login 4 s · traducción desde el panel 12 s · con Validador 29 s · `load-corpus` en directo 26 s (la app sigue traduciendo después) · auditoría del laboratorio 45 s (18 hallazgos) · drift 14 s · dosier 1 s · cumplimiento 3 s · pytest 76 s (556 passed, 85 %). |
+| **Corregido en el guion** | `rosetta translate "texto"` no existe así (el CLI espera un JSON): se usa el panel. Controles esperados fijos (`8.8`, `8.19`, `5.23`): el LLM no es determinista. «114 controles de ISO 27001:2022» → 93. Mejor/peor familia del eval (0,73 / 0,13) → 0,55 / 0. B-4: el límite es 5/min, el 429 llega en el 6.º intento, no en el 3.º. B-9: la cabecera `X-Override-Limit` no existe. `/audit/start` con `target`/`scope` da 422: se usa el panel contra `lab-objetivo`. El dosier no se genera por hallazgo. mypy: sin cifra de ficheros y mostrado en la CI (en local falla con Python 3.13 por los stubs de numpy). INC-01: el historial sí se reescribió (filter-repo). |
+| **Nuevo** | `docs/P3_HOJA_GRABACION.md`: hoja de una página con pestañas, textos de formulario y duraciones. |

@@ -782,6 +782,8 @@ El Validador no cambia la traducción: la aprueba o la rechaza. Discrimina (las 
 ### 10.1 Qué no funciona
 
 - **Commit huérfano `e2819f0` accesible en GitHub:** el objeto persiste tras el filter-repo porque GitHub requiere una solicitud explícita de purga al soporte. Pendiente de respuesta.
+- **Error 500 genérico de `POST /translate` cuando falla la clave del proveedor LLM:** con una `ANTHROPIC_API_KEY` no válida, Anthropic responde 401 y la API devuelve «Internal Server Error», sin indicar que el fallo está en el proveedor (visto el 2026-10-14). El cuerpo no filtra datos, pero no ayuda a diagnosticar; lo adecuado sería un 502 o 503 con un mensaje claro. No se corrige: el código está congelado desde el 2026-10-14.
+- **NIS2 en traducciones con varios marcos:** en las pruebas del 2026-10-14 con 3 marcos (ISO 27001, ENS y NIS2) sobre 8 hallazgos, ni `qwen2.5:14b` ni `qwen2.5:7b` citaron ningún control de NIS2. Pedir varios marcos no garantiza que la respuesta los cubra todos. La causa (recuperación del RAG o el propio LLM) no se ha investigado.
 
 ### 10.2 Qué funciona con condiciones
 
