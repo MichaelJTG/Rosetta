@@ -515,3 +515,14 @@ está vacío.
 | **No funciona** | Panel «Roadmap Vuln.» (RF-20b) siempre vacío: pide `/vuln-roadmap?estado=all` y el endpoint no admite `all` (0 filas; sin filtro, 35). Path traversal con `../` da 404 del router; el 400 de la lista blanca sale con `..\`. `curl -I` da 405 (`/health` no admite HEAD). Código congelado: se cuentan como limitación. |
 | **Corregido en el material** | El curl del Validador con `-d` y tildes daba 400 desde Git Bash (cp1252): el cuerpo va en `validar.json`. |
 | **Recuento** | La matriz tiene 25 RF + 12 RNF (37); la estructura dice 26 + 12 (38). El guion usa 25 + 12. |
+
+### G-9 · Panel Roadmap (RF-20b) con `estado=all` · nuevo punto de congelación
+
+| | |
+|---|---|
+| **Fallo** | El dashboard pide `/vuln-roadmap?estado=all` (`src/rosetta/api/dashboard.py`, línea 3673). En `vuln_roadmap()` (`src/rosetta/api/main.py`), la condición `if estado and estado_hallazgo != estado:` descartaba todos los hallazgos con `estado == "all"`: el panel salía vacío (0 filas con 10 hallazgos cargados; sin filtro, 10). |
+| **Arreglo** | La condición pasa a `if estado and estado != "all" and estado_hallazgo != estado:` y la descripción del `Query` incluye `all`. Único cambio en `src/`: 2 líneas de `main.py`. |
+| **Test** | `test_vuln_roadmap_estado_all_returns_everything` (`tests/test_api_controls.py`): con hallazgos, `?estado=all` devuelve el mismo `total` que sin filtro, y es mayor que 0. Sin el arreglo falla (`assert 0 == 3`). ruff en verde; pytest 557 passed, 1 skipped, 85 %; mypy strict en verde en CI (en local, el venv con Python 3.13 instala numpy 2.5, cuyos stubs no analiza mypy con `python_version = "3.11"`; con 3.12, sin errores). |
+| **Entorno** | `docker compose up -d --build app` con el override de grabación: los 10 hallazgos se conservan y `?estado=all` devuelve 10 (0,2 s). Captura del panel con datos en `~/.rosetta/grabacion/pregenerado/roadmap_vuln.png`. |
+| **Congelación** | `81e76fa` es el nuevo punto de congelación y sustituye a `9ce6942`. |
+| **Commit** | `81e76fa` (CI en verde) |

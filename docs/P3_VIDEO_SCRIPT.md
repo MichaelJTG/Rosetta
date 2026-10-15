@@ -61,8 +61,7 @@ ventana de incógnito y el dashboard principal en la pantalla de login (hoja, «
 > el tipo de origen, no el adaptador. La evaluación cuantitativa del Traductor es nueva. Y el
 > despliegue en servidor propio se ha retirado: la evaluación se hace en local con Docker.
 > Según la matriz: 23 funcionales cumplidos y 2 parciales, el Modo Auditoría y el Validador;
-> 11 no funcionales cumplidos y 1 parcial, la latencia. Al ensayar hoy, el panel del roadmap ha
-> salido vacío; lo cuento al final.»
+> 11 no funcionales cumplidos y 1 parcial, la latencia.»
 
 ---
 
@@ -247,15 +246,13 @@ En el ensayo: `bloquear: true` por `verify=False` (PCI-DSS Req. 3.5, cifrado del
 
 > «El catálogo de controles: estado, responsable, comentarios y evidencias de cada uno.»
 
-### Roadmap de vulnerabilidades [RF-20b] · 0:15 · panel ❌
+### Roadmap de vulnerabilidades [RF-20b] · 0:15 · ✅
 
-**[Pantalla: «Roadmap Vuln.»]** El panel sale vacío. Opcional, comando 3b (la misma información
-por API).
+**[Pantalla: «Roadmap Vuln.»]**
 
-> «Este panel debería listar cada vulnerabilidad con su plazo y su estado, pero sale vacío: el
-> panel pide los hallazgos con el filtro "all" y el endpoint no lo reconoce. Sin el filtro, la
-> API los devuelve todos. Lo encontré ensayando el vídeo, con el código ya congelado, y está en
-> las limitaciones.»
+> «Cada vulnerabilidad con su plazo, su propietario y su estado. Al ensayar el vídeo este panel
+> salía vacío: pedía los hallazgos con el filtro "all" y el endpoint no lo reconocía. Lo corregí y
+> añadí un test para ese caso.»
 
 ### Evidencias [RF-20c] · 0:15 · medido 1 s
 
@@ -400,8 +397,7 @@ Neo4j vuelve a estar *healthy* a los ~17 s.
 > La latencia máxima, en frío, pasa de 30 segundos. No hay roles: todos los usuarios tienen los
 > mismos permisos. Shodan y HIBP siguen en el roadmap. De los 7 marcos, 5 tienen solo un corpus
 > base. El despliegue en servidor propio está retirado. Groq funciona, pero su plan gratuito no
-> aguanta el seed entero. Y el panel del roadmap de vulnerabilidades sale vacío por un filtro mal
-> resuelto, aunque la API devuelve los datos.
+> aguanta el seed entero.
 > Como mejoras: roles, los adaptadores pendientes, evaluar los otros cinco marcos y escanear la
 > imagen Docker. Gracias.»
 

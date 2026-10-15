@@ -80,7 +80,7 @@ controles concretos pueden no coincidir con los del ensayo.
 | 10:50 | CLI [RF-18] | Git Bash | Comando **3** | 2 s · ✅ |
 | 11:05 | Cumplimiento por marco [RF-19] | «Cumplimiento» | Chip «ISO 27001:2022» | 2 s · ✅ |
 | 11:25 | Catálogo de controles [RF-20a] | «Catálogo de Controles» | Clic en una fila (p. ej. A.8.20) → modal; «Cancelar» | 1 s · ✅ 18 controles |
-| 11:40 | Roadmap de vulnerabilidades [RF-20b] | «Roadmap Vuln.» | **Sale vacío** (ver «No funciona»). Opcional: comando **3b** | 1 s · ❌ panel |
+| 11:40 | Roadmap de vulnerabilidades [RF-20b] | «Roadmap Vuln.» | Plazo, propietario y estado de cada hallazgo (corregido en `81e76fa`). Comando **3b**: ya no necesario | 0,2 s · ✅ |
 | 11:55 | Evidencias [RF-20c] | «Panel de Evidencias» | Decir que es mapeo determinista, sin IA | 1 s · ✅ |
 | 12:10 | Gap analysis [RF-20d] | «Pre-Gap Análisis» | ISO 27001 → «Analizar con mis datos» | 23 s · ✅ |
 | 12:40 | Plan director [RF-20e] | Ventana de incógnito | **Pregenerado antes de grabar; decirlo** | 48 s en directo |
@@ -113,14 +113,14 @@ hacia 13:12, mientras se cuenta el plan. Si se lanza a las 12:55, el bloque se a
 ## 7. Cierre · 16:40 (1:00)
 
 Limitaciones: Modo Auditoría solo contra laboratorio, Validador opcional, latencia máxima en frío,
-sin roles, Shodan/HIBP pendiente, 5 marcos con corpus base, despliegue retirado, Groq con límite
-gratuito y **panel de Roadmap vacío**.
+sin roles, Shodan/HIBP pendiente, 5 marcos con corpus base, despliegue retirado y Groq con límite
+gratuito.
 
 ## No funciona (código congelado: se cuenta como limitación)
 
-- **Panel «Roadmap Vuln.» (RF-20b) siempre vacío.** Pide `/vuln-roadmap?estado=all` y el endpoint
-  filtra por `estado == "all"`, que no coincide con ningún hallazgo: 0 filas. Sin el filtro, la API
-  devuelve todos (35 en el ensayo). El comando 3b lo enseña por API.
+- ~~**Panel «Roadmap Vuln.» (RF-20b) siempre vacío.**~~ **Corregido en `81e76fa` (G-9)**: el
+  endpoint acepta `estado=all` y el panel lista todos los hallazgos. El comando 3b (plan B por
+  API) ya no es necesario.
 - **Path traversal con `../`** responde 404 y no 400: la ruta con `/` no llega al endpoint (la
   rechaza el router). El 400 de la lista blanca se ve con `..\`. Las dos peticiones se rechazan.
 - **`curl -I`** responde 405 porque `/health` no admite HEAD (las cabeceras de seguridad salen
