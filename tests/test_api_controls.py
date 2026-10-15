@@ -343,6 +343,21 @@ async def test_vuln_roadmap_filter_by_estado(
         assert item["estado"] == "activo"
 
 
+@pytest.mark.asyncio
+async def test_vuln_roadmap_estado_all_returns_everything(
+    ctrl_client_with_findings: tuple[AsyncClient, ControlStore],
+) -> None:
+    """GET /vuln-roadmap?estado=all devuelve lo mismo que sin filtro (RF-20b)."""
+    c, _ = ctrl_client_with_findings
+    sin_filtro = await c.get("/vuln-roadmap")
+    con_all = await c.get("/vuln-roadmap?estado=all")
+    assert sin_filtro.status_code == 200
+    assert con_all.status_code == 200
+    total = sin_filtro.json()["total"]
+    assert total > 0
+    assert con_all.json()["total"] == total
+
+
 # ---------------------------------------------------------------------------
 # Evidence panel
 # ---------------------------------------------------------------------------

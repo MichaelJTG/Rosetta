@@ -1755,7 +1755,7 @@ async def vuln_roadmap(
     findings: FindingsDep,
     ctrl_store: ControlStoreDep,
     estado: str | None = Query(
-        None, description="Filtra por estado: activo|en_progreso|solucionado"
+        None, description="Filtra por estado: activo|en_progreso|solucionado|all"
     ),
     criticidad: str | None = Query(
         None, description="Filtra por criticidad: baja|media|alta|critica"
@@ -1771,7 +1771,7 @@ async def vuln_roadmap(
     items: list[VulnRoadmapItem] = []
     for m in findings:
         estado_hallazgo = estados_map.get(m.id_hallazgo, "activo")
-        if estado and estado_hallazgo != estado:
+        if estado and estado != "all" and estado_hallazgo != estado:
             continue
 
         compliance = m.compliance_data
