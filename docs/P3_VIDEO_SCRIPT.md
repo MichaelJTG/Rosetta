@@ -1,382 +1,420 @@
-# docs/P3_VIDEO_SCRIPT.md — Guión de demostración P3
+# docs/P3_VIDEO_SCRIPT.md — Guion del vídeo P3
 
-> Duración estimada: **12–14 minutos**.
-> Herramientas: navegador + terminal. Docker corriendo con `docker compose up -d`.
-> Caso ficticio: empresa TechServ S.L. (datos generados con `seed_demo.py`).
+> Duración prevista: **17:40**, en los 7 bloques de `data/fuentes/estructura_video.md`.
+> Hoja de una página: `docs/P3_HOJA_GRABACION.md`. Comandos numerados:
+> `~/.rosetta/grabacion/comandos.txt` (fuera del repo, junto con el PDF ficticio, el diff del
+> Gate y el TOKEN). Caso ficticio: TechServ S.L. Tiempos medidos en el ensayo automático del
+> **2026-10-15** contra `9ce6942` (GPU de 16 GB, Ollama `qwen2.5:14b` en caliente). Los
+> controles que devuelve el LLM cambian de una ejecución a otra.
 
 ---
 
-## Antes de grabar
+## Preparación (no se graba)
 
-El `.env` (o un override de compose) necesita `ROSETTA_USER`, `ROSETTA_PASSWORD`,
-`ROSETTA_JWT_SECRET`, `ROSETTA_AUDIT_ALLOWLIST=lab-objetivo` y
-`OLLAMA_URL=http://host.docker.internal:11434`. Tiempos medidos en el ensayo del
-2026-10-14 (GPU de 16 GB, Ollama `qwen2.5:14b`):
+Override local `~/.rosetta/compose.grabacion.yml` (usuario de demo, secreto JWT,
+`ROSETTA_AUDIT_ALLOWLIST=lab-objetivo`, `OLLAMA_URL=http://host.docker.internal:11434`).
+En Git Bash, desde la raíz del repo:
 
 ```bash
-# Levantar el stack con el laboratorio del Modo Auditoría (~3,5 min con --build)
-docker compose --profile lab up -d
-
-# Esperar a que la app esté healthy (~20 s)
-docker compose ps       # app: healthy, neo4j: healthy
-
-# Cargar el corpus (~25 s) y reiniciar la app
-docker compose exec app rosetta load-corpus all corpus
-# → ✓ 229 fragmentos indexados en ChromaDB (7 marcos)
-docker compose restart app
-
-# Poblar la demo con hallazgos ficticios (~2 min: 12 pasos)
-docker compose exec app python scripts/seed_demo.py
+export COMPOSE_FILE="docker-compose.yml;C:/Users/WorkStation/.rosetta/compose.grabacion.yml"
+docker compose --profile lab down -v                        # 5 s
+docker compose --profile lab up -d --build                  # 20 s con caché; app healthy en ~15 s
+docker compose exec -T app rosetta load-corpus all corpus   # 15 s → 229 fragmentos, 7 marcos
+docker compose restart app                                  # healthy en ~12 s
+docker compose exec -T app python scripts/seed_demo.py      # 95-160 s → 12 pasos correctos
 ```
 
-Abrir el navegador en `http://localhost:8000/dashboard`.
+Después: bloque 0 de `comandos.txt` (TOKEN), modelo cargado, Plan Director generado en una
+ventana de incógnito y el dashboard principal en la pantalla de login (hoja, «Antes de pulsar REC»).
 
 ---
 
-## Sección 1 · Contexto y problema que resuelve ROSETTA (0:00 – 1:00)
+## Bloque 1 · Presentación (0:00 – 1:00)
 
-**[Pantalla: diapositiva o fondo neutro con texto]**
+### Quién eres y qué es ROSETTA [—] · 1:00
 
-> «Cuando un equipo técnico encuentra una vulnerabilidad — un CVE, una mala configuración,
-> un hallazgo de auditoría — sabe que hay un problema. Lo que no sabe es *qué artículo del
-> ENS*, *qué control de ISO 27001* ni *qué requisito de NIS2* incumple.
-> Esa traducción la hace hoy un consultor de cumplimiento, a mano, en días.
-> ROSETTA la hace en segundos.»
+**[Pantalla: cámara o diagrama]**
 
-**[Pantalla: diagrama de tres capas del CLAUDE.md]**
-
-- Capa de sensores (commodity): Nmap, Nuclei, Wazuh, PDF de auditoría
-- Capa núcleo (IP propia): Traductor Simbiótico — LLM + RAG sobre corpus normativo
-- Capa de salida: API REST, CLI, Dashboard, Gate CI/CD
-
-> «No es un escáner. No compite con Vanta ni Drata. Es el Traductor Simbiótico
-> entre lo técnico y lo legal, con soporte multi-marco simultáneo.»
+> «Soy [nombre] y presento ROSETTA, mi proyecto individual de la Práctica 3, con la autorización
+> del equipo docente para hacerlo en solitario.
+> El problema es el tiempo que pasa entre un hallazgo técnico y su evidencia normativa. Un
+> escáner encuentra un CVE en un firewall; el equipo técnico sabe que hay un problema, pero no
+> qué control de ISO 27001 ni qué medida del ENS incumple. Esa traducción la hace hoy un
+> consultor, a mano, y tarda días.
+> ROSETTA la hace en segundos y con la cita literal de la norma. Está pensado para auditores,
+> CISOs y responsables de cumplimiento. No es un escáner ni un SIEM: orquesta herramientas que
+> ya existen y traduce lo que encuentran.»
 
 ---
 
-## Sección 2 · Login y dashboard (1:00 – 1:45)
+## Bloque 2 · Requisitos (1:00 – 2:00)
 
-**[Pantalla: navegador → http://localhost:8000/dashboard]**
+### Requisitos de la P1 y cambios [—] · 1:00
 
-1. Ir a `http://localhost:8000/dashboard`.
-2. Introducir credenciales de demo.
-3. Mostrar el panel de inicio: métricas de cumplimiento por marco.
-4. Señalar los 16 paneles del menú lateral.
+**[Pantalla: `docs/P3_MATRIZ.md` en GitHub]**
 
-> «ROSETTA tiene 31 endpoints HTTP; 30 están documentados en Swagger. El dashboard da acceso
-> visual a los más relevantes. Vamos directamente a lo que importa: la traducción.»
-
----
-
-## Sección 3 · Traducción de hallazgo técnico (1:45 – 3:30) ← RF-01, RF-02
-
-**[Pantalla: panel «Traducir» del dashboard]**
-
-Panel «Traducir» → «+ Traducir hallazgo». Origen `manual`, dificultad `baja`, activo
-`fw-perimetral.techserv.example`, evidencia «CVE-2024-3400: RCE sin
-autenticación en PAN-OS (GlobalProtect). CVSS 10. Explotación activa en el
-firewall perimetral de TechServ.», vector «Petición HTTP manipulada contra el
-portal GlobalProtect expuesto a Internet», marcos ISO 27001:2022 y ENS 2022 →
-«Traducir hallazgo» (~12 s). No usar `rosetta translate` en directo: el CLI recibe la
-ruta de un JSON, no texto libre.
-
-**Mostrar la respuesta:**
-- `controles_incumplidos`: los que devuelva el LLM; no son deterministas (en el ensayo: `A.8.20` y `mp.s.2`, uno de cada marco)
-- `cita_normativa`: fragmento literal del corpus
-- `justificacion`: por qué aplica ese control
-
-> «El Traductor usa RAG sobre el corpus. Recupera los fragmentos más relevantes
-> y fuerza al LLM a responder con IDs de control estructurados mediante tool-use.
-> Si el LLM intenta responder fuera del esquema Pydantic, el sistema lo rechaza.
-> No hay respuesta de texto libre: solo JSON validado.»
-
-**Mostrar el modo validado** (~30 s; en el ensayo el Validador rechazó la
-traducción, `valida: false`):
-
-```bash
-TOKEN=$(curl -s -X POST http://localhost:8000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"auditor-demo","password":"cambia-esta-clave-de-prueba"}' \
-  | python -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
-curl -s -X POST "http://localhost:8000/translate" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"hallazgo": {"origen": "manual", "activo_detectado": "vpn.techserv.example",
-       "evidencia": "4 cuentas de administración sin MFA",
-       "vector_ataque": "Acceso VPN de administradores solo con contraseña",
-       "dificultad_explotacion": "media"},
-       "marcos": ["ens_2022"], "validar": true}'
-```
-
-> «Con `"validar": true` en el cuerpo, el agente Validador actúa como segunda opinión sobre la
-> traducción. Añade latencia, pero está disponible para casos críticos.
-> El cliente controla el coste-calidad.»
+> «La matriz de trazabilidad relaciona cada requisito con su commit, sus tests y su evidencia.
+> Son 25 funcionales, de RF-01 a RF-19 y de RF-20a a RF-20f, y 12 no funcionales.
+> Respecto a la P1 hay cuatro cambios. RF-20 era un único "panel avanzado" y se ha partido en
+> seis requisitos para poder trazarlos: catálogo, roadmap, evidencias, gap analysis, plan
+> director y análisis de riesgos. Los adaptadores de Shodan y HIBP pasan al roadmap: solo existe
+> el tipo de origen, no el adaptador. La evaluación cuantitativa del Traductor es nueva. Y el
+> despliegue en servidor propio se ha retirado: la evaluación se hace en local con Docker.
+> Según la matriz: 23 funcionales cumplidos y 2 parciales, el Modo Auditoría y el Validador;
+> 11 no funcionales cumplidos y 1 parcial, la latencia. Al ensayar hoy, el panel del roadmap ha
+> salido vacío; lo cuento al final.»
 
 ---
 
-## Sección 4 · Pipeline multi-marco y corpus (3:30 – 4:15) ← RF-02, RF-03
+## Bloque 3 · Arquitectura (2:00 – 3:30)
 
-**[Pantalla: terminal]**
+### Diagrama de componentes [—] · 1:30
 
-```bash
-docker compose exec app rosetta load-corpus all corpus
-```
+**[Pantalla: `docs/memoria/diagramas/componentes.svg`]**
 
-Mostrar (salida del comando; `GET /health` solo devuelve `status` y `version`):
-- 229 fragmentos indexados
-- 7 marcos → ISO 27001:2022, ENS 2022, NIS2, DORA, RGPD, NIST CSF 2.0, PCI-DSS 4.0
-
-> «El corpus incluye el Anexo II completo del RD 311/2022 (73 medidas ENS),
-> los 93 controles del Anexo A de ISO 27001:2022, y cinco marcos adicionales.
-> ChromaDB filtra por `framework_id` para que cada traducción recupere solo
-> los fragmentos del marco solicitado.»
-
----
-
-## Sección 5 · Evaluación del Traductor — Bloque C (4:15 – 7:00)
-
-**[Pantalla: terminal → eval/reports/]**
-
-> «Aquí está el resultado más importante de esta práctica desde el punto de vista
-> de la calidad del sistema. El harness mide el Traductor contra un ground truth externo:
-> el SoA real del caso TechServ, creado por el equipo docente.
-> La regla es estricta: prohibido usar salida de IA como ground truth.
-> Si midiéramos el modelo contra sí mismo, estaríamos midiendo coherencia,
-> no calidad.»
-
-### 5a · Modo correspondencia (73 medidas ENS → ISO 27001:2022)
-
-```bash
-cat eval/reports/2026-10-04T22-14-23_correspondencia_eval_report.md | head -25
-```
-
-```
-Casos evaluados: 73/73
-Precision macro-avg: 0.4078
-Recall macro-avg:    0.2164
-F1 macro-avg:        0.2648
-Tasa alucinación:    0.0000  ←
-Tasa discrepancia:   0.6250
-```
-
-> «El número clave es la tasa de alucinación: **cero**.
-> En los 73 casos, el Traductor nunca citó un control que no existe en ISO 27001:2022.
-> Eso es lo que el RAG garantiza: el LLM solo puede recuperar controles del corpus.»
-
-> «La discrepancia es distinta de la alucinación. Un control alucinado es uno inventado,
-> inexistente en la norma — eso sería un error grave y no ocurrió ninguna vez.
-> Un control discrepante es un control real de ISO 27001, pero distinto al que el
-> ground truth asociaba a esa medida ENS. El Traductor se equivoca en *cuál* control
-> es el más relevante — eso explica el F1=0.26 —, pero nunca inventa identificadores.
-> Esta distinción es la que justifica el diseño RAG: sin corpus, habría alucinaciones.»
-
-> «Mejor familia con más de un caso: "Control de acceso", con F1 = 0,55.
-> Peores: "Protección de las comunicaciones" y "Protección de los soportes de
-> información", con F1 = 0 en sus 9 casos: el LLM elige controles reales de
-> ISO 27001, pero no los que asocia el SoA.»
-
-### 5b · Modo hallazgo (16 hallazgos ficticios → ISO 27001:2022)
-
-```bash
-cat eval/reports/2026-10-04T22-23-10_hallazgo_eval_report.md | head -25
-```
-
-```
-Casos evaluados: 16/16
-Precision macro-avg: 0.3125
-Recall macro-avg:    0.2812
-F1 macro-avg:        0.2813
-Tasa alucinación:    0.0000  ←
-Tasa discrepancia:   0.7568
-```
-
-> «16 hallazgos técnicos ficticios — CVEs, malas configuraciones, PII en logs.
-> Mismo resultado: cero alucinación.
-> 0 % en 73 + 16 = **89 casos en total**.
-> El RAG actúa como barrera. El LLM ve solo fragmentos del corpus;
-> si el control no está en el corpus, no puede aparecer en la respuesta.»
-
-### 5c · Comparativa Traductor solo vs Traductor + Validador
-
-```bash
-cat eval/reports/2026-10-11T15-28-50_correspondencia_eval_report.md | grep -A 9 "Comparativa"
-```
-
-```
-Casos con validación:            73
-Aprobados por Validador:         39
-Rechazados por Validador:        34
-F1 medio aprobados:          0.3615
-F1 medio rechazados:         0.1706
-Precision rechazo @F1<0.5:   0.8235
-```
-
-> «El Validador es un agente independiente que recibe la traducción y emite un
-> veredicto. La pregunta es: ¿rechaza traducciones que realmente están mal?
-> Sobre los 73 casos, las aprobadas tienen un F1 medio de 0,36 y las
-> rechazadas de 0,17: discrimina. De cada 100 rechazos, 82 eran traducciones
-> malas.»
-
-> «Pero no basta como filtro. Aprueba 23 de las 51 traducciones malas y
-> rechaza 6 de las 22 buenas. Quedarse solo con las aprobadas sube el F1 de
-> 0,27 a 0,36 a costa de descartar casi la mitad. Es una segunda opinión;
-> no sustituye la revisión del auditor.»
+> «Tres capas. Abajo, los sensores: Nmap y Nuclei para la parte ofensiva, alertas de Wazuh para
+> la defensiva y los informes PDF de auditoría. No los modifico: los orquesto por línea de
+> comandos.
+> En el centro, el núcleo: una API FastAPI que sirve también el dashboard. El Traductor usa RAG:
+> el corpus de 7 marcos está indexado en ChromaDB, se recuperan los fragmentos del marco pedido y
+> el LLM solo puede responder llamando a una función con un esquema Pydantic. El LLM es
+> intercambiable: Ollama en local, que es lo que vais a ver, o cualquier API compatible con
+> OpenAI, como Groq, que también he probado. Neo4j guarda el grafo activo-control, pero es
+> opcional: si se cae, la API sigue. El historial de hallazgos va en SQLite.
+> Arriba, las salidas: API REST, CLI, dashboard, dosier en PDF y el gate de CI/CD.
+> Qué hace la IA: traducir, validar, el Copilot, el drift, el Gate, leer los PDF, el gap
+> analysis, el plan director y las amenazas del análisis de riesgos. Qué es determinista: los
+> escáneres, la correlación con Wazuh, el dosier, el panel de evidencias, el cumplimiento por
+> marco, el catálogo y el grafo.»
 
 ---
 
-## Sección 6 · Seguridad del producto — Bloque B (7:00 – 9:00)
+## Bloque 4 · Demostración (3:30 – 13:10)
 
-> «La seguridad de ROSETTA como producto — no lo que mide, sino lo que protege
-> al propio sistema — se documentó en un modelo de amenazas STRIDE con 10 bloques.»
+### Login y dashboard [RF-15, RF-12] · 0:30 · medido 4 s
 
-### B-4 · Rate limiting por IP real (no por XFF forjable)
+**[Pantalla: `localhost:8000/dashboard`, pantalla de login]** Usuario `auditor-demo`, contraseña
+`cambia-esta-clave-de-prueba` → «Entrar».
 
-```bash
-# Seis logins fallidos seguidos desde el mismo cliente (límite: 5 por minuto)
-for i in 1 2 3 4 5 6; do
-  curl -s -o /dev/null -w "%{http_code} " \
-    -X POST http://localhost:8000/auth/login \
-    -H "Content-Type: application/json" \
-    -d '{"username":"admin","password":"wrong"}'
-done
-# → 401 401 401 401 401 429
-# Cuentan todos los logins del último minuto, también el del TOKEN:
-# lanzar el bucle al menos 1 minuto después del último login.
-```
+> «El acceso usa JWT: un token de 30 minutos y otro de refresco. El login está limitado a cinco
+> intentos por minuto. Estos son los 16 paneles: análisis, inteligencia, asistencia, datos y los
+> seis de gestión que salen de RF-20.»
 
-> «El cliente que supera el límite ve 429. El segundo cliente, con otra IP,
-> empieza su contador desde cero. Antes de este fix, la app usaba X-Forwarded-For,
-> que un atacante puede forjar. Ahora usa X-Real-IP, que nginx pone y el cliente
-> no puede sobrescribir.»
+### Traducir un hallazgo [RF-01, RF-02, RF-03] · 1:00 · medido 25 s
 
-### B-9 · Protección de `POST /ingest/pdf`
+**[Pantalla: «Traducir» → «+ Traducir hallazgo»]** Origen `manual`, dificultad `baja`, activo
+`fw-perimetral.techserv.example`, evidencia «CVE-2024-3400: RCE sin autenticación en PAN-OS
+(GlobalProtect). CVSS 10. Explotación activa en el firewall perimetral de TechServ.», vector
+«Petición HTTP manipulada contra el portal GlobalProtect expuesto a Internet», marcos ISO
+27001:2022 y ENS 2022 → «Traducir hallazgo».
 
-```bash
-# 1. Fichero sin magic bytes PDF → 400
-printf "esto no es un pdf" > /tmp/fake.pdf
-curl -s -o /dev/null -w "%{http_code}\n" \
-  -X POST http://localhost:8000/ingest/pdf \
-  -H "Authorization: Bearer $TOKEN" \
-  -F "file=@/tmp/fake.pdf"
-# → 400
+> «Un hallazgo real de 2024: ejecución remota sin autenticación en el firewall de Palo Alto.
+> Pido dos marcos a la vez. Mientras responde: el Traductor recupera del corpus los fragmentos
+> de cada marco y obliga al modelo a contestar con controles estructurados. No hay texto libre.»
 
-# 2. PDF que supera el límite de 20 MB → 413
-python -c "open('/tmp/large_test.pdf','wb').write(b'%PDF-1.4\n' + b'0' * 21 * 1024 * 1024)"
-curl -s -o /dev/null -w "%{http_code}\n" \
-  -X POST http://localhost:8000/ingest/pdf \
-  -H "Authorization: Bearer $TOKEN" \
-  -F "file=@/tmp/large_test.pdf"
-# → 413
-```
+Al llegar la respuesta (en el ensayo: `mp.s.2`, `mp.s.2.1`, `A.8.20`, `A.8.21`):
 
-> «Tres defensas en capas. Primero: magic bytes. Se leen los primeros 4 bytes
-> del stream — si no empiezan por `%PDF`, el servidor devuelve 400 antes de leer
-> el fichero completo. Segundo: límite de tamaño configurable — 20 MB por defecto,
-> rechaza con 413 sin cargar el fichero entero en memoria.
-> Tercero: límite de páginas — 500 por defecto, rechazo 422 con pdfplumber
-> antes de procesarlo. Cuatro tests cubren los tres casos.»
+> «Controles incumplidos de los dos marcos, la cita literal de cada uno sacada del corpus, la
+> justificación y la acción de mitigación. El impacto legal sale como crítico.»
 
-### B-1 y B-2 (breve)
+### Dosier [RF-04] · 0:30 · medido 2 s
 
-> «B-1 corrige path traversal en la generación de dosiers: el nombre del fichero
-> pasa por validador Pydantic con regex `[A-Za-z0-9_-]` máximo 64 chars.
-> B-2 corrige XSS almacenado: toda salida del LLM que va a innerHTML en el
-> dashboard pasa por la función `esc()`.»
+**[Pantalla: «Hallazgos»]** Organización «TechServ (caso ficticio)» → «Generar dosier» →
+«↓ Descargar PDF» (el segundo botón; el primero es el Markdown).
+
+> «El dosier reúne todos los hallazgos de la sesión en formato de auditoría: portada, resumen
+> ejecutivo y tabla de controles. Lo genera ReportLab, sin IA. Es el entregable para el auditor.»
+
+### Ingesta de PDF de auditoría [RF-05] · 0:40 · medido 16 s
+
+**[Pantalla: «Ingesta PDF»]** Seleccionar `~/.rosetta/grabacion/auditoria_techserv_ficticia.pdf`
+→ «Extraer hallazgos».
+
+> «Esto es un informe de auditoría ficticio de TechServ, de una página, con cuatro hallazgos:
+> un Struts vulnerable en el portal de proveedores, copias del ERP sin cifrar, una cuenta
+> compartida de administrador y logs de base de datos que no se centralizan. pdfplumber saca el
+> texto y el LLM extrae cada hallazgo con su activo y su evidencia.»
+
+Resultado del ensayo: 4 hallazgos, 1 página, modo `texto`.
+
+> «Los cuatro quedan registrados como hallazgos de la sesión, igual que los de los escáneres.»
+
+### Modo Auditoría contra el laboratorio [RF-06] · 1:00 · medido 43 s
+
+**[Pantalla: «Modo Auditoría»]** Objetivos `http://lab-objetivo`, marcar nuclei y nmap, alcance
+«Laboratorio propio local, contenedor lab-objetivo, autorizado por el autor para la demo de la
+P3» → «Iniciar auditoría».
+
+> «Solo escaneo un laboratorio propio: un contenedor nginx sin puertos publicados, en la red
+> interna de Docker. La declaración de alcance es obligatoria, y la API rechaza IPs privadas que
+> no estén en una lista de permitidos; lo veremos en el bloque de seguridad.
+> El progreso llega por WebSocket mientras corren Nuclei y Nmap, y cada hallazgo se registra.»
+
+Resultado del ensayo: «Auditoría completada: 18 hallazgo(s), 0 error(es)».
+
+### Blue Team y correlación [RF-07, RF-08] · 0:30 · medido 2 s
+
+**[Pantalla: «Blue Team»]** Pegar `alertas_wazuh.json` → «Ingestar alertas».
+
+> «Tres alertas de Wazuh en su formato JSON: fuerza bruta por RDP y un intento por SSH. ROSETTA
+> las normaliza y las cruza con los hallazgos ofensivos por activo. La cobertura dice qué
+> hallazgos tienen además una alerta defensiva: aquí, 1 de 33. Es determinista, sin IA.»
+
+### Validador [RF-09] · 0:40 · medido 33 s
+
+**[Pantalla: Git Bash]** Comando 1: `cat` de `validar.json` y el curl a `/translate`.
+
+> «Otra traducción, ahora con validar a true: cuatro cuentas de administración de la VPN sin
+> doble factor, contra el ENS. Un segundo agente, el Validador, revisa la traducción y da un
+> veredicto con su confianza y su razonamiento. Tarda más, por eso es opcional.»
+
+Al llegar (en el ensayo `valida: true`, confianza 1,0; el 14/10 rechazó una traducción
+parecida):
+
+> «Aquí la aprueba. No siempre lo hace: en la evaluación lo veremos con números.»
+
+### Copilot normativo [RF-10] · 0:40 · medido 11 s
+
+**[Pantalla: «Copilot»]** Pregunta de `copilot_pregunta.txt`: «¿Qué exige el ENS para el acceso
+remoto de los administradores? ¿Es obligatorio el doble factor?». Contexto de
+`copilot_contexto.txt`: «Organismo público, sistema de categoría MEDIA, administración por VPN.»
+→ «Preguntar al Copilot».
+
+> «Pregunta libre sobre el corpus. La respuesta cita las medidas de las que sale y da un nivel
+> de confianza calculado según cuánto del corpus ha recuperado.»
+
+### Procedure drift [RF-11] · 0:30 · medido 14 s
+
+**[Pantalla: «Procedure Drift»]** Pegar `drift_procedimiento.txt` (PRO-IAM-001) y
+`drift_observaciones.txt` → «Detectar drift».
+
+> «Esta es la idea de mi mentor, Carlos Gómez Pintado: los procedimientos escritos se separan de
+> la realidad y nadie los actualiza. El procedimiento dice que las cuentas sin uso se deshabilitan
+> a los 90 días; Wazuh ve 37 cuentas sin login desde hace más de 180. ROSETTA marca el drift, el
+> fragmento afectado, una redacción propuesta y los controles.»
+
+En el ensayo: «Drift detectado · ALTA». Ojo: propuso «60 días» y citó `A.12.1` (ISO 27001:2013);
+si vuelve a salir, no apoyarse en esa cita.
+
+### Swagger [RF-13] · 0:10 · medido 1 s
+
+**[Pantalla: `localhost:8000/docs`]**
+
+> «Toda la API está documentada con OpenAPI: 30 operaciones en Swagger.»
+
+### Gate CI/CD [RF-14] · 0:30 · medido 7 s
+
+**[Pantalla: Git Bash]** Comando 2: `cat` de `pr_gate.diff` y el curl a `/analyze-diff`.
+
+> «Un pull request ficticio en el cliente de pagos: añade una clave en claro, registra el número
+> de tarjeta en el log y desactiva la verificación TLS. El Gate analiza cada bloque del diff
+> contra PCI-DSS e ISO 27001 y responde si hay que bloquear el PR, con un comentario en Markdown
+> listo para publicar.»
+
+En el ensayo: `bloquear: true` por `verify=False` (PCI-DSS Req. 3.5, cifrado del PAN en tránsito).
+
+### Historial de hallazgos [RF-16] · 0:20 · medido 2 s
+
+**[Pantalla: «Hallazgos»]** Botón «en progreso» en un hallazgo activo.
+
+> «Cada hallazgo tiene un ciclo de vida: activo, en progreso, solucionado. El historial se guarda
+> en SQLite y no se borra: los resueltos se archivan.»
+
+### Grafo [RF-17] · 0:20 · medido 4 s
+
+**[Pantalla: «Grafo»]** Se carga al abrirlo (57 nodos y 53 aristas en el ensayo). Clic en un nodo.
+
+> «Cada activo afectado, unido a los controles que incumple. Sale de Neo4j; si no está, de
+> memoria.»
+
+### CLI [RF-18] · 0:15 · medido 2 s
+
+**[Pantalla: Git Bash]** Comando 3: `rosetta version` y `rosetta --help`.
+
+> «Lo mismo desde la terminal: traducir, cargar el corpus, generar el dosier, escanear o detectar
+> drift.»
+
+### Cumplimiento por marco [RF-19] · 0:20 · medido 2 s
+
+**[Pantalla: «Cumplimiento»]** Chip «ISO 27001:2022».
+
+> «Estado agregado por marco: hallazgos, distribución de severidad y los controles más
+> incumplidos.»
+
+### Catálogo de controles [RF-20a] · 0:15 · medido 1 s
+
+**[Pantalla: «Catálogo de Controles»]** Clic en una fila (p. ej. A.8.20) → modal → «Cancelar».
+
+> «El catálogo de controles: estado, responsable, comentarios y evidencias de cada uno.»
+
+### Roadmap de vulnerabilidades [RF-20b] · 0:15 · panel ❌
+
+**[Pantalla: «Roadmap Vuln.»]** El panel sale vacío. Opcional, comando 3b (la misma información
+por API).
+
+> «Este panel debería listar cada vulnerabilidad con su plazo y su estado, pero sale vacío: el
+> panel pide los hallazgos con el filtro "all" y el endpoint no lo reconoce. Sin el filtro, la
+> API los devuelve todos. Lo encontré ensayando el vídeo, con el código ya congelado, y está en
+> las limitaciones.»
+
+### Evidencias [RF-20c] · 0:15 · medido 1 s
+
+**[Pantalla: «Panel de Evidencias»]**
+
+> «Cada herramienta, ligada a los controles para los que aporta evidencia. Es un mapeo
+> determinista, sin IA: verde con dos fuentes o más, amarillo con una, rojo sin ninguna.»
+
+### Gap analysis [RF-20d] · 0:30 · medido 23 s
+
+**[Pantalla: «Pre-Gap Análisis»]** ISO 27001:2022 → «Analizar con mis datos».
+
+> «El gap analysis lo hace el LLM en directo: para cada control del catálogo decide, con los
+> hallazgos de la sesión, si se cumple, se cumple en parte, no se cumple o no hay datos.»
+
+En el ensayo: 18 controles, 0 cumplen, 1 parcial, 6 no cumplen, 11 sin datos. Al terminar, abrir
+«Análisis de Riesgos» y pulsar «Generar análisis» antes de ir al plan.
+
+### Plan director [RF-20e] · 0:15 · pregenerado (48 s en directo)
+
+**[Pantalla: ventana de incógnito con el Plan Director ya generado]**
+
+> «El plan director tarda cerca de un minuto, así que lo he generado antes de grabar: acciones
+> priorizadas con esfuerzo en personas-día y coste a 450 euros el día.»
+
+En el ensayo: 13 acciones, 26,5 personas-día, 11.925 €. Respaldo:
+`~/.rosetta/grabacion/pregenerado/plan_director.png`.
+
+### Análisis de riesgos [RF-20f] · 0:15 · medido 35 s
+
+**[Pantalla: «Análisis de Riesgos»]** Lanzado al acabar el gap.
+
+> «Y el análisis de riesgos, en directo: cada activo de la sesión, sus amenazas, probabilidad
+> por impacto en una escala de 1 a 25 y un tratamiento.»
+
+En el ensayo: 15 activos, riesgo medio 14,5.
 
 ---
 
-## Sección 7 · Dosier y otras funcionalidades (9:00 – 10:30) ← RF-04, RF-06, RF-11
+## Bloque 5 · Errores y seguridad (13:10 – 15:15)
 
-### Generación de dosier (RF-04)
+### Fuerza bruta: 401 ×5 y 429 [RNF-07] · 0:25 · medido 2 s
 
-**[Pantalla: panel «Hallazgos» → botón «Generar dosier»]**
+**[Pantalla: Git Bash]** Comando 4 (al menos 1 minuto después del último login).
 
-1. Escribir la organización: «TechServ (caso ficticio)».
-2. Clicar «Generar dosier» (~1 s). El dosier incluye todos los hallazgos de la
-   sesión (31 en el ensayo, con los de la auditoría); no se elige uno.
-3. Clicar «↓ Descargar PDF» → abre el PDF: portada, resumen ejecutivo, tabla de controles.
+> «Seis logins fallidos seguidos. Los cinco primeros, 401; el sexto, 429. El límite se aplica
+> por IP real: la cabecera X-Forwarded-For, que el cliente puede falsificar, no cuenta.»
 
-> «El dosier está en formato de auditoría. Entregable directo al auditor externo.»
+### PDF falso (400) y PDF de 21 MB (413) [B-9] · 0:20 · medido 1 s
 
-### Modo Auditoría Red Team (RF-06)
+**[Pantalla: Git Bash]** Comando 5.
 
-**[Pantalla: panel «Auditoría»]** Objetivo `http://lab-objetivo`, marcar Nuclei
-y Nmap, declaración de alcance «Laboratorio propio local, contenedor
-lab-objetivo, autorizado por el autor para la demo de la P3» → iniciar (~45 s;
-en el ensayo, 18 hallazgos: 17 de Nuclei y 1 de Nmap). Requiere
-`ROSETTA_AUDIT_ALLOWLIST=lab-objetivo` y el perfil `lab` levantado.
+> «La ingesta mira los primeros bytes: un texto con extensión .pdf da 400. Y un PDF de 21 MB
+> da 413: el límite es de 20 MB y se deja de leer en cuanto se pasa.»
 
-> «Nmap y Nuclei corren dentro del contenedor. La validación de alcance bloquea
-> IPs privadas fuera de la allowlist. El progreso llega por WebSocket.»
+### Path traversal en la descarga (400) [B-1] · 0:15 · medido 1 s
 
-### Detección de procedure drift (RF-11)
+**[Pantalla: Git Bash]** Comando 6.
 
-**[Pantalla: panel «Drift»]**
+> «Pedir un informe con `..\` para salir del directorio: 400, nombre no válido. La descarga
+> solo acepta nombres de una lista blanca y comprueba que la ruta no sale de la carpeta. Con
+> `../` ni siquiera llega al endpoint: el router devuelve 404.»
 
-> «ROSETTA compara el procedimiento escrito contra el comportamiento observado
-> por los sensores. Si el procedimiento dice "todos los sistemas se parchean
-> mensualmente" pero Wazuh detecta un servidor sin parches desde hace 90 días,
-> eso es drift — el insight central del mentor Carlos Gómez Pintado.»
+### Escaneo a IP privada rechazado [RNF-08] · 0:20 · medido 1 s
 
----
+**[Pantalla: Git Bash]** Comando 7.
 
-## Sección 8 · CI, cobertura y calidad (10:30 – 11:45) ← Bloque A
+> «Una auditoría contra 192.168.1.10: 400. Las IPs privadas y reservadas se bloquean salvo que
+> el administrador las añada a la lista de permitidos, como el laboratorio de antes.»
 
-**[Pantalla: GitHub → Actions tab]**
+### Cabeceras de seguridad [RNF-11] · 0:15 · medido 1 s
 
-> «CI en GitHub Actions: matriz Python 3.11 y 3.12. Cada push ejecuta ruff,
-> mypy strict sobre src/ sin errores, pytest con cobertura, gitleaks,
-> y pip-audit sobre el uv.lock.»
+**[Pantalla: Git Bash]** Comando 8.
 
-```bash
-# ~75 s: lanzarlo antes y mostrar el final, o cortar la espera
-uv run pytest --cov=rosetta --cov-branch --cov-report=term-missing -q 2>&1 | tail -5
-# 556 passed, 1 skipped · TOTAL 85 % (core/ 92 %)
-```
+> «Content-Security-Policy, X-Frame-Options a DENY, nosniff y Referrer-Policy en todas las
+> respuestas.»
 
-mypy, en el log del job de CI, no en local: con el Python 3.13 del `.venv` local
-falla al leer los stubs de numpy (sintaxis `type` de Python 3.12).
+### Neo4j parado: la app sigue [RNF-01] · 0:30 · medido 7 s + 5 s + 1 s
 
-> «556 tests, cobertura global del 85 % y del 92 % en core/, por encima del
-> 80 % que pide RNF-02. pdf_ingestion.py sigue en 76 %, documentado en
-> P3_REQUISITOS.md. La honestidad sobre los límites del sistema es parte
-> de la calidad de la entrega.»
+**[Pantalla: Git Bash y dashboard]** Comando 9a (`docker compose stop neo4j` y el curl a
+`/compliance/state`) → en el dashboard, «Cumplimiento» → chip «ENS 2022» (responde en ~5 s) →
+comando 9b (`docker compose start neo4j`).
 
-**[Pantalla: incidente INC-01]**
+> «Paro Neo4j. El panel de cumplimiento sigue respondiendo, con los datos en memoria de la sesión:
+> la API detecta que el grafo no está y sigue sin él. Lo vuelvo a arrancar.»
 
-> «Tuvimos un incidente real: una contraseña de prueba se escribió como literal
-> en un test y se publicó. Se detectó, se rotaron las credenciales en producción
-> y se documentó como INC-01 en P3_SEGURIDAD.md. Después se limpió el historial
-> con git filter-repo, pero el incidente sigue documentado: es más honesto
-> contarlo que ocultarlo.»
+Neo4j vuelve a estar *healthy* a los ~17 s.
 
 ---
 
-## Sección 9 · Cierre (11:45 – 13:00)
+## Bloque 6 · Calidad y evaluación (15:15 – 16:40)
 
-**[Pantalla: repo GitHub con badge CI verde]**
+### CI en verde [RNF-03, RNF-04, RNF-06, RNF-10, RNF-12] · 0:25
 
-> «Resumen:
-> - 26 RF: 24 ✅, 2 🟡.
-> - 12 RNF: 11 ✅, 1 🟡 (RNF-09: de 20 traducciones, solo la primera, con el modelo en frío, supera 30 s; p95 = 11 s).
-> - Bloque B: 10/11 bloques. B-9 implementado en esta entrega.
-> - Eval: 0% de controles inventados en 89 casos. El Validador discrimina
->   (F1 0,36 en aprobadas frente a 0,17 en rechazadas; precisión de rechazo
->   0,82), pero aprueba 23 de las 51 traducciones malas.
-> - El código está en GitHub, la CI está en verde, el corpus tiene 7 marcos.»
+**[Pantalla: GitHub Actions, último run]**
+
+> «Cada push pasa por cuatro jobs. Lint, tipos y tests en Python 3.11 y 3.12: ruff, mypy en modo
+> estricto y pytest. gitleaks sobre todo el historial. Y pip-audit sobre las dependencias exactas
+> del lockfile.»
+
+### Tests y cobertura [RNF-02] · 0:15 · ejecutado antes (85 s)
+
+**[Pantalla: Git Bash]** `tail -8 ~/.rosetta/grabacion/pytest_cov.txt`.
+
+> «556 tests, 1 omitido, y un 85 % de cobertura global; el núcleo está en el 92 %.»
+
+### Evaluación del Traductor [—] · 0:25
+
+**[Pantalla: Git Bash]** Comando 11.
+
+> «Medí el Traductor contra un ground truth externo, no contra otra IA: 73 medidas del ENS con su
+> correspondencia en ISO 27001 y 16 hallazgos técnicos. En los 89 casos, cero controles
+> inventados. Ojo: alucinación no es lo mismo que discrepancia. Una discrepancia es un control
+> que existe pero no es el que esperaba la referencia, y ahí el F1 se queda en 0,26. El Validador
+> acierta el 82 % de sus rechazos, pero aprueba 23 de las 51 traducciones malas: es una segunda
+> opinión, no sustituye al auditor.»
+
+### Latencia [RNF-09] · 0:10
+
+**[Pantalla: Git Bash]** Comando 12.
+
+> «Con Ollama, en 20 llamadas: mediana de 7 segundos, p95 de 11 y un máximo de 60, el de la
+> primera llamada con el modelo en frío. Una de 20 pasa de 30 segundos.»
+
+### Instalación desde cero [RNF-05] · 0:10
+
+**[Pantalla: README en GitHub]**
+
+> «El README se ha probado en un clon limpio. Indica cuánta memoria hace falta para el modelo
+> local y, si no la hay, cómo usar Groq.»
 
 ---
 
-## Notas técnicas para la grabación
+## Bloque 7 · Cierre (16:40 – 17:40)
+
+### Limitaciones y mejoras [—] · 1:00
+
+**[Pantalla: repo en GitHub]**
+
+> «Limitaciones. El Modo Auditoría solo lo he probado contra el laboratorio; un objetivo real
+> necesita una autorización escrita. El Validador es opcional y no sustituye la revisión humana.
+> La latencia máxima, en frío, pasa de 30 segundos. No hay roles: todos los usuarios tienen los
+> mismos permisos. Shodan y HIBP siguen en el roadmap. De los 7 marcos, 5 tienen solo un corpus
+> base. El despliegue en servidor propio está retirado. Groq funciona, pero su plan gratuito no
+> aguanta el seed entero. Y el panel del roadmap de vulnerabilidades sale vacío por un filtro mal
+> resuelto, aunque la API devuelve los datos.
+> Como mejoras: roles, los adaptadores pendientes, evaluar los otros cinco marcos y escanear la
+> imagen Docker. Gracias.»
+
+---
+
+## Notas técnicas
 
 | Punto | Detalle |
 |-------|---------|
-| Token de demo | `docker compose exec app python -c "import httpx; r=httpx.post('http://localhost:8000/auth/login',json={'username':'auditor-demo','password':'cambia-esta-clave-de-prueba'}); print(r.json()['access_token'][:40]+'...')"` |
-| LLM en demo | Usar Ollama local (`LLM_PROVIDER=ollama`) para evitar costes y latencia de red |
-| Corpus pre-cargado | Verificar con `rosetta load-corpus all corpus` antes de grabar → 229 fragmentos, y reiniciar la app |
-| Caso TechServ | `scripts/seed_demo.py` crea hallazgos ficticios listos para mostrar |
-| Duración LLM | Ensayo del 2026-10-14: traducción ~12 s, con Validador ~30 s, Drift ~14 s, auditoría del laboratorio ~45 s. No acelerar el vídeo en esas partes |
-| Hoja de grabación | `docs/P3_HOJA_GRABACION.md`: orden de pestañas, textos de cada formulario y duración de cada bloque |
-| Validador | Mostrar primero sin `"validar": true`, luego con él, para contrastar latencia y veredicto |
-| B-9 demo | Preparar fichero no-PDF (`printf "fake" > /tmp/fake.pdf`) y PDF grande para el 413 |
-| Eval reports | Tener terminales con los MD ya abiertos en `less`, no leerlos en directo |
+| Hoja de grabación | `docs/P3_HOJA_GRABACION.md`: momento de cada punto, textos de formulario, esperas medidas y lo que no funciona |
+| Comandos | `~/.rosetta/grabacion/comandos.txt`, del 0 (TOKEN) al 12 (latencia), en el orden del vídeo |
+| TOKEN | `TOKEN=$(bash ~/.rosetta/grabacion/token.sh)`: usa el refresh token (7 días) y no cuenta en el límite de logins |
+| Límites | 5 logins/min y 5 `/audit/start`/hora, en memoria; `docker compose restart app` los pone a cero |
+| Validador | Cuerpo en `validar.json`: con `-d` y tildes, Git Bash rompe la codificación (400). Alternativa: casilla «Activar Validador» del modal de Traducir |
+| Pregenerado | Plan director (48 s en el ensayo): ventana de incógnito antes de REC; respaldo en `~/.rosetta/grabacion/pregenerado/` |
+| No usar | `curl -I` (405: `/health` no admite HEAD); `rosetta translate "texto"` (el CLI espera un JSON); `mypy` en local (falla con el Python 3.13 del `.venv`; enseñarlo en la CI) |

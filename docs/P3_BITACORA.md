@@ -504,3 +504,14 @@ está vacío.
 | **Capturas** | Ninguna figura de la memoria muestra el pie: está dentro del overlay de login y las 11 capturas (figuras 2 a 12) se hicieron con la sesión iniciada. No se rehacen. |
 | **Congelación** | `9ce6942` es el nuevo punto: el tag comprobará que el código no cambia respecto a él. |
 | **Commit** | `9ce6942` |
+
+### G-8 · Preparación del vídeo según la estructura de 7 bloques · ensayo del 2026-10-15
+
+| | |
+|---|---|
+| **Qué** | `P3_HOJA_GRABACION.md` y `P3_VIDEO_SCRIPT.md` reescritos con el orden e identificadores de `data/fuentes/estructura_video.md` (7 bloques, 17:40). Material fuera del repo en `~/.rosetta/grabacion/`: PDF ficticio de TechServ (4 hallazgos), diff del Gate, `comandos.txt` numerado (0 a 12), TOKEN con renovación por refresh y Plan Director pregenerado. |
+| **Entorno** | down -v, laboratorio, corpus (229 fragmentos), restart y seed (12/12), dos veces: antes del ensayo y después, para grabar sin sus restos. Código en `9ce6942`. |
+| **Ensayo** | Playwright y los comandos literales de `comandos.txt`. Traducción 25 s, PDF 16 s, auditoría 43 s (18 hallazgos), Validador 33 s, Copilot 11 s, drift 14 s, Gate 7 s, gap 23 s, plan director 48 s (pregenerado), riesgos 35 s; bloque de seguridad entero en menos de 3 s por punto; pytest 556 passed, 85 %. |
+| **No funciona** | Panel «Roadmap Vuln.» (RF-20b) siempre vacío: pide `/vuln-roadmap?estado=all` y el endpoint no admite `all` (0 filas; sin filtro, 35). Path traversal con `../` da 404 del router; el 400 de la lista blanca sale con `..\`. `curl -I` da 405 (`/health` no admite HEAD). Código congelado: se cuentan como limitación. |
+| **Corregido en el material** | El curl del Validador con `-d` y tildes daba 400 desde Git Bash (cp1252): el cuerpo va en `validar.json`. |
+| **Recuento** | La matriz tiene 25 RF + 12 RNF (37); la estructura dice 26 + 12 (38). El guion usa 25 + 12. |
