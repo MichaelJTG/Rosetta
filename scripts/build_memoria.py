@@ -18,6 +18,34 @@ STATUS_GLYPHS = {
     "🟡": '<span class="st st-parcial">◐</span>',
 }
 
+# Cover: the h1 and the subtitle of memoria.md become a full-width band and the
+# rest of section 1 (heading, table and note) a card below it
+COVER_RE = re.compile(
+    r'(<section class="portada">)\s*'
+    r"<h1>ROSETTA — Memoria técnica de la Práctica 3</h1>\s*"
+    r'(<h2 id="sec-1">.*?</h2>)\s*'
+    r"<p><strong>ROSETTA — (Orquestador de cumplimiento continuo)</strong></p>"
+    r"(.*?)(</section>)",
+    re.S,
+)
+COVER_BAND = (
+    r"\1"
+    '<header class="banda">'
+    '<h1 class="marca">ROSETTA</h1>'
+    r'<p class="subtitulo">\3</p>'
+    '<p class="tipo">Memoria técnica · Práctica 3</p>'
+    "</header>"
+    r'<div class="tarjeta">\2\4</div>'
+    r"\5"
+)
+
+
+def cover_band(body: str) -> str:
+    new_body, count = COVER_RE.subn(COVER_BAND, body, count=1)
+    if count != 1:
+        print("WARNING: cover not found; the cover keeps the plain layout.", file=sys.stderr)
+    return new_body
+
 
 def md_to_html(md_text: str, css_path: Path) -> str:
     try:
@@ -42,8 +70,11 @@ def md_to_html(md_text: str, css_path: Path) -> str:
             escaped = md_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             body = f"<pre style='white-space:pre-wrap'>{escaped}</pre>"
 
-    # Anchor ids for the table of contents (nav.indice -> target-counter)
-    body = re.sub(r"<h2>(\d+)\. ", r'<h2 id="sec-\1">\1. ', body)
+    # Anchor ids for the table of contents (nav.indice -> target-counter);
+    # the section number goes in its own span so the CSS can colour it
+    body = re.sub(r"<h2>(\d+)\. ", r'<h2 id="sec-\1"><span class="num">\1.</span> ', body)
+    body = re.sub(r'(<a href="#sec-\d+">)(\d+)\. ', r'\1<span class="num">\2.</span> ', body)
+    body = cover_band(body)
 
     # The app image has no emoji font: map status emoji to DejaVu glyphs
     for emoji, html in STATUS_GLYPHS.items():
