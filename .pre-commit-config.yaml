@@ -9,6 +9,8 @@ repos:
       - id: check-toml
       - id: check-added-large-files
         args: ["--maxkb=1024"]
+        # Memoria de la P3 en PDF (~1,8 MB por las capturas a resolución completa)
+        exclude: ^docs/memoria/.*\.pdf$
       - id: check-merge-conflict
       - id: detect-private-key
 

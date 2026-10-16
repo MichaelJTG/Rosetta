@@ -1,7 +1,10 @@
 # docs/P3_MATRIZ.md — Matriz de trazabilidad P3
 
 > Relaciona cada RF/RNF con el commit que lo implementa, los tests que lo verifican y la evidencia demostrable.
-> Generado: 2026-10-04 · Bloque D · Última actualización: 2026-10-16 (minutos del vídeo)
+> Generado: 2026-10-04 · Bloque D · Última actualización: 2026-10-16 (minutos de la parte 2 del vídeo)
+> Vídeo: <https://drive.google.com/file/d/1tBNHq--ITta3mDXcef4TIyqi_SYZcIqk/view?usp=sharing> (unos 25 minutos). La parte 2 (errores y seguridad, calidad y cierre),
+> grabada el 16/10 como continuación, empieza en el 20:40: errores y seguridad 21:09, calidad 23:23 y
+> cierre 24:21.
 
 ---
 
@@ -12,7 +15,7 @@
 | RF/RNF | Identificador del requisito en `P3_REQUISITOS.md` |
 | Commit principal | Hash corto del commit que implementa o cierra el requisito |
 | Tests | Fichero(s) de test que verifican el comportamiento |
-| Evidencia | Minuto del vídeo («Vídeo mm:ss») o, si no aparece en él, la prueba (PR-XX, Anexo E de la memoria) y cómo demostrar el cumplimiento |
+| Evidencia | Minuto del vídeo («Vídeo mm:ss»; en la parte 2, «(en directo)» o «(diapositiva)») o, si no aparece en él, la prueba (PR-XX, Anexo E de la memoria) y cómo demostrar el cumplimiento |
 
 ---
 
@@ -52,18 +55,18 @@
 
 | RNF | Descripción breve | Commit | Tests / Mecanismo | Evidencia |
 |-----|-------------------|--------|-------------------|-----------|
-| RNF-01 | Degradación grácil sin Neo4j | `1c567c4` | `tests/test_degradacion.py` | No aparece en el vídeo. PR-26. 4 tests: Neo4j caído al arrancar → 200 en todos los endpoints. Timeouts 5 s. |
-| RNF-02 | Cobertura ≥ 80 % core | `3e8a0ed` | `pytest --cov=rosetta --cov-branch` | No aparece en el vídeo. PR-27. 2026-10-10: 92 % en `core/`, 85 % global (556 tests); `pdf_ingestion.py` a 76 %. |
-| RNF-03 | Sin errores `mypy --strict` | (lint continuo) | `mypy src/` | No aparece en el vídeo. PR-28. 0 errores en 56 ficheros. Pre-commit activo. |
-| RNF-04 | Sin violaciones `ruff` | `7ec6b66` | `ruff check . && ruff format --check` | No aparece en el vídeo. PR-29. CI run 37203612212 verde. Pre-commit alineado con `uv.lock`. |
-| RNF-05 | Instalable: `uv sync` + `docker compose up` | `2339813` | Instalación limpia documentada | No aparece en el vídeo. PR-30 y PR-31. Build 165 s, imagen 3.85 GB, 197 fragmentos indexados, tests en verde. PR-31: un amigo del autor, ajeno al proyecto, lo instaló siguiendo el README el 15/10/2026, sin incidencias según su feedback. |
-| RNF-06 | Cero secretos en el repositorio | `1ef7438`·`4aeef3b` | `gitleaks`, `detect-private-key` | No aparece en el vídeo. PR-32. INC-01: credenciales rotadas 2026-10-04 (dan 401). Historial limpiado 2026-10-06 (`git filter-repo`, `f50957f`→`4aeef3b`): 0 apariciones literal, gitleaks CI verde. Commit huérfano `e2819f0` en GitHub; purga pendiente. |
-| RNF-07 | Rate limiting en endpoints sensibles | `5cf5aac` | `tests/test_auth.py` | No aparece en el vídeo. PR-33. `slowapi` activo. `POST /auth/login`: 5 logins por minuto; 5 respuestas 401 y la sexta 429. |
-| RNF-08 | Validación alcance Modo Auditoría | `810812d` | `tests/test_orchestrator.py` | No aparece en el vídeo. PR-34. 11 tests: IPs privadas/localhost bloqueadas. DNS resolution + `is_global` + allowlist. |
-| RNF-09 | Tiempo Traductor < 30 s | benchmark 2026-10-11 | `eval/bench_latency.py` | No aparece en el vídeo. PR-35. Benchmark 2026-10-11: p50=6.95 s, p95=11.02 s, max=59.88 s (n=20, Ollama qwen2.5:14b, 1 marco). 19/20 bajo umbral; la que lo supera es la primera, en frío (32.9 s de carga del modelo). `eval/reports/2026-10-11T15-28-12_bench_latency_ollama.json` |
-| RNF-10 | Build CI reproducible | `2e7792d` | CI workflow `.github/workflows/ci.yml` | No aparece en el vídeo. PR-36. CI run 37203612212 verde. `setup-uv v7.6.0`, `uv sync --locked`, matriz 3.11/3.12. |
-| RNF-11 | Cabeceras de seguridad HTTP | `c552729` | `tests/test_security.py` | No aparece en el vídeo. PR-37. `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, CSP. 3 tests. |
-| RNF-12 | Audit CVE dependencias en CI | `2e7792d`·`26e63e5` | CI job `dependency-audit` | No aparece en el vídeo. PR-38. Sobre `uv.lock`. 4 avisos chromadb sin parche → R-01. CVE-2026-104851 (fsspec) parchado en `26e63e5`. CI verde. |
+| RNF-01 | Degradación grácil sin Neo4j | `1c567c4` | `tests/test_degradacion.py` | Vídeo 22:22 (en directo). PR-26. 4 tests: Neo4j caído al arrancar → 200 en todos los endpoints. Timeouts 5 s. |
+| RNF-02 | Cobertura ≥ 80 % core | `3e8a0ed` | `pytest --cov=rosetta --cov-branch` | Vídeo 23:23 (diapositiva) · PR-27. 2026-10-10: 92 % en `core/`, 85 % global (556 tests); `pdf_ingestion.py` a 76 %. |
+| RNF-03 | Sin errores `mypy --strict` | (lint continuo) | `mypy src/` | Vídeo 23:23 (diapositiva) · PR-28. 0 errores en 56 ficheros. Pre-commit activo. |
+| RNF-04 | Sin violaciones `ruff` | `7ec6b66` | `ruff check . && ruff format --check` | Vídeo 23:23 (diapositiva) · PR-29. CI run 37203612212 verde. Pre-commit alineado con `uv.lock`. |
+| RNF-05 | Instalable: `uv sync` + `docker compose up` | `2339813` | Instalación limpia documentada | Vídeo 23:23 (diapositiva) · PR-30 y PR-31. Build 165 s, imagen 3.85 GB, 197 fragmentos indexados, tests en verde. PR-31: un amigo del autor, ajeno al proyecto, lo instaló siguiendo el README el 15/10/2026, sin incidencias según su feedback. |
+| RNF-06 | Cero secretos en el repositorio | `1ef7438`·`4aeef3b` | `gitleaks`, `detect-private-key` | Vídeo 22:55 (diapositiva) · PR-32. INC-01: credenciales rotadas 2026-10-04 (dan 401). Historial limpiado 2026-10-06 (`git filter-repo`, `f50957f`→`4aeef3b`): 0 apariciones literal, gitleaks CI verde. Commit huérfano `e2819f0` en GitHub; purga pendiente. |
+| RNF-07 | Rate limiting en endpoints sensibles | `5cf5aac` | `tests/test_auth.py` | Vídeo 21:31 (en directo). PR-33. `slowapi` activo. `POST /auth/login`: 5 logins por minuto; 5 respuestas 401 y la sexta 429. |
+| RNF-08 | Validación alcance Modo Auditoría | `810812d` | `tests/test_orchestrator.py` | Vídeo 21:50 (en directo). PR-34. 11 tests: IPs privadas/localhost bloqueadas. DNS resolution + `is_global` + allowlist. |
+| RNF-09 | Tiempo Traductor < 30 s | benchmark 2026-10-11 | `eval/bench_latency.py` | Vídeo 23:23 (diapositiva) · PR-35. Benchmark 2026-10-11: p50=6.95 s, p95=11.02 s, max=59.88 s (n=20, Ollama qwen2.5:14b, 1 marco). 19/20 bajo umbral; la que lo supera es la primera, en frío (32.9 s de carga del modelo). `eval/reports/2026-10-11T15-28-12_bench_latency_ollama.json` |
+| RNF-10 | Build CI reproducible | `2e7792d` | CI workflow `.github/workflows/ci.yml` | Vídeo 23:23 (diapositiva) · PR-36. CI run 37203612212 verde. `setup-uv v7.6.0`, `uv sync --locked`, matriz 3.11/3.12. |
+| RNF-11 | Cabeceras de seguridad HTTP | `c552729` | `tests/test_security.py` | Vídeo 22:04 (en directo). PR-37. `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, CSP. 3 tests. |
+| RNF-12 | Audit CVE dependencias en CI | `2e7792d`·`26e63e5` | CI job `dependency-audit` | Vídeo 23:23 (diapositiva) · PR-38. Sobre `uv.lock`. 4 avisos chromadb sin parche → R-01. CVE-2026-104851 (fsspec) parchado en `26e63e5`. CI verde. |
 
 ---
 
@@ -72,7 +75,7 @@
 | Bloque | Ítems | Commits | Estado |
 |--------|-------|---------|--------|
 | Bloque A (CI, infraestructura, demos) | A-0, A-1, A-3, A-4, A-5, A-6, A-7, A-8, A-9 | `2e7792d`…`419b737` | ✅ Completo |
-| Bloque B (seguridad) | B-1…B-10 (B-11 pendiente, fuera del alcance MVP) | `5ca3ca8`…`f06f726` | ✅ Completo (B-4: default loopback-only + verificado en el servidor propio el 2026-10-06 `172.18.0.1/32`; B-9: magic bytes + límite 20 MB + tope páginas + 4 tests) |
+| Bloque B (seguridad) | B-1…B-10 (B-11 pendiente, fuera del alcance MVP) | `5ca3ca8`…`f06f726` | ✅ Completo (B-4: default loopback-only + verificado en el servidor propio el 2026-10-06 `172.18.0.1/32`; B-9: magic bytes + límite 20 MB + tope páginas + 4 tests). Vídeo: B-9 21:38 y B-1 21:41 (en directo) |
 | Bloque C (eval + corpus ENS) | C-1, C-2, C-3, C-4 | `92d4b83` · `86a5e91` | ✅ Completo |
 | Bloque D (cierre P3) | D-1, D-2, D-3, D-4, D-5 | `bb8fc2a` · `86a5e91` | ✅ Completo |
 | Bloque E (memoria de insumos) | `docs/P3_MEMORIA_INSUMOS.md` · atribución corpus/ground truth | este commit | ✅ Completo |

@@ -13,8 +13,10 @@
 | Fecha de entrega | 16/10/2026 |
 | Repositorio | <https://github.com/MichaelJTG/Rosetta> |
 | Tag de entrega | `v1.0-practica3` |
-| Vídeo | <https://drive.google.com/file/d/1OWARYoQOd9_7eBRdT3nUHnDCBqWqui38/view?usp=sharing> (unos 20 minutos) |
+| Vídeo | <https://drive.google.com/file/d/1tBNHq--ITta3mDXcef4TIyqi_SYZcIqk/view?usp=sharing> (unos 25 minutos; la parte 2 empieza en el 20:40) |
 | Despliegue | Evaluación en local con Docker siguiendo el README. Existe un despliegue en un servidor propio que a fecha de entrega no está operativo (apdo. 10.1) |
+
+El vídeo dura unos 25 minutos, por encima de los 20 recomendados, porque cubre los 37 requisitos; la matriz indica el minuto de cada uno. La parte final (errores y seguridad, calidad y cierre) se grabó el 16/10 como continuación y se indica en pantalla.
 
 </section>
 
@@ -243,7 +245,7 @@ Los cambios de arquitectura principales introducidos en P3:
 
 | Informe de la P1 | Realidad comprobada |
 |---|---|
-| «FastAPI expone 15 endpoints REST y un WebSocket» | En la versión entregada (commit `992bf42`, 2026-05-20) había 18 rutas REST y 1 WebSocket. Hoy son 31 rutas REST (30 en OpenAPI, más `/dashboard`) y 1 WebSocket. |
+| «FastAPI expone 15 endpoints REST y un WebSocket» | En la versión entregada (commit `992bf42`, 2026-05-20) había 18 rutas REST y 1 WebSocket. Hoy son 30 operaciones REST en OpenAPI (29 rutas), más `/dashboard`, que queda fuera del esquema, y 1 WebSocket. |
 | Adaptadores Red Team: Nuclei, Nmap y Amass | Amass tiene adaptador (`adapters/red/amass.py`), pero no está instalado en la imagen ni conectado al orquestador. El Modo Auditoría solo usa Nmap y Nuclei. |
 | Latencia típica «<4 s por traducción» con Claude | Nunca se midió. El benchmark de RNF-09 (P3) es con Ollama `qwen2.5:14b`: p50 = 6,95 s en 20 llamadas. |
 | Tasa de alucinación como métrica ya medida | No existía harness de evaluación; se creó en la P3 (`eval/run_eval.py`, apartado 8.5). |
@@ -472,7 +474,7 @@ Con Ollama, el prompt del Copilot (unos 5100 tokens con los 7 marcos) no cabe en
 
 ### 6.16 OpenAPI / Swagger UI (RF-13)
 
-**Qué hace:** FastAPI genera automáticamente el esquema en `GET /openapi.json`: 29 rutas y 30 operaciones (las 31 rutas REST menos `/dashboard`, excluida del esquema). Swagger UI se sirve en `GET /docs` y ReDoc en `GET /redoc`, con una CSP propia que permite sus recursos de cdn.jsdelivr.net; el resto de rutas mantiene la CSP estricta de B-3.
+**Qué hace:** FastAPI genera automáticamente el esquema en `GET /openapi.json`: 29 rutas y 30 operaciones (todas las REST salvo `/dashboard`, excluida del esquema). Swagger UI se sirve en `GET /docs` y ReDoc en `GET /redoc`, con una CSP propia que permite sus recursos de cdn.jsdelivr.net; el resto de rutas mantiene la CSP estricta de B-3.
 
 **Requisitos:** RF-13.
 
@@ -489,7 +491,7 @@ Con Ollama, el prompt del Copilot (unos 5100 tokens con los 7 marcos) no cabe en
 
 | Bloque | Descripción | Commit |
 |---|---|---|
-| B-1 | Path traversal en descarga de informes (`/reports/download`) | `5ca3ca8` |
+| B-1 | Path traversal en descarga de informes (`/reports/download`). Vídeo 21:41 (en directo) | `5ca3ca8` |
 | B-2 | XSS via salida del LLM: `esc()` en todos los `innerHTML` con datos LLM/usuario | `5ca3ca8` |
 | B-3 | Cabeceras de seguridad HTTP: CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy; CSP propia para `/docs` y `/redoc` | `c552729` · `c78a0c7` |
 | B-4 | Rate limiting de `slowapi` + validación de proxies confiables (solo loopback/`172.18.0.1/32`) | `5cf5aac` · `f06f726` |
@@ -497,7 +499,7 @@ Con Ollama, el prompt del Copilot (unos 5100 tokens con los 7 marcos) no cabe en
 | B-6 | Mensajes de error genéricos en 500; stack trace solo en log | `5ca3ca8` |
 | B-7 | SSRF gate en Modo Auditoría: validación DNS + `is_global()` + allowlist | `810812d` |
 | B-8 | Scope validation (11 tests de alcance): IPs privadas, localhost, hostname resolution | `810812d` |
-| B-9 | PDF magic bytes + límite 20 MB + límite de páginas (4 tests) | `5ca3ca8` |
+| B-9 | PDF magic bytes + límite 20 MB + límite de páginas (4 tests). Vídeo 21:38 (en directo) | `5ca3ca8` |
 | B-10 | CVE dependencias en CI: 9 tandas de actualización; R-01 documentado | `2e7792d`…`9a611d7` |
 | B-11 | Trivy image scan | No implementado (fuera del sprint) |
 
@@ -766,18 +768,18 @@ El Validador no cambia la traducción: la aprueba o la rechaza. Discrimina (las 
 | RF-20d | Gap analysis | ✅ | `src/rosetta/api/main.py` · `POST /gap-analysis/{marco}` · `b64dd2b` | PR-23 | Vídeo 19:26 · Apdo. 6.14 |
 | RF-20e | Plan director | ✅ | `src/rosetta/api/main.py` · `POST /plan-director/{marco}` · `b64dd2b` | PR-24 | Vídeo 19:53 · Apdo. 6.14 |
 | RF-20f | Análisis riesgos | ✅ | `src/rosetta/api/main.py` · `POST /risk-analysis` · `b64dd2b` | PR-25 | Vídeo 19:54 · Apdo. 6.14 |
-| RNF-01 | Degradación grácil Neo4j | ✅ | `src/rosetta/core/graph.py` (`verify_connectivity`) · `src/rosetta/api/main.py` (`neo4j_unavailable_api_continues`) · `1c567c4` | PR-26 | No aparece en el vídeo · PR-26 · 4 tests degradación · Apdo. 6.12 |
-| RNF-02 | Cobertura ≥ 80 % en core | ✅ 92 % en `core/` | `pytest --cov=rosetta --cov-branch` (CI) | PR-27 | No aparece en el vídeo · PR-27 · 85 % global · `pdf_ingestion.py` 76 % |
-| RNF-03 | mypy 0 errores | ✅ | `mypy src/` (56 ficheros) | PR-28 | No aparece en el vídeo · PR-28 · 0 errores |
-| RNF-04 | ruff 0 violaciones | ✅ | `ruff check . && ruff format --check` · `7ec6b66` | PR-29 | No aparece en el vídeo · PR-29 · CI run 37203612212 verde |
-| RNF-05 | Instalación limpia | ✅ | `Dockerfile` · `docker-compose.yml` · `uv.lock` · `2339813` | PR-30, PR-31 | No aparece en el vídeo · PR-30: build 165 s · PR-31: instalación por persona ajena sin incidencias (15/10/2026) · Apdo. 8.4 |
-| RNF-06 | Cero secretos | ✅ | `.github/workflows/ci.yml` (gitleaks, fetch-depth 0) · `.pre-commit-config.yaml` · `1ef7438`·`4aeef3b` | PR-32 | No aparece en el vídeo · PR-32 · 0 apariciones filter-repo · Apdo. 7.3 |
-| RNF-07 | Rate limiting | ✅ | `src/rosetta/api/main.py` (slowapi) · `5cf5aac` | PR-33 | No aparece en el vídeo · PR-33 · 5 logins por minuto: 5 × 401 y la sexta 429 |
-| RNF-08 | Alcance Modo Auditoría | ✅ | `src/rosetta/core/orchestrator.py:_validar_alcance()` · `810812d` | PR-34 | No aparece en el vídeo · PR-34 · `http://192.168.1.10` → 400 |
-| RNF-09 | Latencia < 30 s | 🟡 p50=6,95 s | `eval/bench_latency.py` · `eval/reports/2026-10-11T15-28-12_bench_latency_ollama.json` | PR-35 | No aparece en el vídeo · PR-35 · p50=6,95 s · p95=11,0 s · máx=59,9 s (en frío) |
-| RNF-10 | CI reproducible | ✅ | `.github/workflows/ci.yml` · `uv.lock` · `2e7792d` | PR-36 | No aparece en el vídeo · PR-36 · CI run 37203612212 verde |
-| RNF-11 | Cabeceras seguridad HTTP | ✅ | `src/rosetta/api/main.py` (SecurityHeadersMiddleware) · `c552729` | PR-37 | No aparece en el vídeo · PR-37 · X-Frame-Options, CSP presentes |
-| RNF-12 | CVE audit CI | ✅ | `.github/workflows/ci.yml` (dependency-audit) · `2e7792d`·`26e63e5` | PR-38 | No aparece en el vídeo · PR-38 · R-01 aceptado; fsspec parcheado |
+| RNF-01 | Degradación grácil Neo4j | ✅ | `src/rosetta/core/graph.py` (`verify_connectivity`) · `src/rosetta/api/main.py` (`neo4j_unavailable_api_continues`) · `1c567c4` | PR-26 | Vídeo 22:22 (en directo) · PR-26 · 4 tests degradación · Apdo. 6.12 |
+| RNF-02 | Cobertura ≥ 80 % en core | ✅ 92 % en `core/` | `pytest --cov=rosetta --cov-branch` (CI) | PR-27 | Vídeo 23:23 (diapositiva) · PR-27 · 85 % global · `pdf_ingestion.py` 76 % |
+| RNF-03 | mypy 0 errores | ✅ | `mypy src/` (56 ficheros) | PR-28 | Vídeo 23:23 (diapositiva) · PR-28 · 0 errores |
+| RNF-04 | ruff 0 violaciones | ✅ | `ruff check . && ruff format --check` · `7ec6b66` | PR-29 | Vídeo 23:23 (diapositiva) · PR-29 · CI run 37203612212 verde |
+| RNF-05 | Instalación limpia | ✅ | `Dockerfile` · `docker-compose.yml` · `uv.lock` · `2339813` | PR-30, PR-31 | Vídeo 23:23 (diapositiva) · PR-30: build 165 s · PR-31: instalación por persona ajena sin incidencias (15/10/2026) · Apdo. 8.4 |
+| RNF-06 | Cero secretos | ✅ | `.github/workflows/ci.yml` (gitleaks, fetch-depth 0) · `.pre-commit-config.yaml` · `1ef7438`·`4aeef3b` | PR-32 | Vídeo 22:55 (diapositiva) · PR-32 · 0 apariciones filter-repo · Apdo. 7.3 |
+| RNF-07 | Rate limiting | ✅ | `src/rosetta/api/main.py` (slowapi) · `5cf5aac` | PR-33 | Vídeo 21:31 (en directo) · PR-33 · 5 logins por minuto: 5 × 401 y la sexta 429 |
+| RNF-08 | Alcance Modo Auditoría | ✅ | `src/rosetta/core/orchestrator.py:_validar_alcance()` · `810812d` | PR-34 | Vídeo 21:50 (en directo) · PR-34 · `http://192.168.1.10` → 400 |
+| RNF-09 | Latencia < 30 s | 🟡 p50=6,95 s | `eval/bench_latency.py` · `eval/reports/2026-10-11T15-28-12_bench_latency_ollama.json` | PR-35 | Vídeo 23:23 (diapositiva) · PR-35 · p50=6,95 s · p95=11,0 s · máx=59,9 s (en frío) |
+| RNF-10 | CI reproducible | ✅ | `.github/workflows/ci.yml` · `uv.lock` · `2e7792d` | PR-36 | Vídeo 23:23 (diapositiva) · PR-36 · CI run 37203612212 verde |
+| RNF-11 | Cabeceras seguridad HTTP | ✅ | `src/rosetta/api/main.py` (SecurityHeadersMiddleware) · `c552729` | PR-37 | Vídeo 22:04 (en directo) · PR-37 · X-Frame-Options, CSP presentes |
+| RNF-12 | CVE audit CI | ✅ | `.github/workflows/ci.yml` (dependency-audit) · `2e7792d`·`26e63e5` | PR-38 | Vídeo 23:23 (diapositiva) · PR-38 · R-01 aceptado; fsspec parcheado |
 
 </div>
 

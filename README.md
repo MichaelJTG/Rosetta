@@ -1,5 +1,7 @@
 # ROSETTA — Orquestador de cumplimiento continuo multi-marco con IA
 
+[![CI](https://github.com/MichaelJTG/Rosetta/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/MichaelJTG/Rosetta/actions/workflows/ci.yml)
+
 > **Real-time Orchestrator for Semantic Evidence, Translation & Traceability of Audit-findings**
 
 ROSETTA toma hallazgos técnicos (de un escáner, de un SOC, de un informe de
@@ -15,13 +17,43 @@ sustituye**: la evidencia generada por IA la revisa siempre una persona.
 
 ---
 
+## Práctica 3 · entrega del 16/10/2026
+
+| | |
+|---|---|
+| **Vídeo** | [Google Drive](https://drive.google.com/file/d/1tBNHq--ITta3mDXcef4TIyqi_SYZcIqk/view?usp=sharing), unos 25 minutos. La matriz indica el minuto de cada requisito; la parte final (errores y seguridad, calidad y cierre) empieza en el 20:40 |
+| **Memoria** | [`docs/memoria/P3_MichaelTelleria_Memoria.pdf`](docs/memoria/P3_MichaelTelleria_Memoria.pdf) |
+| **Matriz de trazabilidad** | [`docs/P3_MATRIZ.md`](docs/P3_MATRIZ.md) |
+| **Requisitos** | [`docs/P3_REQUISITOS.md`](docs/P3_REQUISITOS.md) |
+| **Seguridad** | [`docs/P3_SEGURIDAD.md`](docs/P3_SEGURIDAD.md) (modelo de amenazas, incidente INC-01, riesgos aceptados) |
+| **Bitácora** | [`docs/P3_BITACORA.md`](docs/P3_BITACORA.md) |
+| **Tag** | [`v1.0-practica3`](https://github.com/MichaelJTG/Rosetta/tree/v1.0-practica3). El código está congelado desde `81e76fa`; los commits posteriores solo cambian documentación |
+
+**Estado de los requisitos** (`P3_REQUISITOS.md`):
+- **25 RF:** 23 cumplidos y 2 parciales: RF-06 (Modo Auditoría, probado solo contra el
+  laboratorio local) y RF-09 (Validador).
+- **12 RNF:** 11 cumplidos y 1 parcial: RNF-09 (latencia, por la primera llamada en frío).
+
+**Evaluación del Traductor** (Ollama `qwen2.5:14b`; informes en `eval/reports/`, apartado 8.5 de
+la memoria):
+- **0 % de controles inventados** en 89 casos (73 de correspondencia ENS → ISO 27001 y 16
+  hallazgos técnicos): todos los identificadores devueltos existen en el Anexo A.
+- **F1 de 0,26** frente al SoA en los 73 casos de correspondencia. Lo que falla son
+  discrepancias (controles reales, distintos de los del SoA), no invenciones.
+- **Validador:** acierta el 82 % de sus rechazos (28 de 34 con F1 < 0,5), pero aprueba 23 de
+  las 51 traducciones con F1 < 0,5.
+- **Latencia de `/translate`** (20 llamadas, 1 marco, GPU de 16 GB): p50 6,95 s, p95 11,0 s y
+  máximo 59,9 s, el de la primera llamada, con el modelo en frío.
+
+---
+
 ## Alcance multi-marco (honesto)
 
 Los siete marcos funcionan, pero **no tienen la misma profundidad**:
 
 | Marco | Corpus | Validación |
 |---|---|---|
-| **ENS (RD 311/2022)** | Medidas del Anexo II | Profundidad de producción; evaluación contra *ground truth* ENS↔ISO validado por un auditor (`eval/`) |
+| **ENS (RD 311/2022)** | Medidas del Anexo II | Profundidad de producción; evaluación contra el SoA de TechServ facilitado por el profesor de GRC del máster (`eval/`) |
 | **ISO/IEC 27001:2022** | *Outline* del Anexo A (intuitem), no el texto completo de la norma | Ídem (equivalencias ENS↔ISO) |
 | NIS2 · DORA · RGPD · NIST CSF 2.0 · PCI-DSS 4.0 | Corpus base (artículos / subcategorías / requisitos) | Operativos, **sin** *ground truth* humano: no se presentan con métricas de acierto |
 
@@ -42,7 +74,7 @@ En los paneles conviene distinguir el origen de cada dato:
 |---|---|
 | Ejecutar ROSETTA | **Git** y **Docker** con Compose v2 (Docker Desktop en Windows/macOS). Unos 8 GB de disco para la imagen y los volúmenes, y 4 GB de RAM para los contenedores. |
 | Usar IA **sin API key** | **[Ollama](https://ollama.com)** en el equipo con el modelo `qwen2.5:14b`: ~9 GB de disco y **~12 GB de RAM (o VRAM) libres** al traducir con la ventana de contexto por defecto de ROSETTA (`OLLAMA_NUM_CTX=16384`: 11,9 GB medidos). En CPU, mejor 16 GB de RAM o más; con GPU, 12 GB de VRAM o más. |
-| Usar un LLM en la nube (opcional) | Tu propia API key de un proveedor compatible con OpenAI, como Groq (probado, con límites en el plan gratuito), o de Anthropic (Claude, **no verificado**) |
+| Usar un LLM en la nube (opcional) | Tu propia API key de un proveedor compatible con OpenAI, como Groq (probado, con límites en el plan gratuito), o de Anthropic (Claude: implementado, **sin probar**) |
 | Desarrollar o pasar los tests (opcional) | Python 3.11+ y [uv](https://docs.astral.sh/uv/) |
 
 La imagen se construye para **amd64 y arm64** (el servidor propio de la P1 era ARM64).
@@ -77,7 +109,7 @@ en `ROSETTA_JWT_SECRET=`.
 |---|---|
 | **12 GB de VRAM o más** | Ollama con `qwen2.5:14b` (por defecto). Ocupa 11,9 GB con `OLLAMA_NUM_CTX=16384`. En una GPU de 16 GB: 6,95 s por traducción (mediana de 20 llamadas). |
 | **16 GB de RAM o más, sin tarjeta gráfica** | El mismo modelo en la CPU. Funciona, pero **cada traducción puede tardar mucho** (no se ha medido; en GPU son ~7 s) y el límite de 30 s de RNF-09 no está garantizado. |
-| Menos | Un LLM en la nube con tu propia clave (abajo). Groq: probado, pero el plan gratuito no basta para el seed. Claude: no verificado. |
+| Menos | Un LLM en la nube con tu propia clave (abajo). Groq: probado, pero el plan gratuito no basta para el seed. Claude: implementado, sin probar. |
 
 - **Ollama:** descarga el modelo una vez con `ollama pull qwen2.5:14b` y deja
   Ollama abierto. El `.env` ya apunta a `http://host.docker.internal:11434`. En
@@ -92,7 +124,7 @@ en `ROSETTA_JWT_SECRET=`.
     del despliegue de la P1, ya no existe en Groq; `openai/gpt-oss-120b` es el
     equivalente más cercano de su catálogo.
   - **Claude:** `LLM_PROVIDER=claude`, `ANTHROPIC_API_KEY` y, si quieres otro
-    modelo, `ANTHROPIC_MODEL`. **No verificado**: no había una clave válida.
+    modelo, `ANTHROPIC_MODEL`. **Implementado, sin probar**: no había una clave válida.
 
   Resultados con Groq (8 hallazgos de `eval/ground_truth/ens_hallazgos_tecnicos.json`,
   los mismos de la prueba de `qwen2.5:14b` y `qwen2.5:7b`):
@@ -221,7 +253,7 @@ En Docker, las rutas de las bases de datos, ChromaDB e informes las fija
 
 ```bash
 uv sync --extra dev
-uv run pytest                    # 452 tests; no necesitan API key ni LLM
+uv run pytest                    # 557 tests; no necesitan API key ni LLM
 uv run ruff check . && uv run ruff format --check . && uv run mypy --strict src/
 uv run rosetta load-corpus all corpus
 uv run uvicorn rosetta.api.main:app --reload
@@ -241,13 +273,15 @@ Sensores (orquestados, nunca modificados)
                  │  HallazgoMaestro (Pydantic)
                  ▼
 Núcleo — Traductor Simbiótico
-  LLM (Claude · Ollama · OpenAI, intercambiable por LLM_PROVIDER)
+  LLM intercambiable por LLM_PROVIDER: Ollama y API compatible con OpenAI
+  (Groq), probados · Claude, implementado sin probar
   RAG ChromaDB sobre el corpus normativo · agente Validador crítico
   Grafo de correlación Neo4j (degrada a memoria si no está disponible)
                  │  DatosCompliance
                  ▼
 Salida
-  API REST (31 endpoints + 1 WebSocket) · Dashboard SPA · CLI
+  API REST (30 operaciones en OpenAPI, más /dashboard) + 1 WebSocket
+  Dashboard SPA · CLI
   Dosier MD/PDF descargable · Gate CI/CD (GitHub Action)
 ```
 
@@ -289,18 +323,36 @@ Modelo de amenazas, incidentes y riesgos aceptados en `docs/P3_SEGURIDAD.md`.
 
 ## Limitaciones
 
+Las mismas que en el apartado 10 de la memoria:
+
 - La evidencia generada por IA **requiere revisión humana**. ROSETTA no
   sustituye al auditor.
-- Solo ENS e ISO 27001 se evalúan contra un *ground truth* humano; la
-  evaluación de los otros cinco marcos queda pendiente.
-- El corpus ISO es el *outline* de intuitem, no la norma completa (la norma es
-  de pago).
-- Shodan y HIBP aparecen en el modelo de datos, pero no tienen adaptador
-  integrado. Amass tiene un adaptador experimental que no está conectado al
-  Modo Auditoría.
+- **Latencia en frío:** la primera traducción, con el modelo fuera de memoria,
+  tardó 59,9 s, por encima de los 30 s de RNF-09. En caliente, el máximo fue
+  11,0 s.
+- **Sin roles:** todos los usuarios autenticados tienen los mismos permisos; no
+  hay distinción entre administrador y auditor de solo lectura.
+- **Despliegue retirado:** el despliegue en un servidor propio de la P1 no está
+  operativo a fecha de entrega. La evaluación se hace en local con Docker
+  siguiendo este README.
+- **Plan gratuito de Groq:** al superar el límite por minuto, `/translate`
+  responde con un 500 genérico y `seed_demo.py` no termina. Con ese plan, puebla
+  la demo con Ollama.
+- **Procedure drift:** el detector no usa el RAG ni comprueba los controles
+  contra el corpus, y puede citar identificadores de ISO 27001:2013 (como
+  `A.9.2`) en lugar de la versión 2022.
+- **Shodan y HIBP** aparecen en el modelo de datos, pero no tienen adaptador.
+  Amass tiene un adaptador experimental que no está conectado al Modo
+  Auditoría.
+- Solo ENS e ISO 27001 se evalúan contra un *ground truth* humano, y el corpus
+  ISO es el *outline* de intuitem, no la norma completa (la norma es de pago).
 
 ## Licencia y autoría
 
 Proprietary provisional, ver [LICENSE](./LICENSE). Proyecto individual de **Mj**
 (michael.jt.pro@gmail.com) para el Máster en Ciberseguridad & IA de Evolve
 Academy.
+
+Desarrollado con asistencia de Claude Code (lo indican los commits
+co-firmados), con dirección y revisión del autor. El detalle está en el
+apartado 12 de la memoria, «Uso de herramientas de IA».

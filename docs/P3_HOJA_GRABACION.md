@@ -1,7 +1,8 @@
 # Hoja de grabación · vídeo P3 (17:40)
 
-> **Vídeo grabado: unos 20 minutos.** Minutos reales de cada requisito en la matriz (memoria,
-> apartado 9, y `P3_MATRIZ.md`).
+> **Vídeo final: unos 25 minutos.** Minutos reales de cada requisito en la matriz (memoria,
+> apartado 9, y `P3_MATRIZ.md`). La parte 2 (errores y seguridad, calidad y cierre) se grabó el
+> 16/10 como continuación, con diapositivas y comandos en directo; empieza en el 20:40.
 
 Orden e identificadores de `data/fuentes/estructura_video.md` (7 bloques). Narración completa:
 `docs/P3_VIDEO_SCRIPT.md`. Comandos numerados: `~/.rosetta/grabacion/comandos.txt` (fuera del
