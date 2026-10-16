@@ -1,5 +1,8 @@
 # Hoja de grabación · vídeo P3 (17:40)
 
+> **Vídeo grabado: unos 20 minutos.** Minutos reales de cada requisito en la matriz (memoria,
+> apartado 9, y `P3_MATRIZ.md`).
+
 Orden e identificadores de `data/fuentes/estructura_video.md` (7 bloques). Narración completa:
 `docs/P3_VIDEO_SCRIPT.md`. Comandos numerados: `~/.rosetta/grabacion/comandos.txt` (fuera del
 repo). Tiempos medidos en el ensayo automático del **2026-10-15** contra `9ce6942` (GPU de 16 GB,

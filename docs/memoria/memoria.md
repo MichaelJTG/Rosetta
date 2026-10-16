@@ -8,13 +8,12 @@
 
 | Campo | Valor |
 |---|---|
-| Grupo | <mark>[PENDIENTE: número de grupo, dos dígitos]</mark> |
+| Modalidad | Proyecto individual, autorizado por el equipo docente |
 | Autor | Michael Jordan Telleria Guadalajara |
-| Modalidad | Proyecto individual con autorización del equipo docente |
-| Fecha de entrega | 2026-10-16 |
+| Fecha de entrega | 16/10/2026 |
 | Repositorio | <https://github.com/MichaelJTG/Rosetta> |
 | Tag de entrega | `v1.0-practica3` |
-| Vídeo | <mark>[PENDIENTE: enlace]</mark> |
+| Vídeo | <https://drive.google.com/file/d/1OWARYoQOd9_7eBRdT3nUHnDCBqWqui38/view?usp=sharing> (unos 20 minutos) |
 | Despliegue | Evaluación en local con Docker siguiendo el README. Existe un despliegue en un servidor propio que a fecha de entrega no está operativo (apdo. 10.1) |
 
 </section>
@@ -44,7 +43,7 @@ ROSETTA es una plataforma de cumplimiento normativo continuo que recibe hallazgo
 
 **Destinatarios:** responsable de cumplimiento, CISO, auditor técnico que necesita transformar evidencia operativa en evidencia de auditoría sin trabajo manual.
 
-**Estado de entrega:** producto funcional en local con Docker, que es como se evalúa (README y Anexo A); el despliegue en un servidor propio de la P1 no está operativo a fecha de entrega (apdo. 10.1). Cumple 24 de 26 ítems RF (2 en 🟡 con condiciones: RF-06, RF-09) y 11 de 12 ítems RNF (1 en 🟡: RNF-09, solo la primera traducción con el modelo en frío excede 30 s). Eval cuantitativa ejecutada: F1 = 0,2648 (correspondencia ENS→ISO, 73 casos, 0 % alucinación) y F1 = 0,2813 (hallazgos técnicos, 16 casos, 0 % alucinación). CI verde.
+**Estado de entrega:** producto funcional en local con Docker, que es como se evalúa (README y Anexo A); el despliegue en un servidor propio de la P1 no está operativo a fecha de entrega (apdo. 10.1). Cumple 23 de 25 ítems RF (2 en 🟡 con condiciones: RF-06, RF-09) y 11 de 12 ítems RNF (1 en 🟡: RNF-09, solo la primera traducción con el modelo en frío excede 30 s). Eval cuantitativa ejecutada: F1 = 0,2648 (correspondencia ENS→ISO, 73 casos, 0 % alucinación) y F1 = 0,2813 (hallazgos técnicos, 16 casos, 0 % alucinación). CI verde.
 
 **Cifras clave (2026-10-10):**
 
@@ -83,7 +82,7 @@ ROSETTA en la Práctica 1 era ya una plataforma funcional, desplegada en un serv
 - **Auth JWT + HTTP Basic + rate limiting** (slowapi): Bearer como método principal.
 - **Docker:** imagen y despliegue con Docker Compose en un servidor propio, detrás de nginx con HTTPS. Ese servidor usaba Groq (`llama-3.3-70b-versatile`) a través del proveedor compatible con OpenAI, no Claude (apdo. 5.4). A fecha de entrega de la P3 el despliegue no está operativo (apdo. 10.1).
 - **24 ficheros de test:** ruff + mypy --strict activos; CI configurada pero rota desde el 2026-05-20.
-- **Herramientas de IA en P1:** Claude Code como asistente de programación en todas las fases (ciclos investigar → diseñar → implementar + tests → revisar → commit). <mark>[PENDIENTE: detalle completo de herramientas IA usadas en P1]</mark>
+- **Herramientas de IA en P1:** Gemini, para planificar y ordenar ideas. Claude Code, para la programación; parte del código lo escribió el autor. Además, los conocimientos del Grado Superior en DAM.
 
 Varias de estas afirmaciones del informe de la P1 resultaron inexactas al revisarlas en la P3: Amass tenía adaptador pero no estaba instalado ni conectado al Modo Auditoría; la API tenía 18 rutas REST y no 15 (hoy son 31); y la latencia «<4 s» con Claude nunca se midió. El detalle está en el apartado 5.4 (Cambios respecto a la P1).
 
@@ -91,7 +90,7 @@ En resumen: ROSETTA en P1 era una aplicación completa y desplegada, con API, da
 
 ### 3.2 Feedback recibido
 
-<mark>[PENDIENTE: nota y comentarios de la P1]</mark>
+Nota de la P1: 9/10. Feedback oral breve del equipo docente; la plataforma no recoge comentarios escritos.
 
 ### 3.3 Clasificación inicial al comienzo de P3
 
@@ -349,7 +348,7 @@ Los cambios de arquitectura principales introducidos en P3:
 
 <figure>
 <img src="img/fig06-blue-team-wazuh.png" alt="Panel Blue Team con alertas Wazuh">
-<figcaption>Figura 6. Panel «Blue Team»: 3 alertas Wazuh ficticias normalizadas y cobertura Red↔Blue de la sesión (1 de 13 activos). (RF-07, RF-08)</figcaption>
+<figcaption>Figura 6. Panel «Blue Team»: 3 alertas Wazuh ficticias normalizadas y cobertura Red↔Blue de la sesión (1 de 31 activos, 3,2 %). (RF-07, RF-08)</figcaption>
 </figure>
 
 ---
@@ -391,7 +390,7 @@ Con Ollama, el prompt del Copilot (unos 5100 tokens con los 7 marcos) no cabe en
 
 <figure>
 <img src="img/fig08-procedure-drift.png" alt="Panel Procedure Drift con drift detectado">
-<figcaption>Figura 8. Panel «Procedure Drift»: procedimiento ficticio PRO-IAM-001 frente a tres observaciones; drift de severidad ALTA, fragmento afectado y redacción propuesta. (RF-11)</figcaption>
+<figcaption>Figura 8. Panel «Procedure Drift» (captura del 16/10/2026): procedimiento ficticio PRO-IAM-001 frente a tres observaciones; drift de severidad ALTA, fragmento afectado y redacción propuesta. Los controles los propone el LLM: el detector de drift no usa el RAG ni los comprueba contra el corpus, y <code>A.9.2</code> es un identificador de ISO 27001:2013, no de la versión 2022. (RF-11)</figcaption>
 </figure>
 
 ---
@@ -411,7 +410,7 @@ Con Ollama, el prompt del Copilot (unos 5100 tokens con los 7 marcos) no cabe en
 
 ### 6.11 Auth + rate limiting (RF-15)
 
-**Qué hace:** `POST /auth/login` devuelve un JWT Bearer. Los endpoints protegidos requieren `Authorization: Bearer <token>`. HTTP Basic sigue disponible como fallback. Rate limiting (slowapi): 10 intentos de login fallidos por minuto por IP → 429.
+**Qué hace:** `POST /auth/login` devuelve un JWT Bearer. Los endpoints protegidos requieren `Authorization: Bearer <token>`. HTTP Basic sigue disponible como fallback. Rate limiting (slowapi): 5 logins por minuto por IP; el sexto recibe 429.
 
 **Requisitos:** RF-15, RNF-07.
 
@@ -425,7 +424,7 @@ Con Ollama, el prompt del Copilot (unos 5100 tokens con los 7 marcos) no cabe en
 
 <figure>
 <img src="img/fig10-grafo-correlacion.png" alt="Panel Grafo con nodos activo y control">
-<figcaption>Figura 10. Panel «Grafo»: 30 nodos y 22 aristas activo→control de la sesión, leídos de Neo4j y dibujados con vis.js. (RF-17)</figcaption>
+<figcaption>Figura 10. Panel «Grafo»: 33 nodos y 25 aristas activo→control de la sesión, leídos de Neo4j y dibujados con vis.js. (RF-17)</figcaption>
 </figure>
 
 ---
@@ -649,9 +648,8 @@ De las 38 pruebas definidas (tabla completa en Anexo E):
 
 | Estado | Cantidad | Pruebas |
 |---|---|---|
-| ✅ Pasado | 34 | PR-01..PR-05, PR-07, PR-08, PR-10..PR-30, PR-32..PR-34, PR-36..PR-38 |
+| ✅ Pasado | 35 | PR-01..PR-05, PR-07, PR-08, PR-10..PR-34, PR-36..PR-38 |
 | 🟡 Condicionado | 3 | PR-06 (solo lab. local), PR-09 (aprueba 23 de 51 traducciones malas), PR-35 (1/20 excede 30 s: arranque en frío) |
-| <mark>[PENDIENTE]</mark> | 1 | PR-31 (instalación por persona ajena) |
 
 ### 8.3 Pruebas con resultado no ideal y lección aprendida
 
@@ -668,12 +666,13 @@ De las 38 pruebas definidas (tabla completa en Anexo E):
 | **Estado por marco mezclaba marcos** (RF-19) | Con ISO 27001 aparecían controles de PCI-DSS, RGPD y ENS | Índice control → marco construido desde el corpus (`e244421`). Los datos de demo ya guardados en Neo4j hay que regenerarlos |
 | **`GET /audit/{id}` respondía siempre 422** (RF-06) | El estado de una auditoría no se podía consultar por REST | Parámetro `request` tipado como `Request` (`3286ed8`) |
 | **Textos de la interfaz escritos a mano** (RF-12) | El dashboard decía «Claude Sonnet 4.6» y «max 200 MB» con Ollama y un límite de 20 MB | `GET /config/ui` con el LLM en uso, los marcos y `ROSETTA_PDF_MAX_SIZE_MB` (`5b2a3c1`) |
+| **Panel Roadmap vacío** (RF-20b), encontrado en el ensayo del vídeo del 15/10/2026 | El panel «Roadmap Vuln.» no listaba ningún hallazgo: pide `estado=all` y `GET /vuln-roadmap` no reconocía ese valor | El endpoint acepta `estado=all`, con un test en `tests/test_api_controls.py` (`81e76fa`) |
 
 ---
 
 ### 8.4 Instalación manual por persona ajena
 
-<mark>[PENDIENTE: resultado de la prueba de instalación por una persona ajena al proyecto siguiendo el README]</mark>
+Un amigo del autor, ajeno al proyecto, lo instaló siguiendo el README el 15/10/2026, sin incidencias según su feedback (PR-31 ✅, RNF-05).
 
 ---
 
@@ -731,7 +730,7 @@ El Validador no cambia la traducción: la aprueba o la rechaza. Discrimina (las 
 
 **Limitaciones del eval:**
 - Solo con `LLM_PROVIDER=ollama` (qwen2.5:14b). Con proveedores en la nube (Claude o compatibles con OpenAI) no se ha ejecutado, por coste; solo hay una prueba de 8 hallazgos con Groq (README).
-- Los 16 casos de hallazgo fueron **diseñados por Claude Code** (decisión automatizada en bloque C); sus asignaciones de control ISO son provisionales. <mark>[PENDIENTE: revisados por el autor, sí o no]</mark>
+- Los 16 casos de hallazgo fueron **diseñados por Claude Code** (decisión automatizada en bloque C), no revisados uno a uno por el autor. Sus asignaciones de control son provisionales y los resultados de esos 16 casos son orientativos. El 0 % de alucinación no depende de ellas: se comprueba contra la lista oficial de controles del Anexo A.
 - Solo se evalúan ENS→ISO. Los otros cinco marcos (NIS2, DORA, RGPD, NIST CSF, PCI-DSS) no tienen ground truth disponible aún.
 
 ---
@@ -742,43 +741,43 @@ El Validador no cambia la traducción: la aprueba o la rechaza. Discrimina (las 
 
 | Requisito | Descripción | Estado final | Implementación | Prueba | Evidencia |
 |---|---|---|---|---|---|
-| RF-01 | Traducción hallazgo → controles con cita | ✅ | `src/rosetta/core/traductor.py` · `POST /translate` · `92d4b83` | PR-01 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.1 |
-| RF-02 | Multi-marco 7 frameworks | ✅ | `src/rosetta/core/rag.py` · `corpus/` (7 dirs) · `f29cbde` | PR-02 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.2 |
-| RF-03 | RAG ChromaDB 229 frags | ✅ | `src/rosetta/core/rag.py` · `f29cbde` | PR-03 | 229 frags en la salida de `load-corpus` · Apdo. 6.2 |
-| RF-04 | Dosier MD+PDF descargable | ✅ | `src/rosetta/core/report_generator.py` · `GET /reports/download/{filename}` · `60d437a` | PR-04 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.3 |
-| RF-05 | Ingesta PDF hallazgos | ✅ | `src/rosetta/core/pdf_ingestion.py` · `POST /ingest/pdf` · `b64dd2b` | PR-05 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.4 |
-| RF-06 | Modo Auditoría RT + WebSocket | 🟡 Solo lab. local | `src/rosetta/core/orchestrator.py` · `POST /audit/start` · `WS /audit/ws/{id}` · `419b737` | PR-06 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.5 |
-| RF-07 | Ingesta Wazuh JSON/CSV | ✅ | `src/rosetta/adapters/blue/wazuh.py` · `POST /blue/ingest` · `b64dd2b` | PR-07 | Apdo. 6.6 |
-| RF-08 | Correlación Red↔Blue | ✅ | `src/rosetta/core/blue_enrichment.py` · `b64dd2b` | PR-08 | 96 % cobertura · Apdo. 6.6 |
-| RF-09 | Multi-agente Validador | 🟡 73 casos: precisión de rechazo 0,82 | `src/rosetta/agents/orchestrator.py` · `src/rosetta/agents/validator.py` · `POST /translate` con `"validar": true` · `4ebeade` | PR-09 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.7 |
-| RF-10 | Copilot normativo | ✅ | `src/rosetta/core/copilot.py` · `POST /copilot/ask` · `b64dd2b` | PR-10 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.8 |
-| RF-11 | Procedure drift | ✅ | `src/rosetta/core/drift.py` · `POST /drift/analyze` · `b64dd2b` | PR-11 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.9 |
-| RF-12 | Dashboard 10 pan. (base) · 16 (P3) | ✅ superado | `src/rosetta/api/dashboard.py` · `GET /dashboard` · `92a5989` | PR-12 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.10 |
-| RF-13 | OpenAPI / Swagger UI | ✅ | `src/rosetta/api/main.py` (FastAPI auto) | PR-13 | `GET /openapi.json` → 30 operaciones · Swagger UI · Apdo. 6.16 / fig. 12 |
-| RF-14 | Gate CI/CD diff analyzer | ✅ | `src/rosetta/core/diff_analyzer.py` · `POST /analyze-diff` · `.github/workflows/rosetta-gate.yml` · `b64dd2b` | PR-14 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.15 |
-| RF-15 | Auth JWT + Basic + rate limiting | ✅ | `src/rosetta/api/auth.py` · `POST /auth/login` · `5cf5aac` | PR-15 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.11 |
-| RF-16 | Historial SQLite append-only | ✅ | `src/rosetta/core/session_store.py` · `b64dd2b` | PR-16 | 82 % cobertura |
-| RF-17 | Grafo Neo4j + degradación | ✅ | `src/rosetta/core/graph.py` · `GET /graph/data` · `1c567c4` | PR-17 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.12 |
-| RF-18 | CLI 6 comandos | ✅ | `src/rosetta/cli/main.py` · `06bffda` | PR-18 | Vídeo <mark>[PENDIENTE: mm:ss]</mark> · Apdo. 6.13 |
-| RF-19 | Panel cumplimiento | ✅ | `src/rosetta/api/main.py` · `GET /compliance/state/{marco}` · `b64dd2b` | PR-19 | 100 % cobertura · Apdo. 6.14 |
-| RF-20a | Catálogo controles | ✅ | `src/rosetta/core/control_store.py` · `GET /controls/{marco}` · `GET /controls/{marco}/{control_id}` · `b64dd2b` | PR-20 | Apdo. 6.14 |
-| RF-20b | Roadmap vulns | ✅ | `src/rosetta/api/main.py` · `GET /vuln-roadmap` · `b64dd2b` | PR-21 | Apdo. 6.14 |
-| RF-20c | Panel evidencias | ✅ | `src/rosetta/api/main.py` · `GET /evidence-panel` · `b64dd2b` | PR-22 | Apdo. 6.14 |
-| RF-20d | Gap analysis | ✅ | `src/rosetta/api/main.py` · `POST /gap-analysis/{marco}` · `b64dd2b` | PR-23 | Apdo. 6.14 |
-| RF-20e | Plan director | ✅ | `src/rosetta/api/main.py` · `POST /plan-director/{marco}` · `b64dd2b` | PR-24 | Apdo. 6.14 |
-| RF-20f | Análisis riesgos | ✅ | `src/rosetta/api/main.py` · `POST /risk-analysis` · `b64dd2b` | PR-25 | Apdo. 6.14 |
-| RNF-01 | Degradación grácil Neo4j | ✅ | `src/rosetta/core/graph.py` (`verify_connectivity`) · `src/rosetta/api/main.py` (`neo4j_unavailable_api_continues`) · `1c567c4` | PR-26 | 4 tests degradación · Apdo. 6.12 |
-| RNF-02 | Cobertura ≥ 80 % en core | ✅ 92 % en `core/` | `pytest --cov=rosetta --cov-branch` (CI) | PR-27 | 85 % global · `pdf_ingestion.py` 76 % |
-| RNF-03 | mypy 0 errores | ✅ | `mypy src/` (56 ficheros) | PR-28 | 0 errores |
-| RNF-04 | ruff 0 violaciones | ✅ | `ruff check . && ruff format --check` · `7ec6b66` | PR-29 | CI run 37203612212 verde |
-| RNF-05 | Instalación limpia | ✅ | `Dockerfile` · `docker-compose.yml` · `uv.lock` · `2339813` | PR-30, PR-31 | Build 165 s · PR-31 <mark>[PENDIENTE]</mark> |
-| RNF-06 | Cero secretos | ✅ | `.github/workflows/ci.yml` (gitleaks, fetch-depth 0) · `.pre-commit-config.yaml` · `1ef7438`·`4aeef3b` | PR-32 | 0 apariciones filter-repo · Apdo. 7.3 |
-| RNF-07 | Rate limiting | ✅ | `src/rosetta/api/main.py` (slowapi) · `5cf5aac` | PR-33 | 429 al exceder límite |
-| RNF-08 | Alcance Modo Auditoría | ✅ | `src/rosetta/core/orchestrator.py:_validar_alcance()` · `810812d` | PR-34 | IPs privadas bloqueadas |
-| RNF-09 | Latencia < 30 s | 🟡 p50=6,95 s | `eval/bench_latency.py` · `eval/reports/2026-10-11T15-28-12_bench_latency_ollama.json` | PR-35 | p50=6,95 s · p95=11,0 s · máx=59,9 s (en frío) |
-| RNF-10 | CI reproducible | ✅ | `.github/workflows/ci.yml` · `uv.lock` · `2e7792d` | PR-36 | CI run 37203612212 verde |
-| RNF-11 | Cabeceras seguridad HTTP | ✅ | `src/rosetta/api/main.py` (SecurityHeadersMiddleware) · `c552729` | PR-37 | X-Frame-Options, CSP presentes |
-| RNF-12 | CVE audit CI | ✅ | `.github/workflows/ci.yml` (dependency-audit) · `2e7792d`·`26e63e5` | PR-38 | R-01 aceptado; fsspec parcheado |
+| RF-01 | Traducción hallazgo → controles con cita | ✅ | `src/rosetta/core/traductor.py` · `POST /translate` · `92d4b83` | PR-01 | Vídeo 06:00 · Apdo. 6.1 |
+| RF-02 | Multi-marco 7 frameworks | ✅ | `src/rosetta/core/rag.py` · `corpus/` (7 dirs) · `f29cbde` | PR-02 | Vídeo 06:00 · Apdo. 6.2 |
+| RF-03 | RAG ChromaDB 229 frags | ✅ | `src/rosetta/core/rag.py` · `f29cbde` | PR-03 | Vídeo 06:00 · 229 frags en la salida de `load-corpus` · Apdo. 6.2 |
+| RF-04 | Dosier MD+PDF descargable | ✅ | `src/rosetta/core/report_generator.py` · `GET /reports/download/{filename}` · `60d437a` | PR-04 | Vídeo 07:01 · Apdo. 6.3 |
+| RF-05 | Ingesta PDF hallazgos | ✅ | `src/rosetta/core/pdf_ingestion.py` · `POST /ingest/pdf` · `b64dd2b` | PR-05 | Vídeo 08:01 · Apdo. 6.4 |
+| RF-06 | Modo Auditoría RT + WebSocket | 🟡 Solo lab. local | `src/rosetta/core/orchestrator.py` · `POST /audit/start` · `WS /audit/ws/{id}` · `419b737` | PR-06 | Vídeo 10:31 · Apdo. 6.5 |
+| RF-07 | Ingesta Wazuh JSON/CSV | ✅ | `src/rosetta/adapters/blue/wazuh.py` · `POST /blue/ingest` · `b64dd2b` | PR-07 | Vídeo 10:20 · Apdo. 6.6 |
+| RF-08 | Correlación Red↔Blue | ✅ | `src/rosetta/core/blue_enrichment.py` · `b64dd2b` | PR-08 | Vídeo 10:20 · 96 % cobertura · Apdo. 6.6 |
+| RF-09 | Multi-agente Validador | 🟡 73 casos: precisión de rechazo 0,82 | `src/rosetta/agents/orchestrator.py` · `src/rosetta/agents/validator.py` · `POST /translate` con `"validar": true` · `4ebeade` | PR-09 | Vídeo 12:42 · Apdo. 6.7 |
+| RF-10 | Copilot normativo | ✅ | `src/rosetta/core/copilot.py` · `POST /copilot/ask` · `b64dd2b` | PR-10 | Vídeo 13:24 · Apdo. 6.8 |
+| RF-11 | Procedure drift | ✅ | `src/rosetta/core/drift.py` · `POST /drift/analyze` · `b64dd2b` | PR-11 | No aparece en el vídeo (por tiempo) · PR-11 · Fig. 8 · Apdo. 6.9 |
+| RF-12 | Dashboard 10 pan. (base) · 16 (P3) | ✅ superado | `src/rosetta/api/dashboard.py` · `GET /dashboard` · `92a5989` | PR-12 | Vídeo 03:55 · Apdo. 6.10 |
+| RF-13 | OpenAPI / Swagger UI | ✅ | `src/rosetta/api/main.py` (FastAPI auto) | PR-13 | Vídeo 14:28 · `GET /openapi.json` → 30 operaciones · Apdo. 6.16 / fig. 12 |
+| RF-14 | Gate CI/CD diff analyzer | ✅ | `src/rosetta/core/diff_analyzer.py` · `POST /analyze-diff` · `.github/workflows/rosetta-gate.yml` · `b64dd2b` | PR-14 | No aparece en el vídeo (por tiempo) · PR-14 · Apdo. 6.15 |
+| RF-15 | Auth JWT + Basic + rate limiting | ✅ | `src/rosetta/api/auth.py` · `POST /auth/login` · `5cf5aac` | PR-15 | No aparece en el vídeo (por tiempo) · PR-15 · Apdo. 6.11 |
+| RF-16 | Historial SQLite append-only | ✅ | `src/rosetta/core/session_store.py` · `b64dd2b` | PR-16 | Vídeo 15:09 · 82 % cobertura · Fig. 3 |
+| RF-17 | Grafo Neo4j + degradación | ✅ | `src/rosetta/core/graph.py` · `GET /graph/data` · `1c567c4` | PR-17 | Vídeo 16:31 · Apdo. 6.12 |
+| RF-18 | CLI 6 comandos | ✅ | `src/rosetta/cli/main.py` · `06bffda` | PR-18 | No aparece en el vídeo (por tiempo) · PR-18 · Apdo. 6.13 |
+| RF-19 | Panel cumplimiento | ✅ | `src/rosetta/api/main.py` · `GET /compliance/state/{marco}` · `b64dd2b` | PR-19 | Vídeo 17:53 · 100 % cobertura · Apdo. 6.14 / fig. 11 |
+| RF-20a | Catálogo controles | ✅ | `src/rosetta/core/control_store.py` · `GET /controls/{marco}` · `GET /controls/{marco}/{control_id}` · `b64dd2b` | PR-20 | Vídeo 17:56 · Apdo. 6.14 |
+| RF-20b | Roadmap vulns | ✅ | `src/rosetta/api/main.py` · `GET /vuln-roadmap` · `b64dd2b` · `81e76fa` | PR-21 | Vídeo 17:57 · Apdo. 6.14 |
+| RF-20c | Panel evidencias | ✅ | `src/rosetta/api/main.py` · `GET /evidence-panel` · `b64dd2b` | PR-22 | Vídeo 17:59 · Apdo. 6.14 |
+| RF-20d | Gap analysis | ✅ | `src/rosetta/api/main.py` · `POST /gap-analysis/{marco}` · `b64dd2b` | PR-23 | Vídeo 19:26 · Apdo. 6.14 |
+| RF-20e | Plan director | ✅ | `src/rosetta/api/main.py` · `POST /plan-director/{marco}` · `b64dd2b` | PR-24 | Vídeo 19:53 · Apdo. 6.14 |
+| RF-20f | Análisis riesgos | ✅ | `src/rosetta/api/main.py` · `POST /risk-analysis` · `b64dd2b` | PR-25 | Vídeo 19:54 · Apdo. 6.14 |
+| RNF-01 | Degradación grácil Neo4j | ✅ | `src/rosetta/core/graph.py` (`verify_connectivity`) · `src/rosetta/api/main.py` (`neo4j_unavailable_api_continues`) · `1c567c4` | PR-26 | No aparece en el vídeo · PR-26 · 4 tests degradación · Apdo. 6.12 |
+| RNF-02 | Cobertura ≥ 80 % en core | ✅ 92 % en `core/` | `pytest --cov=rosetta --cov-branch` (CI) | PR-27 | No aparece en el vídeo · PR-27 · 85 % global · `pdf_ingestion.py` 76 % |
+| RNF-03 | mypy 0 errores | ✅ | `mypy src/` (56 ficheros) | PR-28 | No aparece en el vídeo · PR-28 · 0 errores |
+| RNF-04 | ruff 0 violaciones | ✅ | `ruff check . && ruff format --check` · `7ec6b66` | PR-29 | No aparece en el vídeo · PR-29 · CI run 37203612212 verde |
+| RNF-05 | Instalación limpia | ✅ | `Dockerfile` · `docker-compose.yml` · `uv.lock` · `2339813` | PR-30, PR-31 | No aparece en el vídeo · PR-30: build 165 s · PR-31: instalación por persona ajena sin incidencias (15/10/2026) · Apdo. 8.4 |
+| RNF-06 | Cero secretos | ✅ | `.github/workflows/ci.yml` (gitleaks, fetch-depth 0) · `.pre-commit-config.yaml` · `1ef7438`·`4aeef3b` | PR-32 | No aparece en el vídeo · PR-32 · 0 apariciones filter-repo · Apdo. 7.3 |
+| RNF-07 | Rate limiting | ✅ | `src/rosetta/api/main.py` (slowapi) · `5cf5aac` | PR-33 | No aparece en el vídeo · PR-33 · 5 logins por minuto: 5 × 401 y la sexta 429 |
+| RNF-08 | Alcance Modo Auditoría | ✅ | `src/rosetta/core/orchestrator.py:_validar_alcance()` · `810812d` | PR-34 | No aparece en el vídeo · PR-34 · `http://192.168.1.10` → 400 |
+| RNF-09 | Latencia < 30 s | 🟡 p50=6,95 s | `eval/bench_latency.py` · `eval/reports/2026-10-11T15-28-12_bench_latency_ollama.json` | PR-35 | No aparece en el vídeo · PR-35 · p50=6,95 s · p95=11,0 s · máx=59,9 s (en frío) |
+| RNF-10 | CI reproducible | ✅ | `.github/workflows/ci.yml` · `uv.lock` · `2e7792d` | PR-36 | No aparece en el vídeo · PR-36 · CI run 37203612212 verde |
+| RNF-11 | Cabeceras seguridad HTTP | ✅ | `src/rosetta/api/main.py` (SecurityHeadersMiddleware) · `c552729` | PR-37 | No aparece en el vídeo · PR-37 · X-Frame-Options, CSP presentes |
+| RNF-12 | CVE audit CI | ✅ | `.github/workflows/ci.yml` (dependency-audit) · `2e7792d`·`26e63e5` | PR-38 | No aparece en el vídeo · PR-38 · R-01 aceptado; fsspec parcheado |
 
 </div>
 
@@ -826,9 +825,7 @@ Historial con un único autor (Michael Jordan Telleria Guadalajara). Cuenta de G
 | Limpieza historial (INC-01) | 2026-10-06 | filter-repo, verificación gitleaks, force-push. Ejecutado por el autor. |
 | Memoria técnica | 2026-10-06 | Redactada por Claude Code a partir de los documentos `P3_*.md`; revisada y corregida por el autor. |
 
-**Horas del autor:** <mark>[PENDIENTE: horas reales del autor]</mark>
-
-> **Nota:** la implementación de los bloques A–E la realizó mayoritariamente Claude Code en sesiones autónomas los días 4 a 6 de octubre de 2026. El autor estableció la dirección de cada bloque, revisó el trabajo resultante con la bitácora del vault (`vault/00_Bitacora.md`) y aprobó los commits por bloques, no commit a commit.
+**Horas del autor en la P3:** al menos 40–50 (estimación propia, sin registro horario).
 
 ---
 
@@ -836,13 +833,12 @@ Historial con un único autor (Michael Jordan Telleria Guadalajara). Cuenta de G
 
 | Herramienta | Uso en el proyecto |
 |---|---|
-| **Claude Code** | Asistente de programación principal en P1 (todas las fases, ciclo investigar→diseñar→implementar+tests→revisar→commit) y en P3 (bloques A–E de forma autónoma bajo dirección del autor; redacción de esta memoria a partir de los documentos `P3_*.md`). No se especifica el modelo de Claude Code; el autor no puede verificarlo en el contexto de las sesiones. |
+| **Claude Code** | Asistente de programación principal en P1 (todas las fases, ciclo investigar→diseñar→implementar+tests→revisar→commit) y en P3 (bloques A–E de forma autónoma bajo dirección del autor; redacción de esta memoria a partir de los documentos `P3_*.md`). Los 13 commits co-firmados por Claude Code (del 2026-10-04 al 2026-10-06) indican Claude Sonnet 4.6. |
 | **Claude (claude.ai)** | Auditoría del repositorio, planificación de bloques de trabajo, revisión de decisiones de arquitectura (ADR), revisión de esta memoria. |
-| **LLM del producto — Ollama qwen2.5:14b** | Proveedor LLM en desarrollo y benchmarks; seleccionado con `LLM_PROVIDER=ollama`. Todos los evals ejecutados con este modelo. |
-| **LLM del producto** | Intercambiable con `LLM_PROVIDER`: Ollama `qwen2.5:14b` en local (con él se hicieron la evaluación y el benchmark), Claude (Anthropic) o una API compatible con OpenAI. El despliegue de la P1 usaba Groq (`llama-3.3-70b-versatile`). Con proveedores en la nube no se ha ejecutado el eval cuantitativo; solo una prueba de 8 hallazgos con Groq (`openai/gpt-oss-120b`, README). |
-| **Herramientas de IA en P1** | <mark>[PENDIENTE: detalle completo de herramientas IA usadas en P1]</mark> |
+| **LLM del producto** | Intercambiable con `LLM_PROVIDER`: Ollama `qwen2.5:14b` en local (`LLM_PROVIDER=ollama`), el proveedor de desarrollo con el que se hicieron todos los evals y el benchmark; Claude (Anthropic) o una API compatible con OpenAI. El despliegue de la P1 usaba Groq (`llama-3.3-70b-versatile`). Con proveedores en la nube no se ha ejecutado el eval cuantitativo; solo una prueba de 8 hallazgos con Groq (`openai/gpt-oss-120b`, README). |
+| **Herramientas de IA en P1** | Gemini, para planificar y ordenar ideas. Claude Code, para la programación; parte del código lo escribió el autor. Además, los conocimientos del Grado Superior en DAM. |
 
-**Ground truth del eval:** los 73 casos de correspondencia ENS→ISO tienen como ground truth el SoA TechServ facilitado por el equipo docente. **No fue generado por IA.** Los 16 casos de hallazgo técnico fueron **diseñados por Claude Code** (bloque C, decisión automatizada); sus asignaciones de control ISO son provisionales y <mark>[PENDIENTE: revisados por el autor, sí o no]</mark>.
+**Ground truth del eval:** los 73 casos de correspondencia ENS→ISO tienen como ground truth el SoA TechServ facilitado por el equipo docente. **No fue generado por IA.** Los 16 casos de hallazgo técnico fueron **diseñados por Claude Code** (bloque C, decisión automatizada), no revisados uno a uno por el autor. Sus asignaciones de control son provisionales y los resultados de esos 16 casos son orientativos. El 0 % de alucinación no depende de ellas: se comprueba contra la lista oficial de controles del Anexo A.
 
 **Declaración del autor:** puedo explicar cualquier parte del código, la arquitectura y las decisiones de diseño de ROSETTA. La IA es un asistente de programación, no el autor intelectual del proyecto.
 
@@ -989,7 +985,7 @@ No hay instancia desplegada operativa a fecha de entrega (apdo. 10.1): se evalú
 | PR-12 | RF-12 | `GET /dashboard` | HTML con los 16 paneles | 200; los 16 paneles visibles en navegador | ✅ |
 | PR-13 | RF-13 | `GET /openapi.json` y `GET /docs` | Todas las rutas REST salvo `/dashboard` en el esquema; Swagger UI visible | 29 rutas y 30 operaciones en el JSON; Swagger UI carga en el navegador (`tests/e2e/test_docs_ui.py`, 2026-10-10) | ✅ |
 | PR-14 | RF-14 | `POST /analyze-diff` con diff ficticio que añade endpoint sin auth | `decision=block` | `decision=block`; mensaje con control incumplido | ✅ |
-| PR-15 | RF-15 | `POST /auth/login` con credenciales incorrectas 11 veces | 429 en el intento 11 | 429 tras 10 intentos fallidos | ✅ |
+| PR-15 | RF-15 | `POST /auth/login` con credenciales incorrectas 6 veces | 401 en los 5 primeros intentos y 429 en el sexto (límite de 5 logins por minuto) | `401 401 401 401 401 429` (ensayo del 2026-10-15) | ✅ |
 | PR-16 | RF-16 | `POST /translate` × 3; `GET /findings` | 3 registros en historial | 3 hallazgos en SQLite con timestamps correctos | ✅ |
 | PR-17 | RF-17 | `GET /graph/data` con Neo4j apagado | 200 con grafo en memoria (no 500) | 200 con nodos y aristas en memoria | ✅ |
 | PR-18 | RF-18 | `rosetta version` en terminal | Semver (p.e. `1.0.0`) | `1.0.0` impreso en stdout | ✅ |
@@ -1005,10 +1001,10 @@ No hay instancia desplegada operativa a fecha de entrega (apdo. 10.1): se evalú
 | PR-28 | RNF-03 | `mypy src/` | 0 errores | 0 errores en 56 ficheros | ✅ |
 | PR-29 | RNF-04 | `ruff check . && ruff format --check` | 0 violaciones | CI run 37203612212 verde | ✅ |
 | PR-30 | RNF-05 | Instalación limpia desde cero | App funcional en < 10 min | Build 165 s; 197 fragmentos indexados (corpus anterior a la ampliación del ENS); login OK | ✅ |
-| PR-31 | RNF-05 | Instalación por persona ajena al proyecto | <mark>[PENDIENTE: resultado]</mark> | <mark>[PENDIENTE: resultado]</mark> | <mark>[PENDIENTE]</mark> |
+| PR-31 | RNF-05 | Instalación por persona ajena al proyecto | Instalación completa siguiendo solo el README | Un amigo del autor, ajeno al proyecto, lo instaló siguiendo el README el 15/10/2026, sin incidencias según su feedback | ✅ |
 | PR-32 | RNF-06 | `git log -p --all \| grep <literal>` | 0 apariciones | 0 apariciones tras filter-repo (2026-10-06) | ✅ |
-| PR-33 | RNF-07 | `POST /auth/login` × 11 con IP fija | 429 en intento 11 | 429 recibido | ✅ |
-| PR-34 | RNF-08 | `POST /audit/start` con target `192.168.1.1` | Error de alcance | `{"error":"target fuera del alcance permitido"}` | ✅ |
+| PR-33 | RNF-07 | `POST /auth/login` × 6 con IP fija | Límite de 5 logins por minuto: 5 respuestas 401 y la sexta 429 | `401 401 401 401 401 429` (ensayo del 2026-10-15) | ✅ |
+| PR-34 | RNF-08 | `POST /audit/start` con objetivo `http://192.168.1.10` | Error de alcance | 400 `{"detail":"El objetivo 'http://192.168.1.10' apunta a una dirección privada/reservada y no puede ser escaneado. Para un laboratorio autorizado, añádelo a ROSETTA_AUDIT_ALLOWLIST en el servidor."}` | ✅ |
 | PR-35 | RNF-09 | Benchmark: 20 traducciones con Ollama qwen2.5:14b (`eval/bench_latency.py`) | < 30 s | p50=6,95 s · p95=11,0 s · máx=59,9 s | 🟡 1/20 excede 30 s (en frío) |
 | PR-36 | RNF-10 | CI verde con Python 3.11 y 3.12 | Build en verde | Run 37203612212 verde | ✅ |
 | PR-37 | RNF-11 | `GET /health` → inspeccionar cabeceras | `X-Frame-Options: DENY`, CSP, `Referrer-Policy` | Presentes en todas las respuestas | ✅ |

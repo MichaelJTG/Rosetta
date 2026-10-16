@@ -186,7 +186,7 @@ servidor de producción (Hetzner):
 | ID | Amenaza | Componente afectado | Control existente | Riesgo residual |
 |----|---------|--------------------|--------------------|-----------------|
 | S-1 | Robo de JWT para suplantar sesión | `POST /auth/login` · `src/rosetta/api/auth.py` | Secreto JWT ≥ 32 chars obligatorio (B-5); tokens con expiración configurable | Bajo |
-| S-2 | Fuerza bruta de credenciales | `POST /auth/login` · `POST /auth/basic` | Rate limiting slowapi (120 req/min por IP, con X-Real-IP como clave) | Medio — sin bloqueo permanente por cuenta |
+| S-2 | Fuerza bruta de credenciales | `POST /auth/login` | Rate limiting slowapi: 5 logins por minuto por IP (el sexto, 429; 120 req/min por defecto en el resto de rutas), con X-Real-IP como clave | Medio — sin bloqueo permanente por cuenta |
 | S-3 | Inyección de IP para eludir rate limiting via XFF | `_client_ip` en `main.py` | **B-4 corregido**: se usa X-Real-IP (nginx), XFF se descarta | Bajo |
 
 #### T — Tampering (manipulación)

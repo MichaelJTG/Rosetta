@@ -526,3 +526,16 @@ está vacío.
 | **Entorno** | `docker compose up -d --build app` con el override de grabación: los 10 hallazgos se conservan y `?estado=all` devuelve 10 (0,2 s). Captura del panel con datos en `~/.rosetta/grabacion/pregenerado/roadmap_vuln.png`. |
 | **Congelación** | `81e76fa` es el nuevo punto de congelación y sustituye a `9ce6942`. |
 | **Commit** | `81e76fa` (CI en verde) |
+
+### G-10 · Entrega final: memoria, matriz con minutos del vídeo y capturas revisadas · 2026-10-16
+
+| | |
+|---|---|
+| **Memoria** | Portada sin grupo (proyecto individual autorizado), fecha 16/10/2026 y enlace al vídeo (unos 20 minutos). Nota de la P1 (9/10, feedback oral), horas del autor (al menos 40–50, estimación propia), herramientas de IA de la P1 y modelo de Claude Code: los 13 commits co-firmados (2026-10-04 a 2026-10-06) indican Claude Sonnet 4.6. Filas «LLM del producto» unidas. Los 16 casos de hallazgo constan como no revisados uno a uno por el autor (resultados orientativos). PR-31 ✅: instalación por un amigo del autor siguiendo el README el 15/10/2026, sin incidencias según su feedback. RF-20b (panel Roadmap vacío, `81e76fa`) pasa a pruebas fallidas (8.3). |
+| **Matriz** | Minutos de la consola de grabación en la memoria (apartado 9) y en `P3_MATRIZ.md`. RF-11, RF-14, RF-15 y RF-18: «No aparece en el vídeo (por tiempo)» con su prueba. Los 12 RNF figuraban «sin marcar»: «No aparece en el vídeo» con su prueba. |
+| **Capturas** | Revisadas las 11. La figura 8 mostraba «Error 500» (captura del 10/10; la bitácora no registra la causa): rehecha con `drift_procedimiento.txt` y `drift_observaciones.txt`, respuesta 200, drift ALTA, controles `A.5.1` y `A.9.2` (este, de ISO 27001:2013: el detector de drift no usa el RAG). Las demás no muestran errores, paneles vacíos ni textos antiguos; los pies de las figuras 6 (1 de 31 activos) y 10 (33 nodos, 25 aristas) se ajustan a la imagen. |
+| **Contradicciones corregidas** | 24 de 26 RF → 23 de 25 (25 RF + 12 RNF = 37). Login: «10/11 intentos» → 5 por minuto (5 × 401 y la sexta 429), en 6.11, PR-15, PR-33 y STRIDE S-2 de `P3_SEGURIDAD.md` (decía 120/min y una ruta `/auth/basic` que no existe). PR-34: objetivo `http://192.168.1.10` y el mensaje real del 400. `P3_MATRIZ.md`: 166 → 229 fragmentos; tag ya no pendiente. `P3_REQUISITOS.md`: RF-06 ya tiene demo contra el laboratorio; RNF-02 en «modificados» con el 85 % / 92 %. Guion y hoja: duración real del vídeo (unos 20 minutos). |
+| **README** | Sin sección de la P3: el enlace al vídeo queda en la portada de la memoria. |
+| **PDF** | `scripts/build_memoria.py` escribe `dist/P3_MichaelTelleria_Memoria.pdf` (antiguos `P3_GrupoXX_*` y `P3_Memoria.html` borrados). 48 páginas; cuerpo p3–p39 = 37; anexos p40–p48; 0 `[PENDIENTE`. Generado dentro de la imagen `rosetta-app`. |
+| **Congelación** | `git diff 81e76fa..HEAD` sobre `src`, `Dockerfile`, `docker-compose.yml`, `pyproject.toml`, `uv.lock`, `lab`, `corpus` y `scripts` (salvo `build_memoria.py`): vacío. |
+| **Commit** | este commit; tag `v1.0-practica3` |

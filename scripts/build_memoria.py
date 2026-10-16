@@ -1,4 +1,4 @@
-"""Build script: docs/memoria/memoria.md -> dist/P3_GrupoXX_Memoria.pdf"""
+"""Build script: docs/memoria/memoria.md -> dist/P3_MichaelTelleria_Memoria.pdf"""
 
 from __future__ import annotations
 
@@ -6,15 +6,12 @@ import re
 import sys
 from pathlib import Path
 
-# Fill in the two-digit group number before delivery
-GRUPO = "XX"
-
 ROOT = Path(__file__).resolve().parent.parent
 SRC_MD = ROOT / "docs" / "memoria" / "memoria.md"
 SRC_CSS = ROOT / "docs" / "memoria" / "estilos.css"
 DIST = ROOT / "dist"
-OUT_PDF = DIST / f"P3_Grupo{GRUPO}_Memoria.pdf"
-OUT_HTML = DIST / f"P3_Grupo{GRUPO}_Memoria.html"
+OUT_PDF = DIST / "P3_MichaelTelleria_Memoria.pdf"
+OUT_HTML = DIST / "P3_MichaelTelleria_Memoria.html"
 
 STATUS_GLYPHS = {
     "✅": '<span class="st st-ok">✔</span>',

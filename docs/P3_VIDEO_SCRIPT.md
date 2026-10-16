@@ -1,6 +1,9 @@
 # docs/P3_VIDEO_SCRIPT.md — Guion del vídeo P3
 
 > Duración prevista: **17:40**, en los 7 bloques de `data/fuentes/estructura_video.md`.
+> **Vídeo grabado: unos 20 minutos** (enlace en la portada de la memoria). Los minutos de cada
+> requisito están en la matriz (memoria, apartado 9, y `P3_MATRIZ.md`); RF-11, RF-14, RF-15 y
+> RF-18 no aparecen en el vídeo (por tiempo).
 > Hoja de una página: `docs/P3_HOJA_GRABACION.md`. Comandos numerados:
 > `~/.rosetta/grabacion/comandos.txt` (fuera del repo, junto con el PDF ficticio, el diff del
 > Gate y el TOKEN). Caso ficticio: TechServ S.L. Tiempos medidos en el ensayo automático del
